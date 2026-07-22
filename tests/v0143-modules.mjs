@@ -98,6 +98,10 @@ assert.doesNotMatch(index, /src\/v0142-rc3\.js/);
 assert.match(index, /0\.14\.3 TEST\.1/);
 assert.equal(readText('VERSION').trim(), '0.14.3-test.1');
 
+const workflow = readText('.github/workflows/v0142-stability.yml');
+const pullRequestTrigger = workflow.split('pull_request:')[1]?.split('workflow_dispatch:')[0] || '';
+assert.match(pullRequestTrigger, /-\s+main\b/, 'release PRs to main must run TEST.1 checks');
+
 for (const name of ['save','load','autoSave']) assert.equal(typeof context[name], 'function', `${name} global must remain available`);
 assert.equal(context.KorytoTest143.runReleaseCheck().ok, true);
 
