@@ -13,6 +13,15 @@
     "items","commitments","news","log","pendingEvents","surprisePlan","electionBreakdown","planHistory",
     "worldActions","echoes","echoHistory","lastApproaches"
   ];
+  const OBJECT_ENTRY_MAPS = [
+    "party","quests","voters","pendingMeta","factionPlans","companionStories","conflictStates","companionAmbitions"
+  ];
+  const OBJECT_ARRAY_KEYS = [
+    "commitments","news","electionBreakdown","planHistory","worldActions","echoes","echoHistory"
+  ];
+  const NUMBER_MAP_KEYS = [
+    "factions","cooldowns","genericUses","relationships","factionActionCooldowns","approachHeat","partyFatigue"
+  ];
   const STAT_DEFAULTS = {support:14, trust:50, funds:12, heat:0, influence:10, integrity:55, leverage:0};
   let cachedDefaults = null;
 
@@ -135,14 +144,41 @@
     if (!isObject(target)) return ["Chybí herní stav."];
     for (const key of OBJECT_KEYS) if (!isObject(target[key])) issues.push(`${key} není objekt`);
     for (const key of ARRAY_KEYS) if (!Array.isArray(target[key])) issues.push(`${key} není pole`);
+
+    for (const key of OBJECT_ENTRY_MAPS) {
+      if (!isObject(target[key])) continue;
+      for (const [entryKey, value] of Object.entries(target[key])) {
+        if (!isObject(value)) issues.push(`${key}.${entryKey} není objekt`);
+      }
+    }
+    for (const key of ARRAY_KEYS) {
+      if (!Array.isArray(target[key])) continue;
+      target[key].forEach((value, index) => {
+        if (value === null || value === undefined) issues.push(`${key}[${index}] je prázdná položka`);
+      });
+    }
+    for (const key of OBJECT_ARRAY_KEYS) {
+      if (!Array.isArray(target[key])) continue;
+      target[key].forEach((value, index) => {
+        if (!isObject(value)) issues.push(`${key}[${index}] není objekt`);
+      });
+    }
+    for (const key of NUMBER_MAP_KEYS) {
+      if (!isObject(target[key])) continue;
+      for (const [entryKey, value] of Object.entries(target[key])) {
+        if (!Number.isFinite(Number(value))) issues.push(`${key}.${entryKey} není číslo`);
+      }
+    }
+
     if (!Number.isInteger(target.day) || target.day < 1 || target.day > 14) issues.push("neplatný den");
     if (!Number.isInteger(target.actions) || target.actions < 0) issues.push("neplatné akce");
     if (Object.values(target.stats || {}).some(value => !Number.isFinite(Number(value)))) issues.push("NaN ve statistikách");
-    return issues;
+    return [...new Set(issues)];
   }
 
   globalThis.KorytoState = {
     VERSION, SAVE_VERSION, STATE_FLAG, OBJECT_KEYS:[...OBJECT_KEYS], ARRAY_KEYS:[...ARRAY_KEYS],
+    OBJECT_ENTRY_MAPS:[...OBJECT_ENTRY_MAPS], OBJECT_ARRAY_KEYS:[...OBJECT_ARRAY_KEYS], NUMBER_MAP_KEYS:[...NUMBER_MAP_KEYS],
     clone, merge, initializedDefaults, normalizeCollections, replace, reset, validate,
     get current() { return state; },
     get base() { return initializedDefaults(); }
