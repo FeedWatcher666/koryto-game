@@ -1,7 +1,7 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.3 TEST.1";
-  const SAVE_VERSION = "0.14.3-test.1";
+  const VERSION = "0.14.3 TEST.2";
+  const SAVE_VERSION = "0.14.3-test.2";
   const STATE_FLAG = "v0143StateModule";
   const OBJECT_KEYS = [
     "hero","stats","factions","party","flags","quests","cooldowns","genericUses","voters",
