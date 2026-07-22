@@ -1,0 +1,13 @@
+import { loadGameContext } from './helpers.mjs';
+const ctx = loadGameContext();
+ctx.setState(ctx.deep(ctx.baseState));
+const state = ctx.getState();
+state.version = '0.13';
+delete state.rivalOperation; delete state.ui; delete state.companionAmbitions;
+ctx.normalizeState();
+const migrated = ctx.getState();
+if (migrated.version !== '0.14') throw new Error('Save version did not migrate to 0.14');
+if (!migrated.ui || migrated.ui.pixelMap !== true) throw new Error('Missing migrated pixel map flag');
+if (!migrated.rivalOperation) throw new Error('Missing migrated rival operation');
+if (!migrated.companionAmbitions || !Object.keys(migrated.companionAmbitions).length) throw new Error('Missing migrated companion ambitions');
+console.log('save migration ok');

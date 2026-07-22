@@ -1,0 +1,1 @@
+{"scripts":{"test":"node tests/content-integrity.mjs && node tests/save-migration.mjs && node tests/smoke.mjs && node tests/simulation.mjs"},"devDependencies":{}}

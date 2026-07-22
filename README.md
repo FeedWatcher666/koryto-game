@@ -4,7 +4,7 @@ Satirické české politické RPG, ve kterém hráč začíná v Dolních Vejprn
 
 ## Aktuální stabilní verze
 
-**v0.14 – Živý politický svět**
+**v0.14.1 – Modulární technický refaktor**
 
 Hlavní systémy:
 
@@ -37,9 +37,7 @@ koryto-game/
 
 ## Nejbližší technický krok
 
-Větev `codex/v0.14.1-modular-refactor` je určena pro bezpečné rozdělení současného jednosouborového HTML do modulů bez změny herního chování.
-
-Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
+První technický refaktor oddělil HTML shell, CSS a JavaScript do statických souborů bez záměrné změny herního chování. Kontroly lze spustit příkazem `npm test`.
 
 ## Spuštění
 
