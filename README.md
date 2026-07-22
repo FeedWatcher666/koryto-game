@@ -18,9 +18,9 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Kandidát na vydání v0.14.2 RC3
+## Testovací kandidát v0.14.3 TEST.1
 
-RC3 opravuje ukládání verze kandidáta na vydání do ručních i automatických pozic. Současně zachovává obnovu poškozeného stavu, stabilní rozhraní a regresní průchody čisté i korupční kampaně. Build zůstává oddělený od stabilní verze v `main`.
+TEST.1 odděluje kanonický herní stav a ukládání do modulů `src/state.js` a `src/save-system.js` bez změny herních mechanik. Zachovává kompatibilitu savů od v0.13, map-only ruční ukládání i autosave a umí přeskočit poškozenou novější pozici ve prospěch použitelného autosavu nebo staršího kompatibilního savu. Build zůstává oddělený od stabilní verze v `main`.
 
 ## Struktura repozitáře
 
@@ -41,7 +41,7 @@ koryto-game/
 
 ## Nejbližší technický krok
 
-Větev `codex/v0.14.1-modular-refactor` je určena pro bezpečné rozdělení současného jednosouborového HTML do modulů bez změny herního chování.
+Větev `test/v0.14.3-modules` ověřuje první bezpečné oddělení stavu a save systému. Další doménové moduly se mají vytahovat až po přijetí tohoto charakterizačního kroku a bez změny hratelnosti.
 
 Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
 
