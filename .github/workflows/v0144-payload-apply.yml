@@ -22,61 +22,54 @@ jobs:
           fetch-depth: 0
           ref: test/v0.14.4-test10
 
-      - name: Diagnose payload transport
-        shell: bash
-        run: |
-          set -u
-          {
-            echo "uploaded parts:"
-            wc -c .bootstrap/v0144/part-*
-            echo "part hashes:"
-            sha256sum .bootstrap/v0144/part-*
-          } > .bootstrap/v0144/diagnostic.txt
-          cat .bootstrap/v0144/part-* > /tmp/v0144-payload.b64
-          echo "combined base64:" >> .bootstrap/v0144/diagnostic.txt
-          wc -c /tmp/v0144-payload.b64 >> .bootstrap/v0144/diagnostic.txt
-          sha256sum /tmp/v0144-payload.b64 >> .bootstrap/v0144/diagnostic.txt
-          if base64 -d /tmp/v0144-payload.b64 > /tmp/v0144-payload.tar.xz; then
-            echo "base64=ok" >> .bootstrap/v0144/diagnostic.txt
-          else
-            echo "base64=failed" >> .bootstrap/v0144/diagnostic.txt
-          fi
-          echo "decoded archive:" >> .bootstrap/v0144/diagnostic.txt
-          wc -c /tmp/v0144-payload.tar.xz >> .bootstrap/v0144/diagnostic.txt
-          sha256sum /tmp/v0144-payload.tar.xz >> .bootstrap/v0144/diagnostic.txt
-          if xz -t /tmp/v0144-payload.tar.xz; then
-            echo "xz=ok" >> .bootstrap/v0144/diagnostic.txt
-            echo "PAYLOAD_VALID=1" >> "$GITHUB_ENV"
-          else
-            echo "xz=failed" >> .bootstrap/v0144/diagnostic.txt
-            echo "PAYLOAD_VALID=0" >> "$GITHUB_ENV"
-          fi
-
-      - name: Apply and test valid payload
-        if: env.PAYLOAD_VALID == '1'
+      - name: Reconstruct and verify payload
         shell: bash
         run: |
           set -euo pipefail
-          tar -xJf /tmp/v0144-payload.tar.xz -C .
-          rm -rf .bootstrap/v0144
-          rm -f .github/workflows/v0144-bootstrap.yml
-          npm test
+          cat .bootstrap/v0144/part-* > /tmp/v0144-payload.b64
+          base64 -d /tmp/v0144-payload.b64 > /tmp/v0144-payload.tar.xz
+          xz -t /tmp/v0144-payload.tar.xz
+          echo "PAYLOAD_VALID=1" >> "$GITHUB_ENV"
 
-      - name: Commit payload or diagnostics
+      - name: Apply and test payload
+        if: env.PAYLOAD_VALID == '1'
+        shell: bash
+        run: |
+          set +e
+          tar -xJf /tmp/v0144-payload.tar.xz -C .
+          npm test 2>&1 | tee /tmp/v0144-test-output.txt
+          status=${PIPESTATUS[0]}
+          if [ "$status" -eq 0 ]; then
+            echo "TEST_OK=1" >> "$GITHUB_ENV"
+          else
+            echo "TEST_OK=0" >> "$GITHUB_ENV"
+          fi
+          exit 0
+
+      - name: Commit tested payload or test diagnostics
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if [ "$PAYLOAD_VALID" = "1" ]; then
+          if [ "${TEST_OK:-0}" = "1" ]; then
+            cp .github/workflows/v0142-stability.yml /tmp/v0144-stability.yml
+            git checkout HEAD -- .github/workflows/v0142-stability.yml
+            rm -rf .bootstrap/v0144
+            rm -f .github/workflows/v0144-bootstrap.yml
+            git add -A
             git commit -m "v0.14.4 TEST.10: physical monolith extraction"
           else
-            git commit -m "diagnose v0.14.4 payload transport"
+            git reset --hard HEAD
+            git clean -fd
+            mkdir -p .bootstrap/v0144
+            cp /tmp/v0144-test-output.txt .bootstrap/v0144/test-output.txt
+            git add .bootstrap/v0144/test-output.txt
+            git commit -m "capture v0.14.4 full test failure"
           fi
           git push origin HEAD:test/v0.14.4-test10
 
-      - name: Reject invalid payload
-        if: env.PAYLOAD_VALID != '1'
+      - name: Reject failed tests
+        if: env.TEST_OK != '1'
         run: exit 1
