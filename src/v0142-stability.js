@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.2 TEST.8";
+  const VERSION = "0.14.2 TEST.9";
   const STATE_MARKER = "v0142StableVersion";
   const VALID_PROMISES = new Set(["school", "fees", "meadow"]);
   const VALID_PROMISE_STATUS = new Set(["active", "fulfilled", "broken"]);
@@ -62,8 +62,11 @@
       if (target.flags[key] !== undefined && !VALID_ENDORSEMENTS.has(target.flags[key])) delete target.flags[key];
     }
 
-    for (const key of ["v0142BriefingDay", "v0142MediaDay"]) {
+    for (const key of ["v0142BriefingDay", "v0142MediaDay", "v0142StrategyUsedDay"]) {
       if (target.flags[key] !== undefined) target.flags[key] = safeClamp(target.flags[key], 1, 13, target.day || 1);
+    }
+    if (target.flags.v0142StrategyUsedLabel !== undefined) {
+      target.flags.v0142StrategyUsedLabel = String(target.flags.v0142StrategyUsedLabel || "Strategická akce").slice(0,80);
     }
 
     normalizePromise(target);
@@ -92,11 +95,14 @@
     target.actions = safeClamp(target.actions, 0, 99, 0);
     target.party = target.party && typeof target.party === "object" ? target.party : {};
     target.worldChanges = target.worldChanges && typeof target.worldChanges === "object" ? target.worldChanges : {};
+    target.ui = target.ui && typeof target.ui === "object" ? target.ui : {};
+    target.ui.v0142CompactMenus = true;
     normalizeStats(target);
     normalizeFeatureFlags(target);
     normalizeVoters(target);
     normalizeCommitments(target);
     if (globalThis.KorytoCounterCampaign?.normalizeCampaignState) globalThis.KorytoCounterCampaign.normalizeCampaignState(target);
+    if (globalThis.KorytoTest9?.normalizeUiState) globalThis.KorytoTest9.normalizeUiState(target);
     return target;
   }
 
@@ -115,6 +121,7 @@
     }
     const counter = target.flags?.v0142CounterCampaign;
     if (counter && typeof counter !== "object") issues.push("neplatná protikampaň");
+    if (target.ui?.v0142CompactMenus !== true) issues.push("kompaktní menu není aktivní");
     return issues;
   }
 
@@ -161,17 +168,17 @@
   }
 
   function updateVersionLabels() {
-    document.title = `Koryto ${VERSION} – Věčného protikampaň`;
+    document.title = `Koryto ${VERSION} – vyvážený volební štáb`;
     const brand = document.querySelector?.(".brand h1 span");
     if (brand) brand.textContent = `Dolní Vejprnice ${VERSION}`;
     const description = document.querySelector?.('meta[name="description"]');
-    if (description) description.content = `Koryto ${VERSION}: stabilizovaná verze s dvoufázovou Věčného protikampaní a místy zásahu.`;
+    if (description) description.content = `Koryto ${VERSION}: kompaktní menu volebního štábu, jeden strategický tah denně a vyvážené odměny.`;
     const footer = document.querySelector?.(".footer-note");
     if (footer && !footer.dataset.stabilityLabel) {
       footer.dataset.stabilityLabel = "1";
       footer.textContent += ` · ${VERSION}`;
-    } else if (footer && /0\.14\.2 TEST\.[4-7]/.test(footer.textContent || "")) {
-      footer.textContent = footer.textContent.replace(/0\.14\.2 TEST\.[4-7]/g,VERSION);
+    } else if (footer && /0\.14\.2 TEST\.[4-8]/.test(footer.textContent || "")) {
+      footer.textContent = footer.textContent.replace(/0\.14\.2 TEST\.[4-8]/g,VERSION);
     }
   }
 
@@ -180,7 +187,7 @@
     const nodes = [root, ...root.querySelectorAll("*")];
     for (const node of nodes) {
       if (node.children?.length || typeof node.textContent !== "string") continue;
-      if (/0\.14\.2 TEST\.[4-7]/.test(node.textContent)) node.textContent = node.textContent.replace(/0\.14\.2 TEST\.[4-7]/g, VERSION);
+      if (/0\.14\.2 TEST\.[4-8]/.test(node.textContent)) node.textContent = node.textContent.replace(/0\.14\.2 TEST\.[4-8]/g, VERSION);
     }
   }
 
@@ -231,7 +238,7 @@
   updateVersionLabels();
   installButtonGuards();
   healthTick();
-  if (typeof setInterval === "function") setInterval(healthTick,750);
+  if (typeof setInterval === "function") setInterval(healthTick,500);
 
   if (typeof MutationObserver === "function" && document.body) {
     const observer = new MutationObserver(() => rewriteLegacyVersionText());
