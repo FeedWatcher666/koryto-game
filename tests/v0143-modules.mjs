@@ -162,6 +162,24 @@ loaded = context.KorytoSaveSystem.loadGame();
 assert.equal(loaded.hero.name, 'Autosave po budoucím schématu', 'unsupported future schema must be skipped safely');
 
 context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', {...saveFixture('Poškozená družina', 11), party:{marie:null}});
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po poškozené družině', 11));
+const nestedPartyFallback = context.KorytoSaveSystem.readLoadable();
+assert.equal(nestedPartyFallback.invalid[0].error, 'validation');
+assert.match(nestedPartyFallback.invalid[0].issues.join(' '), /party\.marie/);
+assert.doesNotThrow(() => { loaded = context.KorytoSaveSystem.loadGame(); });
+assert.equal(loaded.hero.name, 'Autosave po poškozené družině', 'nested-corrupt party entry must fall back before render');
+
+context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', {...saveFixture('Poškozené zprávy', 12), news:[null]});
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po poškozených zprávách', 12));
+const nestedNewsFallback = context.KorytoSaveSystem.readLoadable();
+assert.equal(nestedNewsFallback.invalid[0].error, 'validation');
+assert.match(nestedNewsFallback.invalid[0].issues.join(' '), /news\[0\]/);
+assert.doesNotThrow(() => { loaded = context.KorytoSaveSystem.loadGame(); });
+assert.equal(loaded.hero.name, 'Autosave po poškozených zprávách', 'nested-corrupt news entry must fall back before render');
+
+context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', '{broken');
 context.setStoredSaveForTest('koryto_v014_auto', '[broken');
 context.setStoredSaveForTest('koryto_v013', saveFixture('Záchranný legacy save', 7));
