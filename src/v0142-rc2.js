@@ -1,11 +1,12 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.2 RC1";
-  const SAVE_VERSION = "0.14.2-rc1";
+  const VERSION = "0.14.2 RC2";
+  const SAVE_VERSION = "0.14.2-rc2";
   const RELEASE_FLAG = "v0142ReleaseCandidate";
   const VALID_PHASES = new Set(["map", "location", "event", "debate", "finale", "coalition"]);
   const STRATEGY_IDS = ["briefingBtn", "mediaBtn", "pollBtn", "promiseBtn", "endorsementBtn"];
   let lastReport = null;
+  let autoSaveGuardInstalled = false;
 
   const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 
@@ -107,7 +108,9 @@
     const nodes = [root, ...root.querySelectorAll("*")];
     for (const node of nodes) {
       if (node.children?.length || typeof node.textContent !== "string") continue;
-      const next = node.textContent.replace(/0\.14\.2 TEST\.\d+/g, VERSION).replace(/0\.14\.2-test\.\d+/g, SAVE_VERSION);
+      const next = node.textContent
+        .replace(/0\.14\.2 (?:TEST\.\d+|RC\d+)/g, VERSION)
+        .replace(/0\.14\.2-(?:test\.\d+|rc\d+)/gi, SAVE_VERSION);
       if (next !== node.textContent) node.textContent = next;
     }
   }
@@ -120,11 +123,11 @@
     const brandText = `Dolní Vejprnice ${VERSION}`;
     if (brand && brand.textContent !== brandText) brand.textContent = brandText;
     const description = document.querySelector?.('meta[name="description"]');
-    const descriptionText = `Koryto ${VERSION}: kandidát na vydání s ověřenou kampaní, migrací uložených her a stabilním rozhraním.`;
+    const descriptionText = `Koryto ${VERSION}: kandidát na vydání s opraveným ukládáním, migrací uložených her a stabilním rozhraním.`;
     if (description && description.content !== descriptionText) description.content = descriptionText;
     const footer = document.querySelector?.(".footer-note");
     if (footer) {
-      const clean = String(footer.textContent || "").replace(/ · 0\.14\.2 (?:TEST\.\d+|RC1)$/u, "");
+      const clean = String(footer.textContent || "").replace(/ · 0\.14\.2 (?:TEST\.\d+|RC\d+)$/u, "");
       const next = `${clean} · ${VERSION}`;
       if (footer.textContent !== next) footer.textContent = next;
     }
@@ -133,15 +136,34 @@
 
   function wrapControl(id, before, after) {
     const button = document.getElementById?.(id);
-    if (!button || button.dataset?.rc1Wrapped === "1" || typeof button.onclick !== "function") return;
+    if (!button || button.dataset?.rc2Wrapped === "1" || typeof button.onclick !== "function") return;
     const original = button.onclick;
-    button.onclick = function rc1Control(event) {
+    button.onclick = function rc2Control(event) {
       before?.();
       const result = original.call(this, event);
       after?.();
       return result;
     };
-    if (button.dataset) button.dataset.rc1Wrapped = "1";
+    if (button.dataset) button.dataset.rc2Wrapped = "1";
+  }
+
+  function persistReleaseSave(key = "koryto_v014") {
+    normalizeReleaseState();
+    const raw = JSON.stringify(state);
+    try { localStorage.setItem(key, raw); }
+    catch (_) { if (typeof memorySave !== "undefined") memorySave = raw; }
+    return raw;
+  }
+
+  function installAutoSaveGuard() {
+    if (autoSaveGuardInstalled || typeof autoSave !== "function") return;
+    const originalAutoSave = autoSave;
+    autoSave = function rc2AutoSave() {
+      const result = originalAutoSave();
+      if (state?.phase === "map" && !state?.ended) persistReleaseSave("koryto_v014_auto");
+      return result;
+    };
+    autoSaveGuardInstalled = true;
   }
 
   function exportChronicle() {
@@ -153,14 +175,16 @@
     const anchor = document.createElement?.("a");
     if (!anchor) return text;
     anchor.href = URL.createObjectURL(blob);
-    anchor.download = "koryto_0.14.2_rc1_kronika.txt";
+    anchor.download = "koryto_0.14.2_rc2_kronika.txt";
     anchor.click?.();
     URL.revokeObjectURL?.(anchor.href);
     return text;
   }
 
   function installControlGuards() {
-    wrapControl("saveBtn", () => normalizeReleaseState());
+    installAutoSaveGuard();
+    wrapControl("confirmBtn", null, () => normalizeReleaseState());
+    wrapControl("saveBtn", null, () => persistReleaseSave("koryto_v014"));
     wrapControl("loadBtn", null, () => {
       normalizeReleaseState();
       closeStaleOverlays();
@@ -168,9 +192,9 @@
       else if (typeof renderAll === "function") renderAll();
     });
     const exportButton = document.getElementById?.("exportBtn");
-    if (exportButton && exportButton.dataset?.rc1Export !== "1") {
+    if (exportButton && exportButton.dataset?.rc2Export !== "1") {
       exportButton.onclick = exportChronicle;
-      exportButton.dataset.rc1Export = "1";
+      exportButton.dataset.rc2Export = "1";
     }
   }
 
@@ -195,19 +219,22 @@
     installControlGuards();
     repairStrategyButtons();
     canonicalVersion();
-    if (!report.ok && !state.flags.v0142Rc1Warning) {
-      state.flags.v0142Rc1Warning = true;
-      console.warn("Koryto RC1 release check", report);
+    if (!report.ok && !state.flags.v0142Rc2Warning) {
+      state.flags.v0142Rc2Warning = true;
+      console.warn("Koryto RC2 release check", report);
     }
   }
 
-  globalThis.KorytoRC1 = {
+  const api = {
     VERSION, SAVE_VERSION, VALID_PHASES:[...VALID_PHASES],
     normalizeReleaseState, validateReleaseState, runReleaseCheck,
     repairStrategyButtons, nativeStrategyEnabled, closeStaleOverlays,
-    rewriteLegacyLabels, canonicalVersion, installControlGuards, exportChronicle,
+    rewriteLegacyLabels, canonicalVersion, installControlGuards,
+    installAutoSaveGuard, persistReleaseSave, exportChronicle,
     get report() { return lastReport; }
   };
+  globalThis.KorytoRC2 = api;
+  globalThis.KorytoReleaseCandidate = api;
 
   canonicalVersion();
   tick();

@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "test": "node --check src/app.js && node --check src/v0142.js && node --check src/v0142c.js && node --check src/v0142d.js && node --check src/v0142-stability.js && node --check src/v0142-countercampaign.js && node --check src/v0142-ui-balance.js && node --check src/v0142-clarity.js && node --check src/v0142-rc1.js && node tests/content-integrity.mjs && node tests/save-migration.mjs && node tests/smoke.mjs && node tests/simulation.mjs && node tests/v0142-stability.mjs && node tests/v0142-countercampaign.mjs && node tests/v0142-ui-balance.mjs && node tests/v0142-clarity.mjs && node tests/v0142-rc1.mjs"
+    "test": "node --check src/app.js && node --check src/v0142.js && node --check src/v0142c.js && node --check src/v0142d.js && node --check src/v0142-stability.js && node --check src/v0142-countercampaign.js && node --check src/v0142-ui-balance.js && node --check src/v0142-clarity.js && node --check src/v0142-rc2.js && node tests/content-integrity.mjs && node tests/save-migration.mjs && node tests/smoke.mjs && node tests/simulation.mjs && node tests/v0142-stability.mjs && node tests/v0142-countercampaign.mjs && node tests/v0142-ui-balance.mjs && node tests/v0142-clarity.mjs && node tests/v0142-rc2.mjs"
   }
 }
