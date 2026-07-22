@@ -17,22 +17,409 @@ node:internal/modules/run_main:123
     triggerUncaughtException(
     ^
 
-AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-+ actual - expected
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /100dvh/. Input:
 
-+ '0.14.4 TEST.10'
-- '0.14.5 TEST.10'
-        ^
+'"use strict";\n' +
+  '(() => {\n' +
+  '  const VERSION = "0.14.5 TEST.10";\n' +
+  '  const BUILD_VERSION = "0.14.5-test.10";\n' +
+  '  const SAVE_VERSION = "0.14.3-test.2";\n' +
+  '  const SAVE_SCHEMA = 1;\n' +
+  '  const RELEASE_FLAG = "v0145PlayabilityComplete";\n' +
+  '\n' +
+  '  const coachSteps = [\n' +
+  '    {\n' +
+  '      icon: "🎯",\n' +
+  '      title: "Vyhrajte třináctidenní kampaň",\n' +
+  '      text: "Každý den máte dvě akce. Řešte hořící kauzy, budujte podporu a nenechte Věčného ovládnout obec, zatímco čtete třetí odstavec tiskové zprávy.",\n' +
+  '      action: "Nejdřív otevřete zvýrazněnou lokaci s hlavním questem."\n' +
+  '    },\n' +
+  '    {\n' +
+  '      icon: "🗺️",\n' +
+  '      title: "Mapa je váš denní plán",\n' +
+  '      text: "Červené lokace mají termín nebo hrozbu. Zlatá značka ukazuje doporučenou prioritu. Číslo v rohu říká, kolik konkrétních událostí tam čeká.",\n' +
+  '      action: "Jedna návštěva a rozhodnutí obvykle spotřebují jednu akci."\n' +
+  '    },\n' +
+  '    {\n' +
+  '      icon: "🎲",\n' +
+  '      title: "Rozhodnutí mají čitelnou cenu",\n' +
+  '      text: "U každé volby vidíte šanci čistého úspěchu, úspěchu za cenu a komplikace. Drahá či špinavá cesta může být rychlá, ale vrátí se ve volbách, vztazích nebo koalici.",\n' +
+  '      action: "Sledujte nejen bonus k hodu, ale také tagy, peníze, integritu a politický dluh."\n' +
+  '    },\n' +
+  '    {\n' +
+  '      icon: "🌙",\n' +
+  '      title: "Obec jedná i bez vás",\n' +
+  '      text: "Na konci dne táhnou frakce, soupeř a členové štábu. Ranní briefing shrne, co se změnilo, co hoří a kam má smysl jít.",\n' +
+  '      action: "Ukončit den dříve lze, ale Věčný získá prostor za každou nevyužitou akci."\n' +
+  '    }\n' +
+  '  ];\n' +
+  '\n' +
+  '  const classFocus = {\n' +
+  '    bard: { difficulty: "snadný start", focus: "veřejné tahy a nálada", risk: "nižší důvěra při přehánění" },\n' +
+  '    rogue: { difficulty: "agresivní", focus: "kompromat, peníze a zákulisí", risk: "rychlá korytizace" },\n' +
+  '    paladin: { difficulty: "stabilní", focus: "důvěra, pravidla a občané", risk: "méně peněz a vlivu" },\n' +
+  '    mage: { difficulty: "taktický", focus: "právo, smlouvy a audit", risk: "slabší veřejné projevy" },\n' +
+  '    technocrat: { difficulty: "analytický", focus: "odborné hody a plánování", risk: "málo charismatu" },\n' +
+  '    necro: { difficulty: "mocenský", focus: "aparát a staré struktury", risk: "vysoký mediální účet" }\n' +
+  '  };\n' +
+  '\n' +
+  '  const intentCounters = {\n' +
+  '    emptyPromise: { counter: "Tabulka bez emocí", why: "Rozpočet a konkrétní čísla lámou jednoduchý slib." },\n' +
+  '    emotional: { counter: "Pustit ke slovu občany", why: "Osobní svědectví vezme Věčnému monopol na emoce." },\n' +
+  '    reverseFacts: { counter: "Odhal kompromat", why: "Dokument ukončí spor o to, která realita platí." },\n' +
+  '    procedural: { counter: "Koaliční klička", why: "Přesuňte debatu z procedury k jeho povolební izolaci." },\n' +
+  '    attack: { counter: "Změnit téma vtipem", why: "Lehký tah sníží tlak a nekrmí osobní útok." }\n' +
+  '  };\n' +
+  '\n' +
+  '  const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;\n' +
+  `  const esc = value => String(value ?? "").replace(/[&<>\\"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;","'":"&#039;"})[char]);\n` +
+  '  const metricLabels = {support:"Podpora",trust:"Důvěra",funds:"Peníze",heat:"Mediální tlak",influence:"Vliv",integrity:"Integrita",leverage:"Kompromat",debt:"Politický dluh"};\n' +
+  '\n' +
+  '  function companionTone(loyalty) {\n' +
+  '    const value = finite(loyalty, 50);\n' +
+  '    if (value < 25) return { label: "na hraně odchodu", className: "critical" };\n' +
+  '    if (value < 42) return { label: "pochybuje", className: "warning" };\n' +
+  '    if (value > 72) return { label: "pevný spojenec", className: "good" };\n' +
+  '    return { label: "spolupracuje", className: "neutral" };\n' +
+  '  }\n' +
+  '\n' +
+  '  function questKind(id) {\n' +
+  '    if (/Personal$/u.test(id) || /^agenda/u.test(id) || /^conflict/u.test(id)) return "personal";\n' +
+  '    if (["register","diesel","roof","meadow","paper","oldfiles","debate","program"].includes(id)) return "main";\n' +
+  '    return "opportunity";\n' +
+  '  }\n' +
+  '\n' +
+  '  function classifyQuest(id, questState, target, deps = {}) {\n' +
+  '    const defs = deps.questDefs || globalThis.KorytoQuestData?.definitions || {};\n' +
+  '    const definition = defs[id] || { title:id, desc:"", location:"hq", failure:"Neřešený problém posílí soupeře." };\n' +
+  '    const deadlineFn = deps.questDeadline || (questId => finite(definition.deadline, 14) + finite(questState?.deadlineBonus, 0));\n' +
+  '    const deadline = finite(deadlineFn(id), 14);\n' +
+  '    const day = finite(target?.day, 1);\n' +
+  '    const left = deadline - day;\n' +
+  '    return {\n' +
+  '      id,\n' +
+  '      kind: questKind(id),\n' +
+  '      title: definition.title,\n' +
+  '      desc: definition.desc,\n' +
+  '      location: definition.location,\n' +
+  '      failure: definition.failure,\n' +
+  '      deadline,\n' +
+  '      left,\n' +
+  '      pressure: left <= 1 ? "kritické" : left <= 3 ? "naléhavé" : "aktivní"\n' +
+  '    };\n' +
+  '  }\n' +
+  '\n' +
+  '  function prioritySnapshot(target, deps = {}) {\n' +
+  '    if (!target || typeof target !== "object") return { urgent:[], recommended:null, faction:null, companion:null };\n' +
+  '    const questStates = target.quests && typeof target.quests === "object" ? target.quests : {};\n' +
+  '    const active = Object.entries(questStates)\n' +
+  '      .filter(([,q]) => q?.status === "active")\n' +
+  '      .map(([id,q]) => classifyQuest(id,q,target,deps))\n' +
+  '      .sort((a,b) => a.left - b.left || a.title.localeCompare(b.title,"cs"));\n' +
+  '    const urgent = active.filter(item => item.left <= 3);\n' +
+  '\n' +
+  '    const planDefs = deps.factionPlanDefs || globalThis.KorytoFactionData?.factionPlanDefs || {};\n' +
+  '    const factionEntries = Object.entries(target.factionPlans || {}).map(([id,plan]) => ({\n' +
+  '      id,\n' +
+  '      name: planDefs[id]?.name || id,\n' +
+  '      icon: planDefs[id]?.icon || "⚠️",\n' +
+  '      location: planDefs[id]?.location || "townhall",\n' +
+  '      progress: finite(plan?.progress, 0)\n' +
+  '    })).sort((a,b) => b.progress - a.progress);\n' +
+  '    const faction = factionEntries[0] || null;\n' +
+  '\n' +
+  '    const partyDefs = deps.companions || globalThis.KorytoCompanionData?.companions || {};\n' +
+  '    const companions = Object.entries(target.party || {}).map(([id,p]) => {\n' +
+  '      const ambition = target.companionAmbitions?.[id] || {};\n' +
+  '      return {\n' +
+  '        id,\n' +
+  '        name: p?.name || partyDefs[id]?.name || id,\n' +
+  '        icon: p?.icon || partyDefs[id]?.icon || "👤",\n' +
+  '        loyalty: finite(p?.loyalty, 50),\n' +
+  '        tension: finite(ambition.tension, 0),\n' +
+  '        score: (100 - finite(p?.loyalty, 50)) + finite(ambition.tension, 0) * .65\n' +
+  '      };\n' +
+  '    }).sort((a,b) => b.score - a.score);\n' +
+  '    const companion = companions[0] || null;\n' +
+  '\n' +
+  '    let recommended = urgent[0] ? {\n' +
+  '      location: urgent[0].location,\n' +
+  '      icon: "🔥",\n' +
+  '      title: urgent[0].title,\n' +
+  '      reason: `${urgent[0].pressure}; ${Math.max(0,urgent[0].left)} dnů do termínu`\n' +
+  '    } : null;\n' +
+  '    if (!recommended && faction && faction.progress >= 45) recommended = {\n' +
+  '      location: faction.location,\n' +
+  '      icon: faction.icon,\n' +
+  '      title: faction.name,\n' +
+  '      reason: `mocenský plán je na ${Math.round(faction.progress)} %`\n' +
+  '    };\n' +
+  '    if (!recommended && companion && companion.loyalty < 42) recommended = {\n' +
+  '      location: globalThis.KorytoCompanionData?.companionAmbitionDefs?.[companion.id]?.location || "hq",\n' +
+  '      icon: companion.icon,\n' +
+  '      title: companion.name,\n' +
+  '      reason: companionTone(companion.loyalty).label\n' +
+  '    };\n' +
+  '    if (!recommended && active[0]) recommended = {\n' +
+  '      location: active[0].location,\n' +
+  '      icon: "📌",\n' +
+  '      title: active[0].title,\n' +
+  '      reason: "nejbližší známý termín"\n' +
+  '    };\n' +
+  '    return { active, urgent, recommended, faction, companion };\n' +
+  '  }\n' +
+  '\n' +
+  '  function electionAnalysis(target) {\n' +
+  '    const breakdown = Array.isArray(target?.electionBreakdown) ? [...target.electionBreakdown] : [];\n' +
+  '    breakdown.sort((a,b) => finite(b.votes) - finite(a.votes));\n' +
+  '    const strongest = breakdown[0] || null;\n' +
+  '    const weakest = breakdown.filter(row => finite(row.ballots) > 20).sort((a,b) => finite(a.share) - finite(b.share))[0] || null;\n' +
+  '    const promises = target?.promiseSummary || {};\n' +
+  '    const costs = [];\n' +
+  '    if (finite(promises.broken) > 0) costs.push(`${promises.broken} porušených závazků`);\n' +
+  '    if (finite(target?.debt) > 0) costs.push(`dluh ${Math.round(target.debt)}`);\n' +
+  '    if (finite(target?.stats?.heat) > 45) costs.push(`vysoký mediální tlak ${Math.round(target.stats.heat)}`);\n' +
+  '    if (finite(target?.stats?.integrity) < 35) costs.push(`integrita pouze ${Math.round(target.stats.integrity)}`);\n' +
+  '    return { strongest, weakest, costs };\n' +
+  '  }\n' +
+  '\n' +
+  '  function ensureState(target) {\n' +
+  '    if (!target || typeof target !== "object") return target;\n' +
+  '    target.flags = target.flags && typeof target.flags === "object" ? target.flags : {};\n' +
+  '    target.ui = target.ui && typeof target.ui === "object" ? target.ui : {};\n' +
+  '    target.ui.v0145 = target.ui.v0145 && typeof target.ui.v0145 === "object" ? target.ui.v0145 : {};\n' +
+  '    const ui = target.ui.v0145;\n' +
+  '    ui.briefedDay = Math.max(0, Math.floor(finite(ui.briefedDay, 0)));\n' +
+  '    ui.coachStep = Math.max(0, Math.min(coachSteps.length - 1, Math.floor(finite(ui.coachStep, 0))));\n' +
+  '    ui.coachDone = Boolean(ui.coachDone);\n' +
+  '    ui.companionReasons = ui.companionReasons && typeof ui.companionReasons === "object" ? ui.companionReasons : {};\n' +
+  '    ui.dailyDelta = ui.dailyDelta && typeof ui.dailyDelta === "object" ? ui.dailyDelta : null;\n' +
+  '    target.flags[RELEASE_FLAG] = VERSION;\n' +
+  '    return target;\n' +
+  '  }\n' +
+  '\n' +
+  '  function deltaRows(before, after) {\n' +
+  '    const keys = ["support","trust","funds","heat","influence","integrity","leverage"];\n' +
+  '    const rows = keys.map(key => ({ key, label:metricLabels[key], value:Math.round(finite(after?.stats?.[key]) - finite(before?.stats?.[key])) })).filter(row => row.value !== 0);\n' +
+  '    const debt = Math.round(finite(after?.debt) - finite(before?.debt));\n' +
+  '    if (debt) rows.push({key:"debt",label:metricLabels.debt,value:debt});\n' +
+  '    return rows;\n' +
+  '  }\n' +
+  '\n' +
+  '  function contentDefinitions() {\n' +
+  '    if (typeof makeOutcome !== "function") return {};\n' +
+  '    const outcome = (text, effects, tags = [], extra = () => {}) => makeOutcome(text, effects, tags, extra);\n' +
+  '    return {\n' +
+  '      doorstepRumor: {\n' +
+  '        id: "doorstepRumor", location: "pub", title: "Řetězová zpráva od tety z okresu", emoji: "📱", kicker: "NOVÁ UDÁLOST",\n' +
+  '        available: () => state.day >= 2 && !state.flags.done_doorstepRumor,\n' +
+  '        text: () => [\n' +
+  '          "V místní skupině se šíří zpráv'... 40653 more characters
 
-    at file:///home/runner/work/koryto-game/koryto-game/tests/v0143-test10.mjs:9:178
+    at file:///home/runner/work/koryto-game/koryto-game/tests/v0143-test10.mjs:11:190
     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
   generatedMessage: true,
   code: 'ERR_ASSERTION',
-  actual: '0.14.4 TEST.10',
-  expected: '0.14.5 TEST.10',
-  operator: 'strictEqual',
+  actual: '"use strict";\n' +
+    '(() => {\n' +
+    '  const VERSION = "0.14.5 TEST.10";\n' +
+    '  const BUILD_VERSION = "0.14.5-test.10";\n' +
+    '  const SAVE_VERSION = "0.14.3-test.2";\n' +
+    '  const SAVE_SCHEMA = 1;\n' +
+    '  const RELEASE_FLAG = "v0145PlayabilityComplete";\n' +
+    '\n' +
+    '  const coachSteps = [\n' +
+    '    {\n' +
+    '      icon: "🎯",\n' +
+    '      title: "Vyhrajte třináctidenní kampaň",\n' +
+    '      text: "Každý den máte dvě akce. Řešte hořící kauzy, budujte podporu a nenechte Věčného ovládnout obec, zatímco čtete třetí odstavec tiskové zprávy.",\n' +
+    '      action: "Nejdřív otevřete zvýrazněnou lokaci s hlavním questem."\n' +
+    '    },\n' +
+    '    {\n' +
+    '      icon: "🗺️",\n' +
+    '      title: "Mapa je váš denní plán",\n' +
+    '      text: "Červené lokace mají termín nebo hrozbu. Zlatá značka ukazuje doporučenou prioritu. Číslo v rohu říká, kolik konkrétních událostí tam čeká.",\n' +
+    '      action: "Jedna návštěva a rozhodnutí obvykle spotřebují jednu akci."\n' +
+    '    },\n' +
+    '    {\n' +
+    '      icon: "🎲",\n' +
+    '      title: "Rozhodnutí mají čitelnou cenu",\n' +
+    '      text: "U každé volby vidíte šanci čistého úspěchu, úspěchu za cenu a komplikace. Drahá či špinavá cesta může být rychlá, ale vrátí se ve volbách, vztazích nebo koalici.",\n' +
+    '      action: "Sledujte nejen bonus k hodu, ale také tagy, peníze, integritu a politický dluh."\n' +
+    '    },\n' +
+    '    {\n' +
+    '      icon: "🌙",\n' +
+    '      title: "Obec jedná i bez vás",\n' +
+    '      text: "Na konci dne táhnou frakce, soupeř a členové štábu. Ranní briefing shrne, co se změnilo, co hoří a kam má smysl jít.",\n' +
+    '      action: "Ukončit den dříve lze, ale Věčný získá prostor za každou nevyužitou akci."\n' +
+    '    }\n' +
+    '  ];\n' +
+    '\n' +
+    '  const classFocus = {\n' +
+    '    bard: { difficulty: "snadný start", focus: "veřejné tahy a nálada", risk: "nižší důvěra při přehánění" },\n' +
+    '    rogue: { difficulty: "agresivní", focus: "kompromat, peníze a zákulisí", risk: "rychlá korytizace" },\n' +
+    '    paladin: { difficulty: "stabilní", focus: "důvěra, pravidla a občané", risk: "méně peněz a vlivu" },\n' +
+    '    mage: { difficulty: "taktický", focus: "právo, smlouvy a audit", risk: "slabší veřejné projevy" },\n' +
+    '    technocrat: { difficulty: "analytický", focus: "odborné hody a plánování", risk: "málo charismatu" },\n' +
+    '    necro: { difficulty: "mocenský", focus: "aparát a staré struktury", risk: "vysoký mediální účet" }\n' +
+    '  };\n' +
+    '\n' +
+    '  const intentCounters = {\n' +
+    '    emptyPromise: { counter: "Tabulka bez emocí", why: "Rozpočet a konkrétní čísla lámou jednoduchý slib." },\n' +
+    '    emotional: { counter: "Pustit ke slovu občany", why: "Osobní svědectví vezme Věčnému monopol na emoce." },\n' +
+    '    reverseFacts: { counter: "Odhal kompromat", why: "Dokument ukončí spor o to, která realita platí." },\n' +
+    '    procedural: { counter: "Koaliční klička", why: "Přesuňte debatu z procedury k jeho povolební izolaci." },\n' +
+    '    attack: { counter: "Změnit téma vtipem", why: "Lehký tah sníží tlak a nekrmí osobní útok." }\n' +
+    '  };\n' +
+    '\n' +
+    '  const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;\n' +
+    `  const esc = value => String(value ?? "").replace(/[&<>\\"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;","'":"&#039;"})[char]);\n` +
+    '  const metricLabels = {support:"Podpora",trust:"Důvěra",funds:"Peníze",heat:"Mediální tlak",influence:"Vliv",integrity:"Integrita",leverage:"Kompromat",debt:"Politický dluh"};\n' +
+    '\n' +
+    '  function companionTone(loyalty) {\n' +
+    '    const value = finite(loyalty, 50);\n' +
+    '    if (value < 25) return { label: "na hraně odchodu", className: "critical" };\n' +
+    '    if (value < 42) return { label: "pochybuje", className: "warning" };\n' +
+    '    if (value > 72) return { label: "pevný spojenec", className: "good" };\n' +
+    '    return { label: "spolupracuje", className: "neutral" };\n' +
+    '  }\n' +
+    '\n' +
+    '  function questKind(id) {\n' +
+    '    if (/Personal$/u.test(id) || /^agenda/u.test(id) || /^conflict/u.test(id)) return "personal";\n' +
+    '    if (["register","diesel","roof","meadow","paper","oldfiles","debate","program"].includes(id)) return "main";\n' +
+    '    return "opportunity";\n' +
+    '  }\n' +
+    '\n' +
+    '  function classifyQuest(id, questState, target, deps = {}) {\n' +
+    '    const defs = deps.questDefs || globalThis.KorytoQuestData?.definitions || {};\n' +
+    '    const definition = defs[id] || { title:id, desc:"", location:"hq", failure:"Neřešený problém posílí soupeře." };\n' +
+    '    const deadlineFn = deps.questDeadline || (questId => finite(definition.deadline, 14) + finite(questState?.deadlineBonus, 0));\n' +
+    '    const deadline = finite(deadlineFn(id), 14);\n' +
+    '    const day = finite(target?.day, 1);\n' +
+    '    const left = deadline - day;\n' +
+    '    return {\n' +
+    '      id,\n' +
+    '      kind: questKind(id),\n' +
+    '      title: definition.title,\n' +
+    '      desc: definition.desc,\n' +
+    '      location: definition.location,\n' +
+    '      failure: definition.failure,\n' +
+    '      deadline,\n' +
+    '      left,\n' +
+    '      pressure: left <= 1 ? "kritické" : left <= 3 ? "naléhavé" : "aktivní"\n' +
+    '    };\n' +
+    '  }\n' +
+    '\n' +
+    '  function prioritySnapshot(target, deps = {}) {\n' +
+    '    if (!target || typeof target !== "object") return { urgent:[], recommended:null, faction:null, companion:null };\n' +
+    '    const questStates = target.quests && typeof target.quests === "object" ? target.quests : {};\n' +
+    '    const active = Object.entries(questStates)\n' +
+    '      .filter(([,q]) => q?.status === "active")\n' +
+    '      .map(([id,q]) => classifyQuest(id,q,target,deps))\n' +
+    '      .sort((a,b) => a.left - b.left || a.title.localeCompare(b.title,"cs"));\n' +
+    '    const urgent = active.filter(item => item.left <= 3);\n' +
+    '\n' +
+    '    const planDefs = deps.factionPlanDefs || globalThis.KorytoFactionData?.factionPlanDefs || {};\n' +
+    '    const factionEntries = Object.entries(target.factionPlans || {}).map(([id,plan]) => ({\n' +
+    '      id,\n' +
+    '      name: planDefs[id]?.name || id,\n' +
+    '      icon: planDefs[id]?.icon || "⚠️",\n' +
+    '      location: planDefs[id]?.location || "townhall",\n' +
+    '      progress: finite(plan?.progress, 0)\n' +
+    '    })).sort((a,b) => b.progress - a.progress);\n' +
+    '    const faction = factionEntries[0] || null;\n' +
+    '\n' +
+    '    const partyDefs = deps.companions || globalThis.KorytoCompanionData?.companions || {};\n' +
+    '    const companions = Object.entries(target.party || {}).map(([id,p]) => {\n' +
+    '      const ambition = target.companionAmbitions?.[id] || {};\n' +
+    '      return {\n' +
+    '        id,\n' +
+    '        name: p?.name || partyDefs[id]?.name || id,\n' +
+    '        icon: p?.icon || partyDefs[id]?.icon || "👤",\n' +
+    '        loyalty: finite(p?.loyalty, 50),\n' +
+    '        tension: finite(ambition.tension, 0),\n' +
+    '        score: (100 - finite(p?.loyalty, 50)) + finite(ambition.tension, 0) * .65\n' +
+    '      };\n' +
+    '    }).sort((a,b) => b.score - a.score);\n' +
+    '    const companion = companions[0] || null;\n' +
+    '\n' +
+    '    let recommended = urgent[0] ? {\n' +
+    '      location: urgent[0].location,\n' +
+    '      icon: "🔥",\n' +
+    '      title: urgent[0].title,\n' +
+    '      reason: `${urgent[0].pressure}; ${Math.max(0,urgent[0].left)} dnů do termínu`\n' +
+    '    } : null;\n' +
+    '    if (!recommended && faction && faction.progress >= 45) recommended = {\n' +
+    '      location: faction.location,\n' +
+    '      icon: faction.icon,\n' +
+    '      title: faction.name,\n' +
+    '      reason: `mocenský plán je na ${Math.round(faction.progress)} %`\n' +
+    '    };\n' +
+    '    if (!recommended && companion && companion.loyalty < 42) recommended = {\n' +
+    '      location: globalThis.KorytoCompanionData?.companionAmbitionDefs?.[companion.id]?.location || "hq",\n' +
+    '      icon: companion.icon,\n' +
+    '      title: companion.name,\n' +
+    '      reason: companionTone(companion.loyalty).label\n' +
+    '    };\n' +
+    '    if (!recommended && active[0]) recommended = {\n' +
+    '      location: active[0].location,\n' +
+    '      icon: "📌",\n' +
+    '      title: active[0].title,\n' +
+    '      reason: "nejbližší známý termín"\n' +
+    '    };\n' +
+    '    return { active, urgent, recommended, faction, companion };\n' +
+    '  }\n' +
+    '\n' +
+    '  function electionAnalysis(target) {\n' +
+    '    const breakdown = Array.isArray(target?.electionBreakdown) ? [...target.electionBreakdown] : [];\n' +
+    '    breakdown.sort((a,b) => finite(b.votes) - finite(a.votes));\n' +
+    '    const strongest = breakdown[0] || null;\n' +
+    '    const weakest = breakdown.filter(row => finite(row.ballots) > 20).sort((a,b) => finite(a.share) - finite(b.share))[0] || null;\n' +
+    '    const promises = target?.promiseSummary || {};\n' +
+    '    const costs = [];\n' +
+    '    if (finite(promises.broken) > 0) costs.push(`${promises.broken} porušených závazků`);\n' +
+    '    if (finite(target?.debt) > 0) costs.push(`dluh ${Math.round(target.debt)}`);\n' +
+    '    if (finite(target?.stats?.heat) > 45) costs.push(`vysoký mediální tlak ${Math.round(target.stats.heat)}`);\n' +
+    '    if (finite(target?.stats?.integrity) < 35) costs.push(`integrita pouze ${Math.round(target.stats.integrity)}`);\n' +
+    '    return { strongest, weakest, costs };\n' +
+    '  }\n' +
+    '\n' +
+    '  function ensureState(target) {\n' +
+    '    if (!target || typeof target !== "object") return target;\n' +
+    '    target.flags = target.flags && typeof target.flags === "object" ? target.flags : {};\n' +
+    '    target.ui = target.ui && typeof target.ui === "object" ? target.ui : {};\n' +
+    '    target.ui.v0145 = target.ui.v0145 && typeof target.ui.v0145 === "object" ? target.ui.v0145 : {};\n' +
+    '    const ui = target.ui.v0145;\n' +
+    '    ui.briefedDay = Math.max(0, Math.floor(finite(ui.briefedDay, 0)));\n' +
+    '    ui.coachStep = Math.max(0, Math.min(coachSteps.length - 1, Math.floor(finite(ui.coachStep, 0))));\n' +
+    '    ui.coachDone = Boolean(ui.coachDone);\n' +
+    '    ui.companionReasons = ui.companionReasons && typeof ui.companionReasons === "object" ? ui.companionReasons : {};\n' +
+    '    ui.dailyDelta = ui.dailyDelta && typeof ui.dailyDelta === "object" ? ui.dailyDelta : null;\n' +
+    '    target.flags[RELEASE_FLAG] = VERSION;\n' +
+    '    return target;\n' +
+    '  }\n' +
+    '\n' +
+    '  function deltaRows(before, after) {\n' +
+    '    const keys = ["support","trust","funds","heat","influence","integrity","leverage"];\n' +
+    '    const rows = keys.map(key => ({ key, label:metricLabels[key], value:Math.round(finite(after?.stats?.[key]) - finite(before?.stats?.[key])) })).filter(row => row.value !== 0);\n' +
+    '    const debt = Math.round(finite(after?.debt) - finite(before?.debt));\n' +
+    '    if (debt) rows.push({key:"debt",label:metricLabels.debt,value:debt});\n' +
+    '    return rows;\n' +
+    '  }\n' +
+    '\n' +
+    '  function contentDefinitions() {\n' +
+    '    if (typeof makeOutcome !== "function") return {};\n' +
+    '    const outcome = (text, effects, tags = [], extra = () => {}) => makeOutcome(text, effects, tags, extra);\n' +
+    '    return {\n' +
+    '      doorstepRumor: {\n' +
+    '        id: "doorstepRumor", location: "pub", title: "Řetězová zpráva od tety z okresu", emoji: "📱", kicker: "NOVÁ UDÁLOST",\n' +
+    '        available: () => state.day >= 2 && !state.flags.done_doorstepRumor,\n' +
+    '        text: () => [\n' +
+    '          "V místní skupině se šíří zpráv'... 40653 more characters,
+  expected: /100dvh/,
+  operator: 'match',
   diff: 'simple'
 }
 
