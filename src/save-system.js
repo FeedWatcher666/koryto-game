@@ -1,7 +1,9 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.3 TEST.1";
-  const SAVE_VERSION = "0.14.3-test.1";
+  const VERSION = "0.14.3 TEST.2";
+  const SAVE_VERSION = "0.14.3-test.2";
+  const SAVE_FORMAT = "koryto";
+  const SAVE_SCHEMA = 1;
   const MANUAL_KEY = "koryto_v014";
   const AUTO_KEY = "koryto_v014_auto";
   const LEGACY_KEYS = [
@@ -12,6 +14,8 @@
     "koryto_v010", "koryto_v091", "koryto_v09"
   ];
   const CORE_STAT_KEYS = ["support", "trust", "funds", "heat", "influence", "integrity", "leverage"];
+  const KNOWN_PHASES = ["map", "location", "event", "debate", "finale", "coalition"];
+  const KNOWN_VERSION = /^v?0\.(?:0?9|1[0-4])(?:[.\s-].*)?$/i;
 
   const isObject = value => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
@@ -24,7 +28,7 @@
         if (stored) candidates.push({key, raw:stored});
       }
     } catch (_) {}
-    if (memory) candidates.push({key:"memory", raw:memory});
+    if (memory && !candidates.some(candidate => candidate.raw === memory)) candidates.push({key:"memory", raw:memory});
     return candidates;
   }
 
@@ -44,20 +48,35 @@
 
   function hasSaveSignature(value) {
     if (!isObject(value)) return false;
+    if (value.saveFormat !== undefined && value.saveFormat !== SAVE_FORMAT) return false;
+    if (value.saveSchema !== undefined) {
+      const schema = Number(value.saveSchema);
+      if (!Number.isInteger(schema) || schema < 1 || schema > SAVE_SCHEMA) return false;
+    }
+
     const hero = value.hero;
     const stats = value.stats;
     const heroSignal = isObject(hero) && (
-      typeof hero.name === "string" ||
-      typeof hero.classId === "string"
+      String(hero.name || "").trim().length > 0 ||
+      String(hero.classId || "").trim().length > 0
     );
     const statSignal = isObject(stats) && CORE_STAT_KEYS.some(key => {
       const stat = stats[key];
       return stat !== null && stat !== "" && Number.isFinite(Number(stat));
     });
-    const progressSignal = (
-      value.day !== null && value.day !== "" && Number.isFinite(Number(value.day))
-    ) || typeof value.version === "string" || typeof value.phase === "string";
-    return heroSignal && statSignal && progressSignal;
+    const versionSignal = typeof value.version === "string" && KNOWN_VERSION.test(value.version.trim());
+    const daySignal = value.day !== null && value.day !== "" && Number.isFinite(Number(value.day));
+    const phaseSignal = typeof value.phase === "string" && KNOWN_PHASES.includes(value.phase);
+    return heroSignal && statSignal && (versionSignal || daySignal || phaseSignal);
+  }
+
+  function applySaveMetadata(target) {
+    target.flags = target.flags && typeof target.flags === "object" ? target.flags : {};
+    target.flags.v0143SaveSystem = VERSION;
+    target.version = SAVE_VERSION;
+    target.saveFormat = SAVE_FORMAT;
+    target.saveSchema = SAVE_SCHEMA;
+    return target;
   }
 
   function applyExtensionNormalizers(target) {
@@ -77,10 +96,9 @@
       if (typeof normalizeState === "function") normalizeState();
       state = globalThis.KorytoState.normalizeCollections(state, {defaults:globalThis.KorytoState.base});
       applyExtensionNormalizers(state);
-      state.flags = state.flags && typeof state.flags === "object" ? state.flags : {};
-      state.flags.v0143SaveSystem = VERSION;
-      state.version = SAVE_VERSION;
+      applySaveMetadata(state);
       if (globalThis.KorytoTest143?.normalizeReleaseState) state = globalThis.KorytoTest143.normalizeReleaseState(state);
+      applySaveMetadata(state);
       const issues = globalThis.KorytoState.validate(state);
       const prepared = globalThis.KorytoState.clone(state);
       return {
@@ -119,19 +137,18 @@
     if (typeof normalizeState === "function") normalizeState();
     state = globalThis.KorytoState.normalizeCollections(state, {defaults:globalThis.KorytoState.base});
     applyExtensionNormalizers(state);
-    state.flags = state.flags && typeof state.flags === "object" ? state.flags : {};
-    state.flags.v0143SaveSystem = VERSION;
-    state.version = SAVE_VERSION;
+    applySaveMetadata(state);
     if (globalThis.KorytoTest143?.normalizeReleaseState) state = globalThis.KorytoTest143.normalizeReleaseState(state);
+    applySaveMetadata(state);
     return state;
   }
 
   function serialize(target = state) {
     const prepared = target === state ? normalize(state) : globalThis.KorytoState.normalizeCollections(target);
-    prepared.flags = prepared.flags && typeof prepared.flags === "object" ? prepared.flags : {};
-    prepared.flags.v0143SaveSystem = VERSION;
-    prepared.version = SAVE_VERSION;
+    applyExtensionNormalizers(prepared);
+    applySaveMetadata(prepared);
     if (globalThis.KorytoTest143?.normalizeReleaseState) globalThis.KorytoTest143.normalizeReleaseState(prepared);
+    applySaveMetadata(prepared);
     return JSON.stringify(prepared);
   }
 
@@ -144,15 +161,18 @@
       localStorage.setItem(key, raw);
       return true;
     } catch (_) {
-      if (typeof memorySave !== "undefined") memorySave = raw;
-      return true;
+      if (typeof memorySave !== "undefined") {
+        memorySave = raw;
+        return true;
+      }
+      return false;
     }
   }
 
   function write(key = MANUAL_KEY, target = state) {
     if (!canWrite(target)) return {ok:false, reason:"phase"};
     const raw = serialize(target);
-    store(key, raw);
+    if (!store(key, raw)) return {ok:false, reason:"storage"};
     return {ok:true, key, raw, state};
   }
 
@@ -215,14 +235,9 @@
       const raw = serialize(target);
       const parsed = parse(raw);
       if (!parsed.ok) return {ok:false, error:parsed.error};
-      let restored = globalThis.KorytoState.normalizeCollections(parsed.value);
-      applyExtensionNormalizers(restored);
-      restored.flags = restored.flags && typeof restored.flags === "object" ? restored.flags : {};
-      restored.flags.v0143SaveSystem = VERSION;
-      restored.version = SAVE_VERSION;
-      if (globalThis.KorytoTest143?.normalizeReleaseState) restored = globalThis.KorytoTest143.normalizeReleaseState(restored);
-      const issues = globalThis.KorytoState.validate(restored);
-      return {ok:issues.length === 0, raw, restored, issues};
+      const migrated = migrateCandidate(parsed.value);
+      if (!migrated.ok) return {ok:false, raw, error:migrated.error, issues:migrated.issues || []};
+      return {ok:true, raw, restored:migrated.value, issues:[]};
     } catch (error) {
       return {ok:false, error:String(error?.message || error), issues:[String(error?.message || error)]};
     }
@@ -237,22 +252,22 @@
     const saveButton = document.getElementById?.("saveBtn");
     if (saveButton) {
       saveButton.onclick = manualSave;
-      saveButton.dataset.v0143Save = "1";
+      saveButton.dataset.v0143Save = "2";
     }
     const loadButton = document.getElementById?.("loadBtn");
     if (loadButton) {
       loadButton.onclick = loadGame;
-      loadButton.dataset.v0143Load = "1";
+      loadButton.dataset.v0143Load = "2";
     }
     const confirmButton = document.getElementById?.("confirmBtn");
-    if (confirmButton && confirmButton.dataset.v0143NewGame !== "1" && typeof confirmButton.onclick === "function") {
+    if (confirmButton && confirmButton.dataset.v0143NewGame !== "2" && typeof confirmButton.onclick === "function") {
       const original = confirmButton.onclick;
       confirmButton.onclick = function v0143NewGame(event) {
         const result = original.call(this, event);
         normalizeNewGame();
         return result;
       };
-      confirmButton.dataset.v0143NewGame = "1";
+      confirmButton.dataset.v0143NewGame = "2";
     }
     try { save = manualSave; } catch (_) {}
     try { load = loadGame; } catch (_) {}
@@ -263,9 +278,10 @@
   }
 
   const api = {
-    VERSION, SAVE_VERSION, MANUAL_KEY, AUTO_KEY, LEGACY_KEYS:[...LEGACY_KEYS], CORE_STAT_KEYS:[...CORE_STAT_KEYS],
+    VERSION, SAVE_VERSION, SAVE_FORMAT, SAVE_SCHEMA,
+    MANUAL_KEY, AUTO_KEY, LEGACY_KEYS:[...LEGACY_KEYS], CORE_STAT_KEYS:[...CORE_STAT_KEYS],
     readCandidates, readRaw, readLoadable, parse, hasSaveSignature, migrateCandidate,
-    normalize, serialize, canWrite, write, manualSave, autoSaveGame, loadGame,
+    applySaveMetadata, normalize, serialize, canWrite, write, manualSave, autoSaveGame, loadGame,
     roundTrip, installControls, normalizeNewGame, activateLoadedGame
   };
   globalThis.KorytoSaveSystem = api;
