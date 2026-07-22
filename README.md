@@ -18,9 +18,9 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Testovací větev v0.14.2 TEST.10
+## Kandidát na vydání v0.14.2 RC1
 
-Aktuální kandidát přidává průvodce prvním dnem, denní souhrny změn, jasnou prioritu dalšího tahu a vysvětlení volebního výsledku. Testovací build zůstává oddělený od stabilní verze v `main`.
+RC1 uzavírá vývoj funkcí pro verzi 0.14.2. Přidává finální kontroly uložených her, obnovu neplatného stavu, sjednocení označení verze a regresní průchody čisté i korupční kampaně. Build zůstává oddělený od stabilní verze v `main`.
 
 ## Struktura repozitáře
 

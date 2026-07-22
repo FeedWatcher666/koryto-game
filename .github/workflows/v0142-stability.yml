@@ -1,4 +1,4 @@
-name: Koryto v0.14.2 stability
+name: Koryto v0.14.2 RC1
 
 on:
   push:
@@ -31,19 +31,19 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.2-test.10-diagnostics
+          name: koryto-v0.14.2-rc1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
 
       - name: Build offline package
         run: |
-          mkdir -p dist/koryto-v0.14.2-test.10
-          cp index.html VERSION README.md dist/koryto-v0.14.2-test.10/
-          cp -R src styles dist/koryto-v0.14.2-test.10/
+          mkdir -p dist/koryto-v0.14.2-rc1
+          cp index.html VERSION README.md dist/koryto-v0.14.2-rc1/
+          cp -R src styles dist/koryto-v0.14.2-rc1/
 
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.2-test.10
-          path: dist/koryto-v0.14.2-test.10
+          name: koryto-v0.14.2-rc1
+          path: dist/koryto-v0.14.2-rc1
           if-no-files-found: error
