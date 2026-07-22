@@ -7,6 +7,7 @@
   const SUMMARY_STYLE_ID = "v0143DaySummaryLayout";
   let lastReport = null;
   let summaryLayoutInstalled = false;
+  let questSaveGuardInstalled = false;
 
   function markBuild(target = state) {
     if (!target || typeof target !== "object") return target;
@@ -58,6 +59,29 @@
     `;
     document.head.appendChild?.(style);
     summaryLayoutInstalled = true;
+    return true;
+  }
+
+  function installQuestSaveGuard() {
+    if (questSaveGuardInstalled) return true;
+    const base = globalThis.KorytoTest143;
+    const quests = globalThis.KorytoQuestSystem;
+    if (!base || typeof base.normalizeReleaseState !== "function" || !quests) return false;
+    const original = base.normalizeReleaseState;
+    if (original.v0143QuestSaveGuard === "3") {
+      questSaveGuardInstalled = true;
+      return true;
+    }
+    const guardedNormalizeReleaseState = function guardedNormalizeReleaseState(target = state) {
+      const normalized = original(target);
+      quests.normalizeState?.(normalized);
+      const issues = quests.validateState?.(normalized) || [];
+      if (issues.length) throw new Error(`Neplatný questový stav: ${issues.join("; ")}`);
+      return normalized;
+    };
+    guardedNormalizeReleaseState.v0143QuestSaveGuard = "3";
+    base.normalizeReleaseState = guardedNormalizeReleaseState;
+    questSaveGuardInstalled = true;
     return true;
   }
 
@@ -117,18 +141,21 @@
   }
 
   function runReleaseCheck(target = state) {
+    installQuestSaveGuard();
     globalThis.KorytoTest143?.normalizeReleaseState?.(target);
     markBuild(target);
     const base = globalThis.KorytoTest143?.runReleaseCheck?.(target) || {ok:false, issues:["Chybí TEST.2 release vrstva."]};
     const quests = globalThis.KorytoQuestSystem?.runIntegrityCheck?.(target) || {ok:false, issues:["Chybí questový modul."]};
     const issues = [...new Set([...(base.issues || []), ...(quests.issues || [])])];
     if (!summaryLayoutInstalled) issues.push("Chybí scrollovatelný layout denního souhrnu.");
+    if (!questSaveGuardInstalled) issues.push("Chybí questová ochrana migrace uložené hry.");
     lastReport = {
       version:VERSION,
       buildVersion:BUILD_VERSION,
       saveVersion:SAVE_VERSION,
       runtimeMode:"event-driven",
       questContract:"external-domain-api",
+      questSaveGuard:questSaveGuardInstalled ? "normalize-and-validate" : "missing",
       daySummaryLayout:summaryLayoutInstalled ? "scrollable-sticky-action" : "missing",
       ok:Boolean(base.ok && quests.ok && issues.length === 0),
       issues,
@@ -145,6 +172,7 @@
     globalThis.KorytoTest143?.refresh?.();
     markBuild();
     installDaySummaryLayout();
+    installQuestSaveGuard();
     installControls();
     canonicalVersion();
     return runReleaseCheck();
@@ -152,9 +180,10 @@
 
   const api = {
     VERSION, BUILD_VERSION, SAVE_VERSION, RELEASE_FLAG, SUMMARY_STYLE_ID,
-    markBuild, installDaySummaryLayout, canonicalVersion, rewriteBuildLabels,
+    markBuild, installDaySummaryLayout, installQuestSaveGuard, canonicalVersion, rewriteBuildLabels,
     exportChronicle, installControls, runReleaseCheck, refresh,
     get summaryLayoutInstalled() { return summaryLayoutInstalled; },
+    get questSaveGuardInstalled() { return questSaveGuardInstalled; },
     get report() { return lastReport; }
   };
 
@@ -163,6 +192,7 @@
 
   markBuild();
   installDaySummaryLayout();
+  installQuestSaveGuard();
   installControls();
   canonicalVersion();
   runReleaseCheck();
