@@ -1,0 +1,35 @@
+uploaded parts:
+  7000 .bootstrap/v0144/part-000
+  7000 .bootstrap/v0144/part-001
+  7000 .bootstrap/v0144/part-002
+ 14000 .bootstrap/v0144/part-003
+ 14000 .bootstrap/v0144/part-005
+ 14000 .bootstrap/v0144/part-007
+ 14000 .bootstrap/v0144/part-009
+ 14000 .bootstrap/v0144/part-011
+ 14000 .bootstrap/v0144/part-013
+ 14000 .bootstrap/v0144/part-015
+ 14000 .bootstrap/v0144/part-017
+  8368 .bootstrap/v0144/part-019
+141368 total
+part hashes:
+a22c591bb4a1d8f764f48185c2b4ff623082eb8db247d4649586c5efa52c6cf8  .bootstrap/v0144/part-000
+3684163e9b05e11081525b01b0305cf2ecc681f987e66432aa3cf0910807a7f0  .bootstrap/v0144/part-001
+a943e04b786e5d12fb1e9ca27f1fe72082ac9ca7f341d225b002472bbf463f83  .bootstrap/v0144/part-002
+b8c7e27325f0f716152d2ef7ef29db87ea4bfdec8c11dee32221c5206d86391c  .bootstrap/v0144/part-003
+f93b649086a50e83bdad17a237baace041e69781b258746fab9eafc8519f089d  .bootstrap/v0144/part-005
+d0df963423d049f5eec48460c815924c93f730f3a48be31e2d94e3e023b14d3f  .bootstrap/v0144/part-007
+024292d90b72504546c74667a870832cded922070a93c5b714bcf3d68b5355df  .bootstrap/v0144/part-009
+55615860d6361448a7184f00c092eb1a6e546268fdc926d31360fb4e6c2bbcbc  .bootstrap/v0144/part-011
+522e3ef39ae12bda3c9671f3b70d8fc9ec6f98cc1d1fa2f96766c8d998d6656c  .bootstrap/v0144/part-013
+3f7f46004d6ed43e4744ceb5704d211c2f8753e5fd42553c152ba0da24bd9999  .bootstrap/v0144/part-015
+7c12cebe63194e5ea492a461f220f617deeb482e050d46c8111003022dbc9838  .bootstrap/v0144/part-017
+33f8cf35c6c4c6018e48ea879f5e2f60422eafb5bc585ae13aa9106b6c254157  .bootstrap/v0144/part-019
+combined base64:
+141368 /tmp/v0144-payload.b64
+afdcd256371889164c795c22ca8dc4bd2b161b1ade951922c6a4f5998c68bdce  /tmp/v0144-payload.b64
+base64=ok
+decoded archive:
+106024 /tmp/v0144-payload.tar.xz
+b38fda8373322e4c2d2583b211e92e1393a1da4c7eb9fe3dd42ff63c3249194d  /tmp/v0144-payload.tar.xz
+xz=failed
