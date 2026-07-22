@@ -4,13 +4,61 @@
   const BUILD_VERSION = "0.14.3-test.3";
   const SAVE_VERSION = "0.14.3-test.2";
   const RELEASE_FLAG = "v0143Test3QuestContract";
+  const SUMMARY_STYLE_ID = "v0143DaySummaryLayout";
   let lastReport = null;
+  let summaryLayoutInstalled = false;
 
   function markBuild(target = state) {
     if (!target || typeof target !== "object") return target;
     target.flags = target.flags && typeof target.flags === "object" ? target.flags : {};
     target.flags[RELEASE_FLAG] = VERSION;
     return target;
+  }
+
+  function installDaySummaryLayout() {
+    if (summaryLayoutInstalled || typeof document === "undefined" || !document.head) return summaryLayoutInstalled;
+    const style = document.createElement?.("style");
+    if (!style) return false;
+    style.id = SUMMARY_STYLE_ID;
+    style.textContent = `
+      #v0142DaySummaryOverlay{
+        overflow:hidden;
+        padding:clamp(8px,2vw,20px);
+      }
+      #v0142DaySummaryOverlay .v0142-summary-dialog{
+        width:min(760px,100%);
+        max-height:calc(100vh - 32px);
+        max-height:calc(100dvh - 32px);
+        overflow-y:auto;
+        overscroll-behavior:contain;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-gutter:stable;
+        touch-action:pan-y;
+        padding-bottom:0;
+      }
+      #v0142DaySummaryOverlay .v0142-summary-dialog [data-summary-close]{
+        position:sticky;
+        bottom:0;
+        z-index:3;
+        display:block;
+        width:100%;
+        margin:16px 0 0;
+        padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+        box-shadow:0 -14px 22px rgba(233,223,199,.96);
+      }
+      @media(max-width:760px){
+        #v0142DaySummaryOverlay{padding:8px}
+        #v0142DaySummaryOverlay .v0142-summary-dialog{
+          max-height:calc(100vh - 16px);
+          max-height:calc(100dvh - 16px);
+          border-radius:10px;
+          padding:16px 14px 0;
+        }
+      }
+    `;
+    document.head.appendChild?.(style);
+    summaryLayoutInstalled = true;
+    return true;
   }
 
   function rewriteBuildLabels(root = document?.body) {
@@ -74,12 +122,14 @@
     const base = globalThis.KorytoTest143?.runReleaseCheck?.(target) || {ok:false, issues:["Chybí TEST.2 release vrstva."]};
     const quests = globalThis.KorytoQuestSystem?.runIntegrityCheck?.(target) || {ok:false, issues:["Chybí questový modul."]};
     const issues = [...new Set([...(base.issues || []), ...(quests.issues || [])])];
+    if (!summaryLayoutInstalled) issues.push("Chybí scrollovatelný layout denního souhrnu.");
     lastReport = {
       version:VERSION,
       buildVersion:BUILD_VERSION,
       saveVersion:SAVE_VERSION,
       runtimeMode:"event-driven",
       questContract:"external-domain-api",
+      daySummaryLayout:summaryLayoutInstalled ? "scrollable-sticky-action" : "missing",
       ok:Boolean(base.ok && quests.ok && issues.length === 0),
       issues,
       base,
@@ -94,15 +144,17 @@
   function refresh() {
     globalThis.KorytoTest143?.refresh?.();
     markBuild();
+    installDaySummaryLayout();
     installControls();
     canonicalVersion();
     return runReleaseCheck();
   }
 
   const api = {
-    VERSION, BUILD_VERSION, SAVE_VERSION, RELEASE_FLAG,
-    markBuild, canonicalVersion, rewriteBuildLabels,
+    VERSION, BUILD_VERSION, SAVE_VERSION, RELEASE_FLAG, SUMMARY_STYLE_ID,
+    markBuild, installDaySummaryLayout, canonicalVersion, rewriteBuildLabels,
     exportChronicle, installControls, runReleaseCheck, refresh,
+    get summaryLayoutInstalled() { return summaryLayoutInstalled; },
     get report() { return lastReport; }
   };
 
@@ -110,6 +162,7 @@
   globalThis.KorytoReleaseCandidate = api;
 
   markBuild();
+  installDaySummaryLayout();
   installControls();
   canonicalVersion();
   runReleaseCheck();
