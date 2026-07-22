@@ -6,15 +6,16 @@ for (const file of [
   'src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js',
   'src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js',
   'src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js',
-  'src/ux-system.js','src/v0143-test10.js','src/balance-system.js','src/v0144-test10.js','src/v0145-campaign.js'
+  'src/ux-system.js','src/v0143-test10.js','src/balance-system.js','src/v0144-test10.js','src/v0145-campaign.js','src/v0146-playtest.js'
 ]) context.eval ? context.eval(readText(file)) : (await import('node:vm')).runInContext(readText(file), context, {filename:file});
 assert.equal(context.KorytoCampaignExperience.VERSION,'0.14.5 TEST.10');
-assert.equal(context.KorytoCampaignExperience.BUILD_VERSION,'0.14.5-test.10');
-assert.equal(context.KorytoCampaignExperience.SAVE_VERSION,'0.14.3-test.2');
+assert.equal(context.KorytoPlaytestLab.VERSION,'0.14.6 TEST.10');
+assert.equal(context.KorytoPlaytestLab.BUILD_VERSION,'0.14.6-test.10');
+assert.equal(context.KorytoPlaytestLab.SAVE_VERSION,'0.14.3-test.2');
 const app=readText('src/app.js');
-assert.ok(app.split('\n').length<1000,'app.js must stay below 1000 lines after playability work');
+assert.ok(app.split('\n').length<1000,'app.js must stay below 1000 lines after AI playtest work');
 for(const pattern of [/const events=\{/,/const questDefs=\{/,/const companions=\{/,/const factionPlanDefs=\{/,/const debateCardDefs=\{/])assert.doesNotMatch(app,pattern);
-for(const name of ['KorytoCoreData','KorytoEventData','KorytoQuestData','KorytoCompanionData','KorytoFactionData','KorytoDebateData','KorytoQuestRuntime','KorytoEventSystem','KorytoFactionSystem','KorytoCompanionSystem','KorytoDebateSystem','KorytoElectionSystem','KorytoGameEngine','KorytoBalanceSystem','KorytoApp','KorytoCampaignExperience'])assert.ok(context[name],`${name} missing`);
+for(const name of ['KorytoCoreData','KorytoEventData','KorytoQuestData','KorytoCompanionData','KorytoFactionData','KorytoDebateData','KorytoQuestRuntime','KorytoEventSystem','KorytoFactionSystem','KorytoCompanionSystem','KorytoDebateSystem','KorytoElectionSystem','KorytoGameEngine','KorytoBalanceSystem','KorytoApp','KorytoCampaignExperience','KorytoPlaytestLab'])assert.ok(context[name],`${name} missing`);
 assert.equal(Object.keys(context.KorytoQuestData.definitions).length,11);
 assert.equal(context.KorytoEventSystem.validate().length,0);
 assert.equal(context.KorytoFactionSystem.validate().length,0);
@@ -32,6 +33,6 @@ context.setStoredSaveForTest('koryto_v013',{version:'0.13',day:3,actions:2,phase
 const loaded=context.KorytoSaveSystem.loadGame();
 assert.equal(loaded.hero.name,'Legacy 0.13');assert.equal(loaded.version,'0.14.3-test.2');assert.equal(loaded.saveSchema,1);assert.equal(loaded.quests.register.stage,0);assert.equal(loaded.quests.register.deadlineBonus,1);assert.equal(context.KorytoState.validate(loaded).length,0);
 const report=context.KorytoReleaseCandidate.runReleaseCheck(state);assert.equal(report.ok,true,report.issues.join('\n'));assert.equal(report.runtimeMode,'modular-orchestrator');
-const index=readText('index.html');const order=['core-data.js','companion-data.js','faction-data.js','debate-data.js','quest-data.js','event-data.js','quest-runtime.js','debate-system.js','election-system.js','game-engine.js','app.js','v0144-test10.js','v0145-campaign.js'].map(x=>index.indexOf(x));assert.ok(order.every((v,i)=>v>=0&&(i===0||v>order[i-1])),'module order invalid');assert.equal(readText('VERSION').trim(),'0.14.5-test.10');
-for(const file of ['src/core-data.js','src/event-data.js','src/game-engine.js','src/debate-system.js','src/election-system.js','src/v0144-test10.js']){const text=readText(file);assert.doesNotMatch(text,/setInterval\s*\(/);assert.doesNotMatch(text,/MutationObserver/);}
-console.log('v0.14.4 modular architecture remains intact in v0.14.5');
+const index=readText('index.html');const order=['core-data.js','companion-data.js','faction-data.js','debate-data.js','quest-data.js','event-data.js','quest-runtime.js','debate-system.js','election-system.js','game-engine.js','app.js','v0144-test10.js','v0145-campaign.js','v0146-playtest.js'].map(x=>index.indexOf(x));assert.ok(order.every((v,i)=>v>=0&&(i===0||v>order[i-1])),'module order invalid');assert.equal(readText('VERSION').trim(),'0.14.6-test.10');
+for(const file of ['src/core-data.js','src/event-data.js','src/game-engine.js','src/debate-system.js','src/election-system.js','src/v0144-test10.js','src/v0146-playtest.js']){const text=readText(file);assert.doesNotMatch(text,/setInterval\s*\(/);assert.doesNotMatch(text,/MutationObserver/);}
+console.log('v0.14.4 modular architecture remains intact in v0.14.6');

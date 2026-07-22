@@ -1,60 +1,55 @@
 # Koryto
 
-Satirické české politické RPG, ve kterém hráč během třináctidenní komunální kampaně řeší kauzy, skládá štáb, čelí frakcím, bojuje v debatách a po volbách vyjednává o moci.
+Satiricke ceske politicke RPG o trinactidenni komunalni kampani v Dolnich Vejprnicich.
 
-## Aktuální testovací verze
+## Aktualni testovaci verze
 
-**v0.14.5 TEST.10 – Hratelná kampaň**
+**v0.14.6 TEST.10 - AI playtest a hluboke QA**
 
-Tato série navazuje na modulární v0.14.4 a soustředí se na samotný zážitek hráče. Začátek kampaně je kratší a srozumitelnější, každý den dostává hráč konkrétní plán, mapa ukazuje priority a rizika a hra lépe vysvětluje následky rozhodnutí, vztahy, tahy frakcí, debaty i volební výsledek.
+Tato verze pridava autonomni playtestovaci laborator, ktera umi hrat kampan jako osm rozdilnych typu hracu a porovnat vsech sest trid. Laborator meri trasy, questy, volby, udalosti, slepe stavy, dominantni rozhodnuti, balans trid a odolnost poskozenych savu.
 
-Save formát zůstává `koryto`, schema `1` a save verze `0.14.3-test.2`. Historické uložené hry v0.09–v0.14 zůstávají podporované.
+### Iterace v0.14.6
 
-### Iterace v0.14.5
+- TEST.1: telemetrie rozhodnuti a tras.
+- TEST.2: osm modelovych typu hracu.
+- TEST.3: matice vsech sesti trid.
+- TEST.4: questova uspesnost a terminy.
+- TEST.5: pokryti udalosti a dominantni volby.
+- TEST.6: chaos testy a poskozene savy.
+- TEST.7: obsahovy a UX audit.
+- TEST.8: oprava normalizace kolekci a neznamych questu.
+- TEST.9: odemceni questu Posledni louka, koalicni doporuceni a vyvazeni predvolebniho specialu.
+- TEST.10: 2400 kampani, release report a offline ZIP.
 
-- **TEST.1 – prvních deset minut:** čtyřkrokový průvodce, vysvětlení tříd, motivací, akcí a cílů kampaně.
-- **TEST.2 – denní smyčka:** ranní briefing, bilance předchozího dne a doporučený další krok.
-- **TEST.3 – mapa:** viditelné termíny, doporučené lokace, příležitosti a stav dostupných akcí.
-- **TEST.4 – questy:** rozdělení na hlavní kauzy, osobní úkoly a politické příležitosti včetně termínů.
-- **TEST.5 – družina:** čitelnější postoje, důvody změny loajality a varování před krizí nebo odchodem.
-- **TEST.6 – frakce:** přehled nejsilnější hrozby, nejbližšího tahu soupeře a doporučené obrany.
-- **TEST.7 – debaty:** záměr soupeře doplněný doporučeným protiútokem a významem jednotlivých taktik.
-- **TEST.8 – volby a koalice:** vysvětlení nejsilnějších a nejslabších voličských bloků, politických nákladů a následků nabídek.
-- **TEST.9 – nový obsah:** osm nových lokálních událostí z obecní kampaně.
-- **TEST.10 – tester build:** úplná regresní sada, 1000 deterministických kampaní, offline ZIP a formulář pro hlášení chyb.
+## Vysledek laboratore
 
-## Hlavní novinky
+- 2400 dokoncenych kampani z 2400.
+- 8 hracskych archetypu.
+- 6 trid.
+- 2400 unikatnich tras.
+- 95 ze 101 udalosti navstiveno, tedy 94,1 %.
+- prumerny vysledek 32,4 % hlasu a 4,9 mandatu.
+- rozdil prumerneho vysledku trid 5 procentnich bodu.
+- zadny zbyvajici P1 ani P2 nalez.
 
-- Průvodce lze kdykoli znovu otevřít z horní lišty.
-- Denní plán řadí urgentní questy, frakční hrozby a napětí ve štábu podle priority.
-- Konec dne upozorní na nevyužité akce.
-- Questový deník ukazuje typ úkolu, cíl, termín a doporučenou lokaci.
-- Debaty obsahují doporučené odpovědi na soupeřův záměr.
-- Volební noc vysvětluje, odkud přišly hlasy a jaké politické náklady si hráč nese.
-- Tlačítko **Nahlásit chybu** otevře připravený GitHub formulář.
+Plny report je v `docs/v0.14/v0146-playtest-report.md`.
 
-## Modulární struktura
+## Spusteni QA laboratore
 
-Nová hratelnost je soustředěna v `src/v0145-campaign.js`. Autoritativní data a výpočty zůstávají v modulech v0.14.4; `src/app.js` se znovu nezvětšuje a zůstává pod 1000 řádky.
+Hru lze otevrit normalne pres `index.html`. Pro interni QA panel pridejte k URL parametr `?qa=1`. Laborator lze take volat z konzole:
 
-## Ověření
+```js
+KorytoPlaytestLab.runLab({ runs: 400, seed: 146000 })
+```
 
-Automatická sada kontroluje:
+## Kompatibilita
 
-- historické savy v0.09–v0.14 a fallback poškozených slotů,
-- integritu questů, událostí, frakcí, společníků, debat a voleb,
-- nový onboarding, briefing, priority, vztahové signály a volební vysvětlení,
-- osm nových událostí a jejich vazby na lokace,
-- mobilní výšku dialogů, sticky akce a safe area,
-- 1000 deterministických kampaní bez zaseknutí a `NaN`,
-- sestavení kompletního offline balíčku.
+- Save format: `koryto`.
+- Save schema: `1`.
+- Save verze: `0.14.3-test.2`.
+- Historicke savy v0.09-v0.14 zustavaji podporovane.
+- Build verze: `0.14.6-test.10`.
 
-## Spuštění
+## Spusteni hry
 
-Rozbalte offline ZIP a otevřete `index.html`. Hra nevyžaduje instalaci ani server.
-
-Chyby a připomínky lze zapisovat přes GitHub Issues v repozitáři. Uveďte verzi, prohlížeč, zařízení, kroky k reprodukci a pokud možno kód kampaně.
-
-## Stav projektu
-
-Projekt je soukromý a zatím bez licence. Zdrojový kód ani grafické podklady nejsou určeny k dalšímu šíření bez souhlasu vlastníka.
+Rozbalte ZIP a otevřete `index.html`. Hra nevyzaduje server ani instalaci.

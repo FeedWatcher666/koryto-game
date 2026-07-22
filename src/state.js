@@ -90,14 +90,29 @@
   function normalizeCollections(input, options = {}) {
     const defaults = options.defaults ? clone(options.defaults) : initializedDefaults();
     const saved = isObject(input) ? input : {};
-    const target = merge(defaults, saved);
+    const target = merge(clone(defaults), saved);
 
     for (const key of OBJECT_KEYS) {
       if (!isObject(target[key])) target[key] = clone(defaults[key] || {});
     }
     for (const key of ARRAY_KEYS) {
       if (!Array.isArray(target[key])) target[key] = clone(defaults[key] || []);
+      target[key] = target[key].filter(value => value !== null && value !== undefined);
     }
+    for (const key of OBJECT_ENTRY_MAPS) {
+      for (const [entryKey, value] of Object.entries(target[key] || {})) {
+        if (isObject(value)) continue;
+        if (isObject(defaults[key]?.[entryKey])) target[key][entryKey] = clone(defaults[key][entryKey]);
+        else delete target[key][entryKey];
+      }
+    }
+    for (const key of OBJECT_ARRAY_KEYS) target[key] = (target[key] || []).filter(isObject);
+    for (const key of NUMBER_MAP_KEYS) {
+      for (const [entryKey, value] of Object.entries(target[key] || {})) {
+        target[key][entryKey] = finite(value, finite(defaults[key]?.[entryKey], 0));
+      }
+    }
+    globalThis.KorytoQuestRuntime?.normalize?.(target);
 
     normalizeHero(target, defaults);
     normalizeStats(target, defaults);
