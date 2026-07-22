@@ -18,9 +18,11 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Testovací kandidát v0.14.3 TEST.1
+## Testovací kandidát v0.14.3 TEST.2
 
-TEST.1 odděluje kanonický herní stav a ukládání do modulů `src/state.js` a `src/save-system.js` bez změny herních mechanik. Zachovává kompatibilitu savů od v0.13, map-only ruční ukládání i autosave a umí přeskočit poškozenou novější pozici ve prospěch použitelného autosavu nebo staršího kompatibilního savu. Build zůstává oddělený od stabilní verze v `main`.
+TEST.2 navazuje na dokončené oddělení kanonického stavu a save systému z TEST.1. Nové uložené pozice mají identifikátor formátu a schema verzi, zatímco historické pozice od v0.09 do v0.14 zůstávají migrovatelné. Poškozený, cizí nebo příliš nový slot nezakryje použitelný autosave či starší pozici. Integrační vrstva už nepoužívá periodický polling ani plošný `MutationObserver`, takže verzi a ovládací prvky nastavuje pouze při skutečné inicializaci nebo explicitním obnovení.
+
+Automatická sada ověřuje map-only ukládání, prioritu ruční save → autosave → legacy, izolaci migrace, zachování vnořených dat, všechny podporované historické klíče, 200 deterministických kampaní a kompletní offline balíček.
 
 ## Struktura repozitáře
 
@@ -41,13 +43,13 @@ koryto-game/
 
 ## Nejbližší technický krok
 
-Větev `test/v0.14.3-modules` ověřuje první bezpečné oddělení stavu a save systému. Další doménové moduly se mají vytahovat až po přijetí tohoto charakterizačního kroku a bez změny hratelnosti.
+Větev `test/v0.14.3-test2` je stabilizační pokračování modulárního state/save základu. Další doménové moduly se mají vytahovat až po ověření TEST.2 a bez změny herních pravidel.
 
 Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
 
 ## Spuštění
 
-Po nahrání stabilního buildu otevřete `index.html` v prohlížeči. Hra nevyžaduje server ani instalaci.
+Otevřete `index.html` v prohlížeči. Hra nevyžaduje server ani instalaci a offline artefakt obsahuje všechny potřebné lokální soubory.
 
 ## Stav projektu
 

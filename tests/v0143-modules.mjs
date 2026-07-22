@@ -12,9 +12,13 @@ for (const file of [
 assert.ok(context.KorytoState, 'state module must be exposed');
 assert.ok(context.KorytoSaveSystem, 'save module must be exposed');
 assert.ok(context.KorytoTest143, 'v0.14.3 release module must be exposed');
-assert.equal(context.KorytoState.VERSION, '0.14.3 TEST.1');
-assert.equal(context.KorytoSaveSystem.SAVE_VERSION, '0.14.3-test.1');
-assert.equal(context.KorytoTest143.VERSION, '0.14.3 TEST.1');
+assert.equal(context.KorytoState.VERSION, '0.14.3 TEST.2');
+assert.equal(context.KorytoState.SAVE_VERSION, '0.14.3-test.2');
+assert.equal(context.KorytoSaveSystem.VERSION, '0.14.3 TEST.2');
+assert.equal(context.KorytoSaveSystem.SAVE_VERSION, '0.14.3-test.2');
+assert.equal(context.KorytoSaveSystem.SAVE_FORMAT, 'koryto');
+assert.equal(context.KorytoSaveSystem.SAVE_SCHEMA, 1);
+assert.equal(context.KorytoTest143.VERSION, '0.14.3 TEST.2');
 
 const requiredObjects = ['quests','party','factions','voters','factionPlans','companionAmbitions','flags','stats','audit'];
 const requiredArrays = ['pendingEvents','items','news','commitments','worldActions','echoes'];
@@ -32,8 +36,6 @@ const legacy = {
   stats:{influence:12, trust:67},
   flags:{legacyMarker:true, nested:{kept:'ano'}}
 };
-assert.equal(context.KorytoSaveSystem.hasSaveSignature(legacy), true);
-assert.equal(context.KorytoSaveSystem.hasSaveSignature({}), false);
 context.setStoredSaveForTest('koryto_v013', legacy);
 let loaded;
 assert.doesNotThrow(() => { loaded = context.KorytoSaveSystem.loadGame(); });
@@ -43,8 +45,10 @@ assert.equal(loaded.stats.influence, 12);
 assert.equal(loaded.stats.trust, 67);
 assert.equal(loaded.flags.legacyMarker, true);
 assert.equal(loaded.flags.nested.kept, 'ano');
-assert.equal(loaded.version, '0.14.3-test.1');
-assert.equal(loaded.flags.v0143ReleaseCandidate, '0.14.3 TEST.1');
+assert.equal(loaded.version, '0.14.3-test.2');
+assert.equal(loaded.saveFormat, 'koryto');
+assert.equal(loaded.saveSchema, 1);
+assert.equal(loaded.flags.v0143ReleaseCandidate, '0.14.3 TEST.2');
 for (const key of requiredObjects) assert.ok(loaded[key] && typeof loaded[key] === 'object' && !Array.isArray(loaded[key]), `${key} must be an object`);
 for (const key of requiredArrays) assert.ok(Array.isArray(loaded[key]), `${key} must be an array`);
 assert.equal(context.KorytoState.validate(loaded).length, 0);
@@ -53,7 +57,34 @@ const roundTrip = context.KorytoSaveSystem.roundTrip(loaded);
 assert.equal(roundTrip.ok, true);
 assert.equal(roundTrip.restored.hero.attrs.charisma, 9);
 assert.equal(roundTrip.restored.flags.nested.kept, 'ano');
-assert.equal(roundTrip.restored.version, '0.14.3-test.1');
+assert.equal(roundTrip.restored.version, '0.14.3-test.2');
+assert.equal(roundTrip.restored.saveFormat, 'koryto');
+assert.equal(roundTrip.restored.saveSchema, 1);
+
+const legacyMatrix = [
+  ['koryto_v09', '0.9'],
+  ['koryto_v091', '0.9.1'],
+  ['koryto_v010', '0.10'],
+  ['koryto_v011', '0.11'],
+  ['koryto_v011_auto', '0.11'],
+  ['koryto_v012', '0.12'],
+  ['koryto_v012_auto', '0.12'],
+  ['koryto_v013', '0.13'],
+  ['koryto_v013_auto', '0.13'],
+  ['koryto_v014', '0.14'],
+  ['koryto_v014_auto', '0.14']
+];
+for (const [index, [key, version]] of legacyMatrix.entries()) {
+  context.clearStoredSavesForTest();
+  const fixture = saveFixture(`Migrace ${key}`, Math.min(14, index + 1));
+  fixture.version = version;
+  context.setStoredSaveForTest(key, fixture);
+  loaded = context.KorytoSaveSystem.loadGame();
+  assert.equal(loaded.hero.name, `Migrace ${key}`, `${key} must remain loadable`);
+  assert.equal(loaded.version, '0.14.3-test.2');
+  assert.equal(loaded.saveFormat, 'koryto');
+  assert.equal(loaded.saveSchema, 1);
+}
 
 for (const phase of ['event','location','debate','coalition']) {
   context.clearStoredSavesForTest();
@@ -74,10 +105,15 @@ mapState.currentEvent = null;
 mapState.currentLocation = null;
 const autosavesBefore = Number(mapState.audit.autosaves) || 0;
 assert.equal(context.KorytoSaveSystem.manualSave(), true);
-assert.equal(JSON.parse(context.getStoredSaveForTest('koryto_v014')).version, '0.14.3-test.1');
+const manualStored = JSON.parse(context.getStoredSaveForTest('koryto_v014'));
+assert.equal(manualStored.version, '0.14.3-test.2');
+assert.equal(manualStored.saveFormat, 'koryto');
+assert.equal(manualStored.saveSchema, 1);
 assert.equal(context.KorytoSaveSystem.autoSaveGame(), true);
 const autoStored = JSON.parse(context.getStoredSaveForTest('koryto_v014_auto'));
-assert.equal(autoStored.version, '0.14.3-test.1');
+assert.equal(autoStored.version, '0.14.3-test.2');
+assert.equal(autoStored.saveFormat, 'koryto');
+assert.equal(autoStored.saveSchema, 1);
 assert.equal(autoStored.audit.autosaves, autosavesBefore + 1);
 
 context.clearStoredSavesForTest();
@@ -114,6 +150,18 @@ assert.equal(loaded.hero.name, 'Autosave po falešném savu', 'JSON without core
 assert.equal(loaded.day, 8);
 
 context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', {...saveFixture('Cizí formát', 9), saveFormat:'foreign', saveSchema:1});
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po cizím formátu', 9));
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Autosave po cizím formátu', 'foreign save format must be skipped');
+
+context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', {...saveFixture('Budoucí schema', 10), saveFormat:'koryto', saveSchema:99});
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po budoucím schématu', 10));
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Autosave po budoucím schématu', 'unsupported future schema must be skipped safely');
+
+context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', '{broken');
 context.setStoredSaveForTest('koryto_v014_auto', '[broken');
 context.setStoredSaveForTest('koryto_v013', saveFixture('Záchranný legacy save', 7));
@@ -126,8 +174,8 @@ context.setStoredSaveForTest('koryto_v014', '{broken');
 context.setStoredSaveForTest('koryto_v014_auto', {});
 assert.equal(context.KorytoSaveSystem.loadGame(), false, 'all syntactically or structurally corrupt saves must fail gracefully');
 
-const simulations = context.runSimulationForTest(100, 24000);
-assert.equal(simulations.length, 100);
+const simulations = context.runSimulationForTest(200, 24000);
+assert.equal(simulations.length, 200);
 assert.equal(simulations.every(result => result.ended), true);
 for (const result of simulations) {
   for (const value of Object.values(result)) {
@@ -145,14 +193,22 @@ const savePos = index.indexOf('src/save-system.js');
 const releasePos = index.indexOf('src/v0143.js');
 assert.ok(appPos >= 0 && statePos > appPos && savePos > statePos && releasePos > savePos, 'offline module order must be app, state, save, release');
 assert.doesNotMatch(index, /src\/v0142-rc3\.js/);
-assert.match(index, /0\.14\.3 TEST\.1/);
-assert.equal(readText('VERSION').trim(), '0.14.3-test.1');
+assert.match(index, /0\.14\.3 TEST\.2/);
+assert.equal(readText('VERSION').trim(), '0.14.3-test.2');
+
+const releaseSource = readText('src/v0143.js');
+assert.doesNotMatch(releaseSource, /setInterval\s*\(/, 'release integration must not poll continuously');
+assert.doesNotMatch(releaseSource, /MutationObserver/, 'release integration must not observe the whole DOM');
 
 const workflow = readText('.github/workflows/v0142-stability.yml');
 const pullRequestTrigger = workflow.split('pull_request:')[1]?.split('workflow_dispatch:')[0] || '';
-assert.match(pullRequestTrigger, /-\s+main\b/, 'release PRs to main must run TEST.1 checks');
+assert.match(pullRequestTrigger, /-\s+test\/v0\.14\.3-modules\b/, 'TEST.2 PRs must run against TEST.1 base');
+assert.match(pullRequestTrigger, /-\s+main\b/, 'release PRs to main must run TEST.2 checks');
+assert.match(workflow, /koryto-v0\.14\.3-test\.2/);
 
 for (const name of ['save','load','autoSave']) assert.equal(typeof context[name], 'function', `${name} global must remain available`);
-assert.equal(context.KorytoTest143.runReleaseCheck().ok, true);
+const releaseReport = context.KorytoTest143.runReleaseCheck();
+assert.equal(releaseReport.ok, true);
+assert.equal(releaseReport.runtimeMode, 'event-driven');
 
-console.log('v0.14.3 modular state/save checks ok');
+console.log('v0.14.3 TEST.2 state/save stabilization checks ok');
