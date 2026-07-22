@@ -30,18 +30,44 @@ jobs:
           base64 -d /tmp/v0145-payload.b64 > /tmp/v0145-payload.tar.xz
           echo "84cdef51fc5e2dea0f4dde0f459b24929e3ac403b70813d06ff38d2919ea2c9b  /tmp/v0145-payload.tar.xz" | sha256sum -c -
           xz -t /tmp/v0145-payload.tar.xz
+          echo "PAYLOAD_OK=1" >> "$GITHUB_ENV"
+
+      - name: Apply and test payload
+        if: env.PAYLOAD_OK == '1'
+        shell: bash
+        run: |
+          set +e
           tar -xJf /tmp/v0145-payload.tar.xz -C .
-          rm -rf .bootstrap/v0145
+          npm test 2>&1 | tee /tmp/v0145-test-output.txt
+          status=${PIPESTATUS[0]}
+          if [ "$status" -eq 0 ]; then
+            echo "TEST_OK=1" >> "$GITHUB_ENV"
+          else
+            echo "TEST_OK=0" >> "$GITHUB_ENV"
+          fi
+          exit 0
 
-      - name: Run complete regression suite
-        run: npm test
-
-      - name: Commit exact tested payload
+      - name: Commit tested payload or diagnostics
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "v0.14.5 TEST.10: playable campaign and tester build"
+          if [ "${TEST_OK:-0}" = "1" ]; then
+            rm -rf .bootstrap/v0145
+            git add -A
+            git commit -m "v0.14.5 TEST.10: playable campaign and tester build"
+          else
+            git reset --hard HEAD
+            git clean -fd
+            mkdir -p .bootstrap/v0145
+            cp /tmp/v0145-test-output.txt .bootstrap/v0145/test-output.txt
+            git add .bootstrap/v0145/test-output.txt
+            git commit -m "capture v0.14.5 full test failure"
+          fi
           git push origin HEAD:test/v0.14.5-test10
+
+      - name: Reject failed tests
+        if: env.TEST_OK != '1'
+        run: exit 1
