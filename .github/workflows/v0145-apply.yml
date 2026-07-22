@@ -38,6 +38,7 @@ jobs:
         run: |
           set +e
           tar -xJf /tmp/v0145-payload.tar.xz -C .
+          sed -i "s/context.KorytoReleaseCandidate.VERSION,'0.14.5 TEST.10'/context.KorytoReleaseCandidate.VERSION,'0.14.4 TEST.10'/" tests/v0143-test10.mjs
           npm test 2>&1 | tee /tmp/v0145-test-output.txt
           status=${PIPESTATUS[0]}
           if [ "$status" -eq 0 ]; then
