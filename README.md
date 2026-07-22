@@ -18,11 +18,13 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Testovací kandidát v0.14.3 TEST.2
+## Testovací kandidát v0.14.3 TEST.3
 
-TEST.2 navazuje na dokončené oddělení kanonického stavu a save systému z TEST.1. Nové uložené pozice mají identifikátor formátu a schema verzi, zatímco historické pozice od v0.09 do v0.14 zůstávají migrovatelné. Poškozený, cizí nebo příliš nový slot nezakryje použitelný autosave či starší pozici. Integrační vrstva už nepoužívá periodický polling ani plošný `MutationObserver`, takže verzi a ovládací prvky nastavuje pouze při skutečné inicializaci nebo explicitním obnovení.
+TEST.3 je první doménová modularizační iterace nad ověřeným základem TEST.2. Přidává samostatný modul `src/quest-system.js`, který poskytuje jednotný kontrakt pro jedenáct kampaních questů: kontroluje úplnost definic, platnost lokací a termínů, integritu questového stavu, efektivní deadline a přehled aktivních úkolů.
 
-Automatická sada ověřuje map-only ukládání, prioritu ruční save → autosave → legacy, izolaci migrace, zachování vnořených dat, všechny podporované historické klíče, 200 deterministických kampaní a kompletní offline balíček.
+Herní obsah, výsledky voleb, questové následky ani pravidla hodů se nemění. Save formát zůstává `koryto`, schema `1` a runtime save verze `0.14.3-test.2`, takže TEST.3 nevyžaduje novou migraci uložených pozic. Build a uživatelské rozhraní mají samostatnou verzi `0.14.3-test.3`.
+
+Automatická sada nadále ověřuje bezpečný save fallback včetně poškozených vnořených kolekcí, map-only ukládání, historické pozice v0.09–v0.14, 200 deterministických kampaní, všech jedenáct questových definic a kompletní offline balíček.
 
 ## Struktura repozitáře
 
@@ -31,6 +33,14 @@ koryto-game/
 ├── index.html
 ├── AGENTS.md
 ├── VERSION
+├── src/
+│   ├── app.js
+│   ├── state.js
+│   ├── save-system.js
+│   ├── quest-system.js
+│   ├── v0143.js
+│   └── v0143-test3.js
+├── tests/
 ├── docs/
 │   ├── architecture.md
 │   ├── codex-task-v0.14.1.md
@@ -43,7 +53,7 @@ koryto-game/
 
 ## Nejbližší technický krok
 
-Větev `test/v0.14.3-test2` je stabilizační pokračování modulárního state/save základu. Další doménové moduly se mají vytahovat až po ověření TEST.2 a bez změny herních pravidel.
+Po přijetí questového kontraktu lze v dalších iteracích bezpečně přesouvat samotné questové definice a operace z monolitického `app.js` do doménového modulu po malých, charakterizačně krytých částech. Změny nesmějí měnit hratelnost ani kompatibilitu savů.
 
 Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
 
