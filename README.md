@@ -18,9 +18,11 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Kandidát na vydání v0.14.2 RC3
+## Testovací kandidát v0.14.3 TEST.2
 
-RC3 opravuje ukládání verze kandidáta na vydání do ručních i automatických pozic. Současně zachovává obnovu poškozeného stavu, stabilní rozhraní a regresní průchody čisté i korupční kampaně. Build zůstává oddělený od stabilní verze v `main`.
+TEST.2 navazuje na dokončené oddělení kanonického stavu a save systému z TEST.1. Nové uložené pozice mají identifikátor formátu a schema verzi, zatímco historické pozice od v0.09 do v0.14 zůstávají migrovatelné. Poškozený, cizí nebo příliš nový slot nezakryje použitelný autosave či starší pozici. Integrační vrstva už nepoužívá periodický polling ani plošný `MutationObserver`, takže verzi a ovládací prvky nastavuje pouze při skutečné inicializaci nebo explicitním obnovení.
+
+Automatická sada ověřuje map-only ukládání, prioritu ruční save → autosave → legacy, izolaci migrace, zachování vnořených dat, všechny podporované historické klíče, 200 deterministických kampaní a kompletní offline balíček.
 
 ## Struktura repozitáře
 
@@ -41,13 +43,13 @@ koryto-game/
 
 ## Nejbližší technický krok
 
-Větev `codex/v0.14.1-modular-refactor` je určena pro bezpečné rozdělení současného jednosouborového HTML do modulů bez změny herního chování.
+Větev `test/v0.14.3-test2` je stabilizační pokračování modulárního state/save základu. Další doménové moduly se mají vytahovat až po ověření TEST.2 a bez změny herních pravidel.
 
 Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
 
 ## Spuštění
 
-Po nahrání stabilního buildu otevřete `index.html` v prohlížeči. Hra nevyžaduje server ani instalaci.
+Otevřete `index.html` v prohlížeči. Hra nevyžaduje server ani instalaci a offline artefakt obsahuje všechny potřebné lokální soubory.
 
 ## Stav projektu
 
