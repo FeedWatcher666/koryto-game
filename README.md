@@ -18,13 +18,23 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Testovací kandidát v0.14.3 TEST.3
+## Testovací kandidát v0.14.3 TEST.10
 
-TEST.3 je první doménová modularizační iterace nad ověřeným základem TEST.2. Přidává samostatný modul `src/quest-system.js`, který poskytuje jednotný kontrakt pro jedenáct kampaních questů: kontroluje úplnost definic, platnost lokací a termínů, integritu questového stavu, efektivní deadline a přehled aktivních úkolů.
+TEST.10 uzavírá kumulativní sérii TEST.4 až TEST.10 nad ověřeným save základem TEST.2. Build přidává samostatná runtime autoritativní questová data, questový runtime, katalog událostí, frakční a společníkový systém, globální mobilní UX vrstvu a souhrnný release/balance audit.
 
-Herní obsah, výsledky voleb, questové následky ani pravidla hodů se nemění. Save formát zůstává `koryto`, schema `1` a runtime save verze `0.14.3-test.2`, takže TEST.3 nevyžaduje novou migraci uložených pozic. Build a uživatelské rozhraní mají samostatnou verzi `0.14.3-test.3`.
+Herní obsah, výsledky voleb, questové následky ani pravidla hodů se nemění. Save formát zůstává `koryto`, schema `1` a runtime save verze `0.14.3-test.2`, takže TEST.10 nevyžaduje novou migraci uložených pozic. Build a uživatelské rozhraní mají verzi `0.14.3-test.10`.
 
-Automatická sada nadále ověřuje bezpečný save fallback včetně poškozených vnořených kolekcí, map-only ukládání, historické pozice v0.09–v0.14, 200 deterministických kampaní, všech jedenáct questových definic a kompletní offline balíček.
+Automatická sada ověřuje bezpečný save fallback včetně poškozených vnořených kolekcí, map-only ukládání, historické pozice v0.09–v0.14, normalizaci číselných questových hodnot, 200 deterministických kampaní, integritu událostí, frakcí a společníků i kompletní offline balíček.
+
+### Iterace
+
+- TEST.4: externí questová data s kontrolou driftu vůči původnímu monolitu.
+- TEST.5: normalizace questového stavu, termíny, přechody a priority.
+- TEST.6: katalog a integrita událostí podle lokací a questů.
+- TEST.7: frakční plány, konspirační stopy a koaliční partneři.
+- TEST.8: společníci, osobní příběhy, vztahy a konflikty.
+- TEST.9: viewport-safe dialogy, mobilní safe area, sticky akce a přístupné focus stavy.
+- TEST.10: jednotný release report, balanční guardraily, 200 simulací a offline balíček.
 
 ## Struktura repozitáře
 
@@ -37,9 +47,16 @@ koryto-game/
 │   ├── app.js
 │   ├── state.js
 │   ├── save-system.js
+│   ├── quest-data.js
+│   ├── quest-runtime.js
 │   ├── quest-system.js
+│   ├── event-system.js
+│   ├── faction-system.js
+│   ├── companion-system.js
+│   ├── ux-system.js
 │   ├── v0143.js
-│   └── v0143-test3.js
+│   ├── v0143-test3.js
+│   └── v0143-test10.js
 ├── tests/
 ├── docs/
 │   ├── architecture.md
@@ -53,7 +70,7 @@ koryto-game/
 
 ## Nejbližší technický krok
 
-Po přijetí questového kontraktu lze v dalších iteracích bezpečně přesouvat samotné questové definice a operace z monolitického `app.js` do doménového modulu po malých, charakterizačně krytých částech. Změny nesmějí měnit hratelnost ani kompatibilitu savů.
+Další hlavní vývojová větev může fyzicky zmenšovat `app.js` po jednotlivých doménách. TEST.10 už poskytuje externí autoritativní data, runtime kontrakty a regresní síť, takže tento přesun lze dělat bez změny hratelnosti a kompatibility savů.
 
 Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
 
