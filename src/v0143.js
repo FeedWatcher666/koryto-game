@@ -1,7 +1,7 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.3 TEST.1";
-  const SAVE_VERSION = "0.14.3-test.1";
+  const VERSION = "0.14.3 TEST.2";
+  const SAVE_VERSION = "0.14.3-test.2";
   const RELEASE_FLAG = "v0143ReleaseCandidate";
   let lastReport = null;
 
@@ -44,13 +44,13 @@
 
   function canonicalVersion() {
     if (typeof document === "undefined") return;
-    const title = `Koryto ${VERSION} – modulární testovací verze`;
+    const title = `Koryto ${VERSION} – stabilizační testovací verze`;
     if (document.title !== title) document.title = title;
     const brand = document.querySelector?.(".brand h1 span");
     const brandText = `Dolní Vejprnice ${VERSION}`;
     if (brand && brand.textContent !== brandText) brand.textContent = brandText;
     const description = document.querySelector?.('meta[name="description"]');
-    const descriptionText = `Koryto ${VERSION}: modulární stav a ukládání při zachování kompletní kampaně a offline hraní.`;
+    const descriptionText = `Koryto ${VERSION}: stabilizovaný modulární stav, bezpečná migrace uložených her a plynulé offline hraní.`;
     if (description && description.content !== descriptionText) description.content = descriptionText;
     const footer = document.querySelector?.(".footer-note");
     if (footer) {
@@ -72,7 +72,7 @@
     const anchor = document.createElement?.("a");
     if (!anchor) return text;
     anchor.href = URL.createObjectURL(blob);
-    anchor.download = "koryto_0.14.3_test.1_kronika.txt";
+    anchor.download = "koryto_0.14.3_test.2_kronika.txt";
     anchor.click?.();
     URL.revokeObjectURL?.(anchor.href);
     return text;
@@ -83,7 +83,7 @@
     const exportButton = document.getElementById?.("exportBtn");
     if (exportButton) {
       exportButton.onclick = exportChronicle;
-      exportButton.dataset.v0143Export = "1";
+      exportButton.dataset.v0143Export = "2";
     }
   }
 
@@ -93,6 +93,7 @@
     lastReport = {
       version:VERSION,
       saveVersion:SAVE_VERSION,
+      runtimeMode:"event-driven",
       ok:issues.length === 0,
       issues,
       day:target?.day,
@@ -106,12 +107,13 @@
     if (typeof state !== "undefined" && state && state.version !== SAVE_VERSION) normalizeReleaseState();
     installControls();
     canonicalVersion();
+    return runReleaseCheck();
   }
 
   const api = {
     VERSION, SAVE_VERSION, RELEASE_FLAG,
     normalizeReleaseState, validateReleaseState, runReleaseCheck,
-    canonicalVersion, rewriteLegacyLabels, installControls, exportChronicle,
+    canonicalVersion, rewriteLegacyLabels, installControls, exportChronicle, refresh,
     get report() { return lastReport; }
   };
   globalThis.KorytoTest143 = api;
@@ -121,10 +123,4 @@
   installControls();
   canonicalVersion();
   runReleaseCheck();
-  if (typeof setInterval === "function") setInterval(refresh, 1200);
-  if (typeof MutationObserver === "function") {
-    const observer = new MutationObserver(() => canonicalVersion());
-    if (document.head) observer.observe(document.head, {subtree:true, childList:true, characterData:true, attributes:true});
-    if (document.body) observer.observe(document.body, {subtree:true, childList:true, characterData:true});
-  }
 })();
