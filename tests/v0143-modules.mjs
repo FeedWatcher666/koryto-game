@@ -39,7 +39,7 @@ assert.equal(loaded.version, '0.14.3-test.1');
 assert.equal(loaded.flags.v0143ReleaseCandidate, '0.14.3 TEST.1');
 for (const key of requiredObjects) assert.ok(loaded[key] && typeof loaded[key] === 'object' && !Array.isArray(loaded[key]), `${key} must be an object`);
 for (const key of requiredArrays) assert.ok(Array.isArray(loaded[key]), `${key} must be an array`);
-assert.deepEqual(context.KorytoState.validate(loaded), []);
+assert.equal(context.KorytoState.validate(loaded).length, 0);
 
 const roundTrip = context.KorytoSaveSystem.roundTrip(loaded);
 assert.equal(roundTrip.ok, true);
