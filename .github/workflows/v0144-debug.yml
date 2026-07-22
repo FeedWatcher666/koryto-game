@@ -1,0 +1,42 @@
+name: Diagnose v0.14.4 test failure
+
+on:
+  push:
+    branches:
+      - test/v0.14.4-test10
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run full tests
+        id: tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test-output.txt
+      - name: Post precise failure to PR
+        if: steps.tests.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          {
+            echo '### v0.14.4 CI failure detail'
+            echo '```text'
+            tail -n 90 test-output.txt
+            echo '```'
+          } | gh pr comment 13 --body-file -
+      - name: Fail job when tests failed
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
