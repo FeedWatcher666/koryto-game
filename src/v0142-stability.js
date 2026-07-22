@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.2 TEST.9";
+  const VERSION = "0.14.2 TEST.10";
   const STATE_MARKER = "v0142StableVersion";
   const VALID_PROMISES = new Set(["school", "fees", "meadow"]);
   const VALID_PROMISE_STATUS = new Set(["active", "fulfilled", "broken"]);
@@ -103,6 +103,7 @@
     normalizeCommitments(target);
     if (globalThis.KorytoCounterCampaign?.normalizeCampaignState) globalThis.KorytoCounterCampaign.normalizeCampaignState(target);
     if (globalThis.KorytoTest9?.normalizeUiState) globalThis.KorytoTest9.normalizeUiState(target);
+    if (globalThis.KorytoTest10?.normalizeClarityState) globalThis.KorytoTest10.normalizeClarityState(target);
     return target;
   }
 
@@ -122,6 +123,7 @@
     const counter = target.flags?.v0142CounterCampaign;
     if (counter && typeof counter !== "object") issues.push("neplatná protikampaň");
     if (target.ui?.v0142CompactMenus !== true) issues.push("kompaktní menu není aktivní");
+    if (target.flags?.v0142ClaritySummaries !== undefined && !Array.isArray(target.flags.v0142ClaritySummaries)) issues.push("neplatné denní souhrny");
     return issues;
   }
 
@@ -168,17 +170,17 @@
   }
 
   function updateVersionLabels() {
-    document.title = `Koryto ${VERSION} – vyvážený volební štáb`;
+    document.title = `Koryto ${VERSION} – čitelná volební kampaň`;
     const brand = document.querySelector?.(".brand h1 span");
     if (brand) brand.textContent = `Dolní Vejprnice ${VERSION}`;
     const description = document.querySelector?.('meta[name="description"]');
-    if (description) description.content = `Koryto ${VERSION}: kompaktní menu volebního štábu, jeden strategický tah denně a vyvážené odměny.`;
+    if (description) description.content = `Koryto ${VERSION}: průvodce prvním dnem, denní souhrny, jasné priority a vysvětlení volebního výsledku.`;
     const footer = document.querySelector?.(".footer-note");
     if (footer && !footer.dataset.stabilityLabel) {
       footer.dataset.stabilityLabel = "1";
       footer.textContent += ` · ${VERSION}`;
-    } else if (footer && /0\.14\.2 TEST\.[4-8]/.test(footer.textContent || "")) {
-      footer.textContent = footer.textContent.replace(/0\.14\.2 TEST\.[4-8]/g,VERSION);
+    } else if (footer && /0\.14\.2 TEST\.[4-9]/.test(footer.textContent || "")) {
+      footer.textContent = footer.textContent.replace(/0\.14\.2 TEST\.[4-9]/g,VERSION);
     }
   }
 
@@ -187,7 +189,7 @@
     const nodes = [root, ...root.querySelectorAll("*")];
     for (const node of nodes) {
       if (node.children?.length || typeof node.textContent !== "string") continue;
-      if (/0\.14\.2 TEST\.[4-8]/.test(node.textContent)) node.textContent = node.textContent.replace(/0\.14\.2 TEST\.[4-8]/g, VERSION);
+      if (/0\.14\.2 TEST\.[4-9]/.test(node.textContent)) node.textContent = node.textContent.replace(/0\.14\.2 TEST\.[4-9]/g, VERSION);
     }
   }
 
