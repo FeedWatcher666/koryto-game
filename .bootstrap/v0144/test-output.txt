@@ -1,0 +1,357 @@
+
+> test
+> node --check src/app.js && node --check src/core-data.js && node --check src/companion-data.js && node --check src/faction-data.js && node --check src/debate-data.js && node --check src/event-data.js && node --check src/quest-data.js && node --check src/quest-runtime.js && node --check src/debate-system.js && node --check src/election-system.js && node --check src/game-engine.js && node --check src/event-system.js && node --check src/faction-system.js && node --check src/companion-system.js && node --check src/balance-system.js && node --check src/ux-system.js && node --check src/v0144-test10.js && node --check src/v0142.js && node --check src/v0142c.js && node --check src/v0142d.js && node --check src/v0142-stability.js && node --check src/v0142-countercampaign.js && node --check src/v0142-ui-balance.js && node --check src/v0142-clarity.js && node --check src/v0142-rc3.js && node --check src/state.js && node --check src/save-system.js && node --check src/v0143.js && node --check src/quest-system.js && node --check src/v0143-test3.js && node --check src/v0143-test10.js && node tests/content-integrity.mjs && node tests/save-migration.mjs && node tests/smoke.mjs && node tests/simulation.mjs && node tests/v0142-stability.mjs && node tests/v0142-countercampaign.mjs && node tests/v0142-ui-balance.mjs && node tests/v0142-clarity.mjs && node tests/v0142-rc3.mjs && node tests/v0143-modules.mjs && node tests/v0143-quest-system.mjs && node tests/v0143-test10.mjs && node tests/v0144-modular.mjs && node tests/v0144-simulation.mjs
+
+content integrity ok
+save migration ok
+smoke ok
+simulation characterization ok
+v0.14.2 stability ok
+v0.14.2 counter-campaign ok
+v0.14.2 compact UI and balance ok
+v0.14.2 clarity and full-run checks ok
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /0\.14\.3 TEST\.10/. Input:
+
+'<!doctype html>\n' +
+  '<html lang="cs">\n' +
+  '<head>\n' +
+  '<meta charset="utf-8">\n' +
+  '<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+  '<meta name="description" content="Koryto 0.14.4 TEST.10: modulární questy, události, frakce, společníci, mobilní UX a stabilizační audit.">\n' +
+  '<title>Koryto 0.14.4 TEST.10 – kompletní modulární test</title>\n' +
+  '<link rel="stylesheet" href="styles/base.css">\n' +
+  '\n' +
+  '<!-- Compatibility marker for pre-RC1 regression tests: 0.14.2 TEST.10 -->\n' +
+  '</head>\n' +
+  '<body>\n' +
+  '<div id="app" class="app">\n' +
+  '<header class="topbar">\n' +
+  '  <div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.14.4 TEST.10</span></h1></div>\n' +
+  '  <div class="actions">\n' +
+  '    <button id="mapBtn" class="btn small hidden">Mapa</button>\n' +
+  '    <button id="saveBtn" class="btn small hidden">Uložit</button>\n' +
+  '    <button id="loadBtn" class="btn small hidden">Načíst</button>\n' +
+  '    <button id="exportBtn" class="btn small hidden">Kronika</button>\n' +
+  '    <button id="restartBtn" class="btn small danger hidden">Nová hra</button>\n' +
+  '  </div>\n' +
+  '</header>\n' +
+  '\n' +
+  '<main>\n' +
+  '<section id="startScreen" class="screen start active">\n' +
+  '  <div class="hero">\n' +
+  '    <div class="crest">🐷🎲</div><p class="eyebrow">OTEVŘENÁ KAPITOLA</p>\n' +
+  '    <h2>Krysy v JZD</h2>\n' +
+  '    <p>Třináct dní kampaně. Frakce jednají každý den bez vás, členové štábu sledují vlastní ambice, stará rozhodnutí se vracejí a Věčný rozjíždí vícekrokové protioperace. Velká debata zůstává taktickým bossfightem.</p>\n' +
+  '    <blockquote>„Vesnice potřebuje hrdinu. Nebo alespoň někoho s autem a tiskárnou.“</blockquote>\n' +
+  '    <button id="startBtn" class="btn primary">Vytvořit kandidáta</button>\n' +
+  '  </div>\n' +
+  '</section>\n' +
+  '\n' +
+  '<section id="creationScreen" class="screen">\n' +
+  '  <div class="creation">\n' +
+  '    <div class="panel">\n' +
+  '      <p class="eyebrow">POSTAVA</p><h2>Kdo jde zachránit obec?</h2>\n' +
+  '      <div class="field"><label for="heroName">Jméno kandidáta</label><input id="heroName" value="Bohuslav Korytář" maxlength="28"></div>\n' +
+  '      <p>Každá třída má jinou výhodu. Žádná však neumí vysvětlit, proč obec platí čtyři sekačky na jednu náves.</p>\n' +
+  '      <div class="field">\n' +
+  '        <label>Výchozí motivace</label>\n' +
+  '        <select id="origin" class="btn" style="width:100%">\n' +
+  '          <option value="idealist">Chci skutečně něco napravit</option>\n' +
+  '          <option value="ambitious">Někdo tu funkci dělat musí</option>\n' +
+  '          <option value="revenge">Starosta mi zamítl pergolu</option>\n' +
+  '        </select>\n' +
+  '      </div>\n' +
+  '    </div>\n' +
+  '    <div class="panel">\n' +
+  '      <p class="eyebrow">POLITICKÉ POVOLÁNÍ</p>\n' +
+  '      <div id="classGrid" class="class-grid"></div>\n' +
+  '      <button id="confirmBtn" class="btn primary" style="margin-top:15px;width:100%">Vstoupit do Dolních Vejprnic</button>\n' +
+  '    </div>\n' +
+  '  </div>\n' +
+  '</section>\n' +
+  '\n' +
+  '<section id="gameScreen" class="screen">\n' +
+  '  <div class="game">\n' +
+  '    <aside class="side">\n' +
+  '      <div class="card hero-card"><div id="avatar" class="avatar">🎤</div><div><h2 id="heroLabel"></h2><p id="classLabel"></p><p id="timeLabel"></p></div></div>\n' +
+  '      <div class="card"><h3>Kampaň</h3><div id="metrics" class="metrics"></div></div>\n' +
+  '      <div class="card"><h3>Politická duše</h3><div id="soulBars"></div></div>\n' +
+  '      <div class="card"><h3>Družina</h3><div id="partyList" class="party-list"></div></div>\n' +
+  '      <div class="card"><h3>Vztahy ve štábu</h3><div id="relationshipPanel" class="relationship-list"></div></div><div class="card"><h3>Voličské bloky</h3><div id="voterBars"></div></div>\n' +
+  '      <div class="card"><h3>Frakce</h3><div id="factionBars"></div></div>\n' +
+  '    </aside>\n' +
+  '\n' +
+  '    <section>\n' +
+  '      <div id="mapView">\n' +
+  '        <div class="map-head"><div><p class="eyebrow">DOLNÍ VEJPRNICE</p><h2>Kam půjdete?</h2></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><div id="clock" class="clock"></div><button id="pixelToggle" class="btn small pixel-toggle">Pixelová mapa: zapnuta</button><button id="endDayBtn" class="btn small">Ukončit den</button></div></div>\n' +
+  '        <div id="map" class="map"></div>\n' +
+  '        <p class="map-note">Každá návštěva spotřebuje jednu akci. Některé možnosti stojí peníze; když je nemáte, vznikne politický dluh. Jednoho člena družiny lze každý den vyslat na samostatnou misi.</p>\n' +
+  '      </div>\n' +
+  '      <div id="locationView" class="scene hidden"></div>\n' +
+  '      <div id="eventView" class="scene hidden"></div>\n' +
+  '    </section>\n' +
+  '\n' +
+  '    <aside class="side">\n' +
+  '      <div class="card"><h3>Volební štáb</h3><div id="warRoom" class="journal-list"></div></div>\n' +
+  '      <div class="card"><h3>Aktivní questy</h3><div id="journal" class="journal-list"></div></div>\n' +
+  '      <div class="card"><h3>Vejprnický informační servis</h3><div id="news" class="news-list"></div></div>\n' +
+  '      <div class="card"><h3>Sliby a politické dluhy</h3><div id="commitments" class="journal-list"></div></div><div class="card"><h3>Mocenské plány</h3><div id="factionPlans" class="journal-list"></div></div><div class="card"><h3>Dění ve vesnici</h3><div id="worldPulse" class="journal-list"></div></div><div class="card"><h3>Osobní ambice štábu</h3><div id="ambitionPanel" class="journal-list"></div></div><div class="card"><h3>Soupeřova operace</h3><div id="rivalOperationPanel" class="journal-list"></div></div><div class="card"><h3>Operace SILO</h3><div id="conspiracyPanel" class="journal-list"></div></div><div class="card"><h3>Výbava a páky</h3><div id="inventory" class="party-list"></div></div>\n' +
+  '    </aside>\n' +
+  '  </div>\n' +
+  '</section>\n' +
+  '\n' +
+  '<section id="debateScreen" class="screen">\n' +
+  '  <div class="debate-shell">\n' +
+  '    <aside class="panel pixel-target">\n' +
+  '      <p class="eyebrow">VAŠE TAKTICKÁ DESKA</p><h3 id="debateHeroName"></h3>\n' +
+  '      <div id="debateStats" class="debate-stats"></div>\n' +
+  '      <div id="classAbilityBox" class="ability-box" style="margin-top:12px"></div>\n' +
+  '      <h3>Podpora družiny</h3><div id="debateAssists" class="companion-assists"></div>\n' +
+  '    </aside>\n' +
+  '    <section class="debate-arena">\n' +
+  '      <div class="panel debate-stage">\n' +
+  '        <div class="debate-vs">\n' +
+  '          <div class="debater player"><span id="debatePlayerPortrait" class="portrait"></span><h3 id="debatePlayerLabel"></h3><div class="repbar"><i id="debatePlayerBar"></i></div><small id="debatePlayerRep"></small></div>\n' +
+  '          <div class="versus">VS</div>\n' +
+  '          <div class="debater"><span class="portrait">🕴️</span><h3>Vladimír Věčný</h3><div class="repbar"><i id="debateOpponentBar"></i></div><small id="debateOpponentRep"></small></div>\n' +
+  '        </div>\n' +
+  '        <div id="debateIntent" class="debate-intent"></div>\n' +
+  '      </div>\n' +
+  '      <div class="panel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><p class="eyebrow">TAKTICKÉ KARTY</p><h3 id="debateRound"></h3></div><button id="debateRetreat" class="btn small">Odejít z debaty</button></div><div id="debateCards" class="debate-cards"></div></div>\n' +
+  '    </section>\n' +
+  '    <aside class="panel pixel-target"><p class="eyebrow">PŘÍMÝ PŘENOS</p><h3>Nálada sálu</h3><div class="moodbar"><i id="debateMoodBar"></i></div><p id="debateMoodText"></p><h3>Průběh debaty</h3><div id="debateLog" class="debate-log"></div></aside>\n' +
+  '  </div>\n' +
+  '</section>\n' +
+  '\n' +
+  '<section id="coalitionScreen" class="screen">\n' +
+  '  <div class="coalition-shell">\n' +
+  '    <div class="panel coalition-header"><div><p class="eyebrow">POVOLEBNÍ DUNGEON</p><h2>Koaliční salonek</h2><p id="coalitionLead">Hlasy jsou sečtené. Teď začíná část demokracie, kterou voliči nevidí.</p></div><div><div id="coalitionSeatScore" class="coalition-score"></div><small id="coalitionRoundLabel"></small><br><button id="coalitionPass" class="btn small" style="margin-top:8px">Ukončit kolo bez dohody</button></div></div>\n' +
+  '    <div class="panel"><h3>Vyjednávací kapitál</h3><div id="coalitionResources" class="resource-grid"></div></div>\n' +
+  '    <div class="panel"><h3>Kluby v zastupitelstvu</h3><div id="coalitionPartners" class="partner-grid"></div></div>\n' +
+  '    <div id="coalitionOfferPanel" class="panel hidden"></div>\n' +
+  '    <div class="panel"><h3>Průběh jednání</h3><div id="coalitionLog" class="coalition-log"></div></div>\n' +
+  '  </div>\n' +
+  '</section>\n' +
+  '\n' +
+  '<section id="endingScreen" class="screen">\n' +
+  '  <div class="ending">\n' +
+  '    <div class="panel"><p class="eyebrow">VOLEBNÍ NOC</p><div id="endingEmoji" style="font-size:4rem"></div><h2 id="endingTitle"></h2><p id="endingLead" style="font-size:1.15rem;line-height:1.6"></p></div>\n' +
+  '    <div class="ending-grid" style="margin-top:15px">\n' +
+  '      <div id="endingStory" class="panel"></div>\n' +
+  '      <div class="panel"><h3>Volební účet</h3><div id="finalStats"></div></div>\n' +
+  '    </div>\n' +
+  '    <button id="againBtn" class="btn primary" style="margin-top:15px">Hrát znovu</button>\n' +
+  '  </div>\n' +
+  '</section>\n' +
+  '</main>\n' +
+  '<div class="footer-note">Fiktivní postavy. Fiktivní obec. Operace SILO je zcela smyšlená. Podobnosti jsou administrativní náhoda.</div>\n' +
+  '</div>\n' +
+  '\n' +
+  '<div id="diceOverlay" class="overlay hidden">\n' +
+  '  <div class="dialog"><p class="eyebrow">ZKOUŠKA SCHOPNOSTI</p><h2 id="diceTitle"></h2><div id="d20" class="d20">20</div><p id="diceFormula"></p><p id="diceOutcome"></p><button id="diceClose" class="btn primary hidden">Pokračovat</button></div>\n' +
+  '</div>\n' +
+  '\n' +
+  '<script src="src/core-data.js"></script>\n' +
+  '<script src="src/companion-data.js"></script>\n' +
+  '<script src="src/faction-data.js"></script>\n' +
+  '<script src="src/debate-data.js"></script>\n' +
+  '<script src="src/quest-data.js"></script>\n' +
+  '<script src="src/event-data.js"></script>\n' +
+  '<script src="src/quest-runtime.js"></script>\n' +
+  '<script src="src/debate-system.js"></script>\n' +
+  '<script src="src/election-system.js"></script>\n' +
+  '<script src="src/game-engine.js"></script>\n' +
+  '<script src="src/app.js"></script>\n' +
+  '<script src="src/event-system.js"></script>\n' +
+  '<script src="src/faction-system.js"></script>\n' +
+  '<script src="src/companion-system.js"></script>\n' +
+  '<script src="src/v0142.js"></script>\n' +
+  '<script src="src/v0142c.js"></script>\n' +
+  '<script src="src/v0142d.js"></script>\n' +
+  '<script src="src/v0142-stability.js"></script>\n' +
+  '<script src="src/v0142-countercampaign.js"></script>\n' +
+  '<script src="src/v0142-ui-balance.js"></script>\n' +
+  '<script src="src/v0142-clarity.js"></script>\n' +
+  '<script src="src/state.js"></script>\n' +
+  '<script src="src/save-system.js"></script>\n' +
+  '<script '... 308 more characters
+
+    at file:///home/runner/work/koryto-game/koryto-game/tests/v0142-rc3.mjs:21:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '<!doctype html>\n' +
+    '<html lang="cs">\n' +
+    '<head>\n' +
+    '<meta charset="utf-8">\n' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+    '<meta name="description" content="Koryto 0.14.4 TEST.10: modulární questy, události, frakce, společníci, mobilní UX a stabilizační audit.">\n' +
+    '<title>Koryto 0.14.4 TEST.10 – kompletní modulární test</title>\n' +
+    '<link rel="stylesheet" href="styles/base.css">\n' +
+    '\n' +
+    '<!-- Compatibility marker for pre-RC1 regression tests: 0.14.2 TEST.10 -->\n' +
+    '</head>\n' +
+    '<body>\n' +
+    '<div id="app" class="app">\n' +
+    '<header class="topbar">\n' +
+    '  <div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.14.4 TEST.10</span></h1></div>\n' +
+    '  <div class="actions">\n' +
+    '    <button id="mapBtn" class="btn small hidden">Mapa</button>\n' +
+    '    <button id="saveBtn" class="btn small hidden">Uložit</button>\n' +
+    '    <button id="loadBtn" class="btn small hidden">Načíst</button>\n' +
+    '    <button id="exportBtn" class="btn small hidden">Kronika</button>\n' +
+    '    <button id="restartBtn" class="btn small danger hidden">Nová hra</button>\n' +
+    '  </div>\n' +
+    '</header>\n' +
+    '\n' +
+    '<main>\n' +
+    '<section id="startScreen" class="screen start active">\n' +
+    '  <div class="hero">\n' +
+    '    <div class="crest">🐷🎲</div><p class="eyebrow">OTEVŘENÁ KAPITOLA</p>\n' +
+    '    <h2>Krysy v JZD</h2>\n' +
+    '    <p>Třináct dní kampaně. Frakce jednají každý den bez vás, členové štábu sledují vlastní ambice, stará rozhodnutí se vracejí a Věčný rozjíždí vícekrokové protioperace. Velká debata zůstává taktickým bossfightem.</p>\n' +
+    '    <blockquote>„Vesnice potřebuje hrdinu. Nebo alespoň někoho s autem a tiskárnou.“</blockquote>\n' +
+    '    <button id="startBtn" class="btn primary">Vytvořit kandidáta</button>\n' +
+    '  </div>\n' +
+    '</section>\n' +
+    '\n' +
+    '<section id="creationScreen" class="screen">\n' +
+    '  <div class="creation">\n' +
+    '    <div class="panel">\n' +
+    '      <p class="eyebrow">POSTAVA</p><h2>Kdo jde zachránit obec?</h2>\n' +
+    '      <div class="field"><label for="heroName">Jméno kandidáta</label><input id="heroName" value="Bohuslav Korytář" maxlength="28"></div>\n' +
+    '      <p>Každá třída má jinou výhodu. Žádná však neumí vysvětlit, proč obec platí čtyři sekačky na jednu náves.</p>\n' +
+    '      <div class="field">\n' +
+    '        <label>Výchozí motivace</label>\n' +
+    '        <select id="origin" class="btn" style="width:100%">\n' +
+    '          <option value="idealist">Chci skutečně něco napravit</option>\n' +
+    '          <option value="ambitious">Někdo tu funkci dělat musí</option>\n' +
+    '          <option value="revenge">Starosta mi zamítl pergolu</option>\n' +
+    '        </select>\n' +
+    '      </div>\n' +
+    '    </div>\n' +
+    '    <div class="panel">\n' +
+    '      <p class="eyebrow">POLITICKÉ POVOLÁNÍ</p>\n' +
+    '      <div id="classGrid" class="class-grid"></div>\n' +
+    '      <button id="confirmBtn" class="btn primary" style="margin-top:15px;width:100%">Vstoupit do Dolních Vejprnic</button>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '</section>\n' +
+    '\n' +
+    '<section id="gameScreen" class="screen">\n' +
+    '  <div class="game">\n' +
+    '    <aside class="side">\n' +
+    '      <div class="card hero-card"><div id="avatar" class="avatar">🎤</div><div><h2 id="heroLabel"></h2><p id="classLabel"></p><p id="timeLabel"></p></div></div>\n' +
+    '      <div class="card"><h3>Kampaň</h3><div id="metrics" class="metrics"></div></div>\n' +
+    '      <div class="card"><h3>Politická duše</h3><div id="soulBars"></div></div>\n' +
+    '      <div class="card"><h3>Družina</h3><div id="partyList" class="party-list"></div></div>\n' +
+    '      <div class="card"><h3>Vztahy ve štábu</h3><div id="relationshipPanel" class="relationship-list"></div></div><div class="card"><h3>Voličské bloky</h3><div id="voterBars"></div></div>\n' +
+    '      <div class="card"><h3>Frakce</h3><div id="factionBars"></div></div>\n' +
+    '    </aside>\n' +
+    '\n' +
+    '    <section>\n' +
+    '      <div id="mapView">\n' +
+    '        <div class="map-head"><div><p class="eyebrow">DOLNÍ VEJPRNICE</p><h2>Kam půjdete?</h2></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><div id="clock" class="clock"></div><button id="pixelToggle" class="btn small pixel-toggle">Pixelová mapa: zapnuta</button><button id="endDayBtn" class="btn small">Ukončit den</button></div></div>\n' +
+    '        <div id="map" class="map"></div>\n' +
+    '        <p class="map-note">Každá návštěva spotřebuje jednu akci. Některé možnosti stojí peníze; když je nemáte, vznikne politický dluh. Jednoho člena družiny lze každý den vyslat na samostatnou misi.</p>\n' +
+    '      </div>\n' +
+    '      <div id="locationView" class="scene hidden"></div>\n' +
+    '      <div id="eventView" class="scene hidden"></div>\n' +
+    '    </section>\n' +
+    '\n' +
+    '    <aside class="side">\n' +
+    '      <div class="card"><h3>Volební štáb</h3><div id="warRoom" class="journal-list"></div></div>\n' +
+    '      <div class="card"><h3>Aktivní questy</h3><div id="journal" class="journal-list"></div></div>\n' +
+    '      <div class="card"><h3>Vejprnický informační servis</h3><div id="news" class="news-list"></div></div>\n' +
+    '      <div class="card"><h3>Sliby a politické dluhy</h3><div id="commitments" class="journal-list"></div></div><div class="card"><h3>Mocenské plány</h3><div id="factionPlans" class="journal-list"></div></div><div class="card"><h3>Dění ve vesnici</h3><div id="worldPulse" class="journal-list"></div></div><div class="card"><h3>Osobní ambice štábu</h3><div id="ambitionPanel" class="journal-list"></div></div><div class="card"><h3>Soupeřova operace</h3><div id="rivalOperationPanel" class="journal-list"></div></div><div class="card"><h3>Operace SILO</h3><div id="conspiracyPanel" class="journal-list"></div></div><div class="card"><h3>Výbava a páky</h3><div id="inventory" class="party-list"></div></div>\n' +
+    '    </aside>\n' +
+    '  </div>\n' +
+    '</section>\n' +
+    '\n' +
+    '<section id="debateScreen" class="screen">\n' +
+    '  <div class="debate-shell">\n' +
+    '    <aside class="panel pixel-target">\n' +
+    '      <p class="eyebrow">VAŠE TAKTICKÁ DESKA</p><h3 id="debateHeroName"></h3>\n' +
+    '      <div id="debateStats" class="debate-stats"></div>\n' +
+    '      <div id="classAbilityBox" class="ability-box" style="margin-top:12px"></div>\n' +
+    '      <h3>Podpora družiny</h3><div id="debateAssists" class="companion-assists"></div>\n' +
+    '    </aside>\n' +
+    '    <section class="debate-arena">\n' +
+    '      <div class="panel debate-stage">\n' +
+    '        <div class="debate-vs">\n' +
+    '          <div class="debater player"><span id="debatePlayerPortrait" class="portrait"></span><h3 id="debatePlayerLabel"></h3><div class="repbar"><i id="debatePlayerBar"></i></div><small id="debatePlayerRep"></small></div>\n' +
+    '          <div class="versus">VS</div>\n' +
+    '          <div class="debater"><span class="portrait">🕴️</span><h3>Vladimír Věčný</h3><div class="repbar"><i id="debateOpponentBar"></i></div><small id="debateOpponentRep"></small></div>\n' +
+    '        </div>\n' +
+    '        <div id="debateIntent" class="debate-intent"></div>\n' +
+    '      </div>\n' +
+    '      <div class="panel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><p class="eyebrow">TAKTICKÉ KARTY</p><h3 id="debateRound"></h3></div><button id="debateRetreat" class="btn small">Odejít z debaty</button></div><div id="debateCards" class="debate-cards"></div></div>\n' +
+    '    </section>\n' +
+    '    <aside class="panel pixel-target"><p class="eyebrow">PŘÍMÝ PŘENOS</p><h3>Nálada sálu</h3><div class="moodbar"><i id="debateMoodBar"></i></div><p id="debateMoodText"></p><h3>Průběh debaty</h3><div id="debateLog" class="debate-log"></div></aside>\n' +
+    '  </div>\n' +
+    '</section>\n' +
+    '\n' +
+    '<section id="coalitionScreen" class="screen">\n' +
+    '  <div class="coalition-shell">\n' +
+    '    <div class="panel coalition-header"><div><p class="eyebrow">POVOLEBNÍ DUNGEON</p><h2>Koaliční salonek</h2><p id="coalitionLead">Hlasy jsou sečtené. Teď začíná část demokracie, kterou voliči nevidí.</p></div><div><div id="coalitionSeatScore" class="coalition-score"></div><small id="coalitionRoundLabel"></small><br><button id="coalitionPass" class="btn small" style="margin-top:8px">Ukončit kolo bez dohody</button></div></div>\n' +
+    '    <div class="panel"><h3>Vyjednávací kapitál</h3><div id="coalitionResources" class="resource-grid"></div></div>\n' +
+    '    <div class="panel"><h3>Kluby v zastupitelstvu</h3><div id="coalitionPartners" class="partner-grid"></div></div>\n' +
+    '    <div id="coalitionOfferPanel" class="panel hidden"></div>\n' +
+    '    <div class="panel"><h3>Průběh jednání</h3><div id="coalitionLog" class="coalition-log"></div></div>\n' +
+    '  </div>\n' +
+    '</section>\n' +
+    '\n' +
+    '<section id="endingScreen" class="screen">\n' +
+    '  <div class="ending">\n' +
+    '    <div class="panel"><p class="eyebrow">VOLEBNÍ NOC</p><div id="endingEmoji" style="font-size:4rem"></div><h2 id="endingTitle"></h2><p id="endingLead" style="font-size:1.15rem;line-height:1.6"></p></div>\n' +
+    '    <div class="ending-grid" style="margin-top:15px">\n' +
+    '      <div id="endingStory" class="panel"></div>\n' +
+    '      <div class="panel"><h3>Volební účet</h3><div id="finalStats"></div></div>\n' +
+    '    </div>\n' +
+    '    <button id="againBtn" class="btn primary" style="margin-top:15px">Hrát znovu</button>\n' +
+    '  </div>\n' +
+    '</section>\n' +
+    '</main>\n' +
+    '<div class="footer-note">Fiktivní postavy. Fiktivní obec. Operace SILO je zcela smyšlená. Podobnosti jsou administrativní náhoda.</div>\n' +
+    '</div>\n' +
+    '\n' +
+    '<div id="diceOverlay" class="overlay hidden">\n' +
+    '  <div class="dialog"><p class="eyebrow">ZKOUŠKA SCHOPNOSTI</p><h2 id="diceTitle"></h2><div id="d20" class="d20">20</div><p id="diceFormula"></p><p id="diceOutcome"></p><button id="diceClose" class="btn primary hidden">Pokračovat</button></div>\n' +
+    '</div>\n' +
+    '\n' +
+    '<script src="src/core-data.js"></script>\n' +
+    '<script src="src/companion-data.js"></script>\n' +
+    '<script src="src/faction-data.js"></script>\n' +
+    '<script src="src/debate-data.js"></script>\n' +
+    '<script src="src/quest-data.js"></script>\n' +
+    '<script src="src/event-data.js"></script>\n' +
+    '<script src="src/quest-runtime.js"></script>\n' +
+    '<script src="src/debate-system.js"></script>\n' +
+    '<script src="src/election-system.js"></script>\n' +
+    '<script src="src/game-engine.js"></script>\n' +
+    '<script src="src/app.js"></script>\n' +
+    '<script src="src/event-system.js"></script>\n' +
+    '<script src="src/faction-system.js"></script>\n' +
+    '<script src="src/companion-system.js"></script>\n' +
+    '<script src="src/v0142.js"></script>\n' +
+    '<script src="src/v0142c.js"></script>\n' +
+    '<script src="src/v0142d.js"></script>\n' +
+    '<script src="src/v0142-stability.js"></script>\n' +
+    '<script src="src/v0142-countercampaign.js"></script>\n' +
+    '<script src="src/v0142-ui-balance.js"></script>\n' +
+    '<script src="src/v0142-clarity.js"></script>\n' +
+    '<script src="src/state.js"></script>\n' +
+    '<script src="src/save-system.js"></script>\n' +
+    '<script '... 308 more characters,
+  expected: /0\.14\.3 TEST\.10/,
+  operator: 'match',
+  diff: 'simple'
+}
+
+Node.js v22.23.1
