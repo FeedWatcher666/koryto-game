@@ -1,12 +1,12 @@
-name: Koryto v0.14.2 RC3
+name: Koryto v0.14.3 TEST.1
 
 on:
   push:
     branches:
-      - test/v0.14.2-playable
+      - test/v0.14.3-modules
   pull_request:
     branches:
-      - main
+      - test/v0.14.2-playable
   workflow_dispatch:
 
 jobs:
@@ -31,20 +31,21 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.2-rc3-diagnostics
+          name: koryto-v0.14.3-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
 
       - name: Build offline package
         run: |
-          mkdir -p dist/koryto-v0.14.2-rc3
-          cp index.html VERSION README.md dist/koryto-v0.14.2-rc3/
-          cp -R src styles dist/koryto-v0.14.2-rc3/
-          rm -f dist/koryto-v0.14.2-rc3/src/v0142-rc2.js
+          mkdir -p dist/koryto-v0.14.3-test.1
+          cp index.html VERSION README.md dist/koryto-v0.14.3-test.1/
+          cp -R src styles dist/koryto-v0.14.3-test.1/
+          rm -f dist/koryto-v0.14.3-test.1/src/v0142-rc2.js
+          rm -f dist/koryto-v0.14.3-test.1/src/v0142-rc3.js
 
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.2-rc3
-          path: dist/koryto-v0.14.2-rc3
+          name: koryto-v0.14.3-test.1
+          path: dist/koryto-v0.14.3-test.1
           if-no-files-found: error
