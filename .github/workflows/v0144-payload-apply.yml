@@ -22,23 +22,61 @@ jobs:
           fetch-depth: 0
           ref: test/v0.14.4-test10
 
-      - name: Reconstruct, verify and test payload
+      - name: Diagnose payload transport
+        shell: bash
+        run: |
+          set -u
+          {
+            echo "uploaded parts:"
+            wc -c .bootstrap/v0144/part-*
+            echo "part hashes:"
+            sha256sum .bootstrap/v0144/part-*
+          } > .bootstrap/v0144/diagnostic.txt
+          cat .bootstrap/v0144/part-* > /tmp/v0144-payload.b64
+          echo "combined base64:" >> .bootstrap/v0144/diagnostic.txt
+          wc -c /tmp/v0144-payload.b64 >> .bootstrap/v0144/diagnostic.txt
+          sha256sum /tmp/v0144-payload.b64 >> .bootstrap/v0144/diagnostic.txt
+          if base64 -d /tmp/v0144-payload.b64 > /tmp/v0144-payload.tar.xz; then
+            echo "base64=ok" >> .bootstrap/v0144/diagnostic.txt
+          else
+            echo "base64=failed" >> .bootstrap/v0144/diagnostic.txt
+          fi
+          echo "decoded archive:" >> .bootstrap/v0144/diagnostic.txt
+          wc -c /tmp/v0144-payload.tar.xz >> .bootstrap/v0144/diagnostic.txt
+          sha256sum /tmp/v0144-payload.tar.xz >> .bootstrap/v0144/diagnostic.txt
+          if xz -t /tmp/v0144-payload.tar.xz; then
+            echo "xz=ok" >> .bootstrap/v0144/diagnostic.txt
+            echo "PAYLOAD_VALID=1" >> "$GITHUB_ENV"
+          else
+            echo "xz=failed" >> .bootstrap/v0144/diagnostic.txt
+            echo "PAYLOAD_VALID=0" >> "$GITHUB_ENV"
+          fi
+
+      - name: Apply and test valid payload
+        if: env.PAYLOAD_VALID == '1'
         shell: bash
         run: |
           set -euo pipefail
-          cat .bootstrap/v0144/part-* | base64 -d > /tmp/v0144-payload.tar.xz
-          xz -t /tmp/v0144-payload.tar.xz
           tar -xJf /tmp/v0144-payload.tar.xz -C .
           rm -rf .bootstrap/v0144
           rm -f .github/workflows/v0144-bootstrap.yml
           npm test
 
-      - name: Commit exact tested payload
+      - name: Commit payload or diagnostics
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "v0.14.4 TEST.10: physical monolith extraction"
+          if [ "$PAYLOAD_VALID" = "1" ]; then
+            git commit -m "v0.14.4 TEST.10: physical monolith extraction"
+          else
+            git commit -m "diagnose v0.14.4 payload transport"
+          fi
           git push origin HEAD:test/v0.14.4-test10
+
+      - name: Reject invalid payload
+        if: env.PAYLOAD_VALID != '1'
+        run: exit 1
