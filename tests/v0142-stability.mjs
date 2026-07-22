@@ -42,7 +42,7 @@ assert.equal(state.stats.heat, 17);
 const roundTrip = context.KorytoStability.roundTripCheck(state);
 assert.equal(roundTrip.ok, true, roundTrip.issues.join(', '));
 assert.ok(roundTrip.bytes > 100);
-assert.deepEqual(context.KorytoStability.validateState(state), []);
+assert.equal(context.KorytoStability.validateState(state).length, 0);
 
 const index = readText('index.html');
 assert.match(index, /0\.14\.2 TEST\.7/);
