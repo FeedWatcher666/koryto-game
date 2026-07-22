@@ -41,6 +41,7 @@ export function loadGameContext() {
       addEventListener() {},
       appendChild(child) { this.children.push(child); return child; },
       insertBefore(child) { this.children.unshift(child); return child; },
+      insertAdjacentElement(_position, child) { this.children.push(child); return child; },
       querySelector(selector) {
         if (selector === '.dialog') return this.children.find(child => child.classList?.contains('dialog')) || makeEl();
         return makeEl();
