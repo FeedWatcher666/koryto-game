@@ -18,6 +18,12 @@ assert.equal(context.KorytoTest143.VERSION, '0.14.3 TEST.1');
 
 const requiredObjects = ['quests','party','factions','voters','factionPlans','companionAmbitions','flags','stats','audit'];
 const requiredArrays = ['pendingEvents','items','news','commitments','worldActions','echoes'];
+const saveFixture = (name, day = 2) => ({
+  version:'0.14', day, actions:2, phase:'map',
+  hero:{name, classId:'bard', origin:'idealist', attrs:{charisma:4}},
+  stats:{support:20, trust:55, funds:12, heat:0, influence:10, integrity:55, leverage:0},
+  flags:{source:name}
+});
 
 context.clearStoredSavesForTest();
 const legacy = {
@@ -73,8 +79,30 @@ assert.equal(autoStored.version, '0.14.3-test.1');
 assert.equal(autoStored.audit.autosaves, autosavesBefore + 1);
 
 context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', saveFixture('Ruční priorita', 4));
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave druhý', 5));
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Ruční priorita', 'valid manual save must win over autosave');
+assert.equal(loaded.day, 4);
+
+context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', '{broken');
-assert.equal(context.KorytoSaveSystem.loadGame(), false, 'corrupt JSON must fail gracefully');
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Záchranný autosave', 6));
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Záchranný autosave', 'corrupt manual save must fall back to autosave');
+assert.equal(loaded.day, 6);
+
+context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', '{broken');
+context.setStoredSaveForTest('koryto_v014_auto', '[broken');
+context.setStoredSaveForTest('koryto_v013', saveFixture('Záchranný legacy save', 7));
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Záchranný legacy save', 'corrupt current slots must fall back to a valid legacy save');
+assert.equal(loaded.day, 7);
+
+context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', '{broken');
+assert.equal(context.KorytoSaveSystem.loadGame(), false, 'all-corrupt saves must fail gracefully');
 
 const simulations = context.runSimulationForTest(100, 24000);
 assert.equal(simulations.length, 100);
