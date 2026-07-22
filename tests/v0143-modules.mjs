@@ -211,8 +211,8 @@ const savePos = index.indexOf('src/save-system.js');
 const releasePos = index.indexOf('src/v0143.js');
 assert.ok(appPos >= 0 && statePos > appPos && savePos > statePos && releasePos > savePos, 'offline module order must be app, state, save, release');
 assert.doesNotMatch(index, /src\/v0142-rc3\.js/);
-assert.match(index, /0\.14\.3 TEST\.2/);
-assert.equal(readText('VERSION').trim(), '0.14.3-test.2');
+assert.match(index, /0\.14\.3 TEST\.3/);
+assert.equal(readText('VERSION').trim(), '0.14.3-test.3');
 
 const releaseSource = readText('src/v0143.js');
 assert.doesNotMatch(releaseSource, /setInterval\s*\(/, 'release integration must not poll continuously');
@@ -220,13 +220,13 @@ assert.doesNotMatch(releaseSource, /MutationObserver/, 'release integration must
 
 const workflow = readText('.github/workflows/v0142-stability.yml');
 const pullRequestTrigger = workflow.split('pull_request:')[1]?.split('workflow_dispatch:')[0] || '';
-assert.match(pullRequestTrigger, /-\s+test\/v0\.14\.3-modules\b/, 'TEST.2 PRs must run against TEST.1 base');
-assert.match(pullRequestTrigger, /-\s+main\b/, 'release PRs to main must run TEST.2 checks');
-assert.match(workflow, /koryto-v0\.14\.3-test\.2/);
+assert.match(pullRequestTrigger, /-\s+test\/v0\.14\.2-playable\b/, 'TEST.3 PRs must run against the integrated TEST.2 baseline');
+assert.match(pullRequestTrigger, /-\s+main\b/, 'release PRs to main must run TEST.3 checks');
+assert.match(workflow, /koryto-v0\.14\.3-test\.3/);
 
 for (const name of ['save','load','autoSave']) assert.equal(typeof context[name], 'function', `${name} global must remain available`);
 const releaseReport = context.KorytoTest143.runReleaseCheck();
 assert.equal(releaseReport.ok, true);
 assert.equal(releaseReport.runtimeMode, 'event-driven');
 
-console.log('v0.14.3 TEST.2 state/save stabilization checks ok');
+console.log('v0.14.3 TEST.2 save contract remains stable inside TEST.3');
