@@ -2,81 +2,67 @@
 
 Satirické české politické RPG, ve kterém hráč začíná v Dolních Vejprnicích a přes komunální politiku, kauzy, družinu, debaty, volby a koaliční vyjednávání buduje vlastní cestu ke korytu.
 
-## Aktuální stabilní verze
+## Aktuální testovací verze
 
-**v0.14 – Živý politický svět**
+**v0.14.4 TEST.10 – Rozpad monolitu**
 
-Hlavní systémy:
+Tato verze fyzicky přesouvá autoritativní herní data a klíčové výpočty z původního `src/app.js` do samostatných modulů. `app.js` klesl z 1 716 řádků na méně než 900 a funguje především jako uživatelské rozhraní a orchestrátor.
 
-- otevřená mapa obce a časový tlak,
-- autonomní tahy frakcí,
-- politické dluhy, sliby a protislužby,
-- družina s loajalitou, ambicemi a konflikty,
-- větvené kauzy včetně Operace SILO,
-- vícekolové debatní bossfighty,
-- volby, mandáty a koaliční vyjednávání,
-- migrace uložených her,
-- první pixel-artová mapová vrstva.
+Hratelnost, texty událostí, pravidla hodů a volební výsledky zůstávají kompatibilní s v0.14.3. Save formát zůstává `koryto`, schema `1` a save verze `0.14.3-test.2`; nová migrace uložených her proto není nutná.
 
-## Testovací kandidát v0.14.3 TEST.10
+### Iterace v0.14.4
 
-TEST.10 uzavírá kumulativní sérii TEST.4 až TEST.10 nad ověřeným save základem TEST.2. Build přidává samostatná runtime autoritativní questová data, questový runtime, katalog událostí, frakční a společníkový systém, globální mobilní UX vrstvu a souhrnný release/balance audit.
+- **TEST.1:** charakterizační audit monolitu, závislostí a save kontraktu.
+- **TEST.2:** fyzický přesun tříd, lokací, voličů, základního stavu a všech 11 questů.
+- **TEST.3:** fyzický přesun katalogu více než 50 událostí do továrny `event-data.js`.
+- **TEST.4:** přesun frakčních plánů, koaličních partnerů, protioperací a živého světa.
+- **TEST.5:** přesun společníků, osobních příběhů, vztahů, konfliktů a ambicí.
+- **TEST.6:** samostatné čisté výpočty debat, projekcí, hlasů a mandátů.
+- **TEST.7:** veřejné API `KorytoApp` a normalizační `KorytoGameEngine`.
+- **TEST.8:** přístupné dialogy, focus management, mobilní safe area a sticky akce.
+- **TEST.9:** balanční guardraily a audit tisíce deterministických kampaní.
+- **TEST.10:** kompatibilní testovací loader, úplný release audit a offline ZIP.
 
-Herní obsah, výsledky voleb, questové následky ani pravidla hodů se nemění. Save formát zůstává `koryto`, schema `1` a runtime save verze `0.14.3-test.2`, takže TEST.10 nevyžaduje novou migraci uložených pozic. Build a uživatelské rozhraní mají verzi `0.14.3-test.10`.
-
-Automatická sada ověřuje bezpečný save fallback včetně poškozených vnořených kolekcí, map-only ukládání, historické pozice v0.09–v0.14, normalizaci číselných questových hodnot, 200 deterministických kampaní, integritu událostí, frakcí a společníků i kompletní offline balíček.
-
-### Iterace
-
-- TEST.4: externí questová data s kontrolou driftu vůči původnímu monolitu.
-- TEST.5: normalizace questového stavu, termíny, přechody a priority.
-- TEST.6: katalog a integrita událostí podle lokací a questů.
-- TEST.7: frakční plány, konspirační stopy a koaliční partneři.
-- TEST.8: společníci, osobní příběhy, vztahy a konflikty.
-- TEST.9: viewport-safe dialogy, mobilní safe area, sticky akce a přístupné focus stavy.
-- TEST.10: jednotný release report, balanční guardraily, 200 simulací a offline balíček.
-
-## Struktura repozitáře
+## Modulární struktura
 
 ```text
-koryto-game/
-├── index.html
-├── AGENTS.md
-├── VERSION
-├── src/
-│   ├── app.js
-│   ├── state.js
-│   ├── save-system.js
-│   ├── quest-data.js
-│   ├── quest-runtime.js
-│   ├── quest-system.js
-│   ├── event-system.js
-│   ├── faction-system.js
-│   ├── companion-system.js
-│   ├── ux-system.js
-│   ├── v0143.js
-│   ├── v0143-test3.js
-│   └── v0143-test10.js
-├── tests/
-├── docs/
-│   ├── architecture.md
-│   ├── codex-task-v0.14.1.md
-│   └── v0.14/
-├── builds/
-│   └── v0.14/
-└── assets/
-    └── reference/
+src/
+├── core-data.js          # třídy, lokace, voliči a výchozí stav
+├── quest-data.js         # autoritativní definice questů
+├── event-data.js         # autoritativní události a odemykání
+├── faction-data.js       # frakce, koalice a soupeřovy operace
+├── companion-data.js     # společníci, vztahy, příběhy a ambice
+├── debate-data.js        # karty, mastery a tahy soupeře
+├── quest-runtime.js      # stavy, termíny a přechody questů
+├── debate-system.js      # čisté debatní výpočty
+├── election-system.js    # projekce, hlasy, mandáty a kapacita koalice
+├── game-engine.js        # normalizace stavu a orchestrace kontraktů
+├── event-system.js       # katalog a validace událostí
+├── faction-system.js     # frakční stav a největší hrozba
+├── companion-system.js   # soupis a morálka družiny
+├── balance-system.js     # guardraily a simulační audit
+├── ux-system.js          # dialogy, mobilní UX a přístupnost
+├── app.js                # UI, renderování a koordinace hry
+└── v0144-test10.js       # release vrstva v0.14.4
 ```
 
-## Nejbližší technický krok
+## Ověření
 
-Další hlavní vývojová větev může fyzicky zmenšovat `app.js` po jednotlivých doménách. TEST.10 už poskytuje externí autoritativní data, runtime kontrakty a regresní síť, takže tento přesun lze dělat bez změny hratelnosti a kompatibility savů.
+Automatická sada kontroluje:
 
-Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
+- historické savy v0.09–v0.14,
+- map-only ukládání a fallback z poškozeného slotu,
+- normalizaci číselných questových hodnot,
+- integritu questů, událostí, frakcí, společníků a debat,
+- shodu projekcí, hlasů a mandátů s původními pravidly,
+- pořadí offline skriptů,
+- přístupnost a mobilní výšku dialogů,
+- tisíc deterministických kampaní bez zaseknutí nebo `NaN`,
+- sestavení kompletního offline balíčku.
 
 ## Spuštění
 
-Otevřete `index.html` v prohlížeči. Hra nevyžaduje server ani instalaci a offline artefakt obsahuje všechny potřebné lokální soubory.
+Rozbalte offline ZIP a otevřete `index.html`. Hra nevyžaduje server ani instalaci.
 
 ## Stav projektu
 
