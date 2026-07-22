@@ -1,0 +1,68 @@
+name: Chyba v Korytu
+description: Nahlaste problém z tester buildu Koryto
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Díky za testování. Čím přesnější popis, tím rychleji lze chybu zopakovat.
+  - type: input
+    id: version
+    attributes:
+      label: Verze hry
+      placeholder: 0.14.5-test.10
+    validations:
+      required: true
+  - type: dropdown
+    id: save
+    attributes:
+      label: Jak byla hra spuštěna?
+      options:
+        - Nová hra
+        - Načtená uložená hra
+        - Importovaný starší save
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Zařízení a prohlížeč
+      placeholder: iPhone 15 / Safari nebo Windows 11 / Chrome
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Kroky k zopakování
+      description: Popište jednotlivé kliky nebo rozhodnutí.
+      placeholder: "1. Začal jsem novou hru...\n2. Otevřel jsem...\n3. Po kliknutí..."
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Co se stalo?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Co se mělo stát?
+    validations:
+      required: true
+  - type: input
+    id: campaign
+    attributes:
+      label: Kód kampaně
+      description: Je-li dostupný v kronice nebo uložené hře.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshot, video nebo další informace
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Kontrola
+      options:
+        - label: Ověřil/a jsem, že problém přetrvává i po obnovení stránky.

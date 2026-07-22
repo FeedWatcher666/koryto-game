@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Koryto 0.14.4 TEST.10: modulární questy, události, frakce, společníci, mobilní UX a stabilizační audit.">
-<title>Koryto 0.14.4 TEST.10 – kompletní modulární test</title>
+<meta name="description" content="Koryto 0.14.5 TEST.10: hratelnější kampaň, denní briefing, čitelné následky, nové události a veřejný tester build.">
+<title>Koryto 0.14.5 TEST.10 – veřejný tester build</title>
 <link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/v0145.css">
 
 <!-- Compatibility marker for pre-RC1 regression tests: 0.14.2 TEST.10 -->
 </head>
 <body>
 <div id="app" class="app">
 <header class="topbar">
-  <div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.14.4 TEST.10</span></h1></div>
+  <div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.14.5 TEST.10</span></h1></div>
   <div class="actions">
     <button id="mapBtn" class="btn small hidden">Mapa</button>
     <button id="saveBtn" class="btn small hidden">Uložit</button>
@@ -27,9 +28,10 @@
   <div class="hero">
     <div class="crest">🐷🎲</div><p class="eyebrow">OTEVŘENÁ KAPITOLA</p>
     <h2>Krysy v JZD</h2>
-    <p>Třináct dní kampaně. Frakce jednají každý den bez vás, členové štábu sledují vlastní ambice, stará rozhodnutí se vracejí a Věčný rozjíždí vícekrokové protioperace. Velká debata zůstává taktickým bossfightem.</p>
+    <p>Máte třináct dní, dvě akce denně a obec plnou lidí, kteří si pamatují každou lavičku i každou protislužbu. Vyřešte kauzy, sestavte štáb a porazte Vladimíra Věčného ve volbách.</p>
+    <div class="v0145-start-flow"><span><b>1</b> Vytvořte kandidáta</span><span><b>2</b> Řešte kauzy na mapě</span><span><b>3</b> Přežijte debatu a volby</span></div>
     <blockquote>„Vesnice potřebuje hrdinu. Nebo alespoň někoho s autem a tiskárnou.“</blockquote>
-    <button id="startBtn" class="btn primary">Vytvořit kandidáta</button>
+    <button id="startBtn" class="btn primary">Začít třináctidenní kampaň</button>
   </div>
 </section>
 
@@ -38,7 +40,7 @@
     <div class="panel">
       <p class="eyebrow">POSTAVA</p><h2>Kdo jde zachránit obec?</h2>
       <div class="field"><label for="heroName">Jméno kandidáta</label><input id="heroName" value="Bohuslav Korytář" maxlength="28"></div>
-      <p>Každá třída má jinou výhodu. Žádná však neumí vysvětlit, proč obec platí čtyři sekačky na jednu náves.</p>
+      <p>Vyberte styl kampaně. Karta ukazuje nejsilnější stránku, obtížnost začátku i hlavní riziko. Volbu později nezměníte, politické názory ano.</p>
       <div class="field">
         <label>Výchozí motivace</label>
         <select id="origin" class="btn" style="width:100%">
@@ -167,6 +169,7 @@
 <script src="src/v0143-test10.js"></script>
 <script src="src/balance-system.js"></script>
 <script src="src/v0144-test10.js"></script>
+<script src="src/v0145-campaign.js"></script>
 
 </body>
 </html>
