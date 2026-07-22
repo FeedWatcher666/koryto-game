@@ -65,7 +65,7 @@ assert.ok(state.stats.heat > heatBefore);
 state.flags.v0142CounterCampaign = { active:{ id:'invalid' }, history:'broken', lastStartDay:'99' };
 const normalized = api.normalizeCampaignState(state);
 assert.equal(normalized.active, null);
-assert.deepEqual(normalized.history, []);
+assert.equal(normalized.history.length, 0);
 assert.equal(normalized.lastStartDay, 13);
 
 const roundTrip = context.KorytoStability.roundTripCheck(state);
