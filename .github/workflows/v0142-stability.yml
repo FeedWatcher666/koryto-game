@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - test/v0.14.2-playable
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
