@@ -17,7 +17,7 @@ for (const file of [
 const api = context.KorytoTest9;
 assert.ok(api, 'TEST.9 compact UI API must be exposed');
 assert.equal(api.VERSION, '0.14.2 TEST.9');
-assert.equal(context.KorytoStability.VERSION, '0.14.2 TEST.9');
+assert.equal(context.KorytoStability.VERSION, '0.14.2 TEST.10');
 assert.deepEqual(Array.from(api.STRATEGY_IDS), ['briefingBtn','mediaBtn','pollBtn','promiseBtn','endorsementBtn']);
 assert.deepEqual(Array.from(api.SYSTEM_IDS), ['saveBtn','loadBtn','exportBtn','restartBtn']);
 
@@ -60,11 +60,11 @@ assert.equal(state.stats.leverage, 5);
 assert.equal(state.voters.parents.support, 47);
 
 context.KorytoStability.normalizeStateExtensions(state);
-assert.equal(state.flags.v0142StableVersion, '0.14.2 TEST.9');
+assert.equal(state.flags.v0142StableVersion, '0.14.2 TEST.10');
 assert.equal(context.KorytoStability.roundTripCheck(state).ok, true);
 
 const index = readText('index.html');
-assert.match(index, /0\.14\.2 TEST\.9/);
+assert.match(index, /0\.14\.2 TEST\.10/);
 assert.match(index, /src\/v0142-ui-balance\.js/);
 assert.ok(index.indexOf('src/v0142-ui-balance.js') > index.indexOf('src/v0142-countercampaign.js'));
 
