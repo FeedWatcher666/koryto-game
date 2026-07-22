@@ -68,11 +68,11 @@ assert.equal(simulations.length, 20);
 assert.equal(simulations.every(result => result.ended), true);
 
 const index = readText('index.html');
-assert.match(index, /0\.14\.3 TEST\.1/);
+assert.match(index, /0\.14\.3 TEST\.2/);
 assert.match(index, /src\/state\.js/);
 assert.match(index, /src\/save-system\.js/);
 assert.match(index, /src\/v0143\.js/);
 assert.doesNotMatch(index, /src\/v0142-rc3\.js/);
-assert.equal(readText('VERSION').trim(), '0.14.3-test.1');
+assert.equal(readText('VERSION').trim(), '0.14.3-test.2');
 
 console.log('v0.14.2 RC3 legacy load regressions remain covered');
