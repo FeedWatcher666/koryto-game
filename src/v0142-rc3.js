@@ -244,7 +244,9 @@
   function installControlGuards() {
     installAutoSaveGuard();
     wrapControl("confirmBtn", null, () => normalizeReleaseState());
-    wrapControl("saveBtn", null, () => persistReleaseSave("koryto_v014"));
+    wrapControl("saveBtn", null, () => {
+      if (state?.phase === "map" && !state?.ended) persistReleaseSave("koryto_v014");
+    });
     try { load = safeLoad; } catch (_) {}
     globalThis.load = safeLoad;
     const loadButton = document.getElementById?.("loadBtn");

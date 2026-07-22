@@ -39,6 +39,26 @@ for (const key of ['pendingEvents','items','news','commitments']) assert.ok(Arra
 assert.equal(api.validateReleaseState(loaded).length, 0);
 assert.equal(context.KorytoStability.roundTripCheck(loaded).ok, true);
 
+// Codex P1 regression: the RC wrapper must preserve the original map-only save rule.
+context.clearStoredSavesForTest();
+const eventState = context.getStateForTest();
+eventState.phase = 'event';
+eventState.currentEvent = 'intro';
+eventState.currentLocation = 'townhall';
+api.installControlGuards();
+const saveButton = context.getElementForTest('saveBtn');
+assert.equal(typeof saveButton.onclick, 'function');
+assert.doesNotThrow(() => saveButton.onclick());
+assert.equal(context.getStoredSaveForTest('koryto_v014'), null, 'saving during an event must remain blocked');
+
+eventState.phase = 'map';
+eventState.currentEvent = null;
+eventState.currentLocation = null;
+assert.doesNotThrow(() => saveButton.onclick());
+const mapSave = JSON.parse(context.getStoredSaveForTest('koryto_v014'));
+assert.equal(mapSave.phase, 'map');
+assert.equal(mapSave.version, '0.14.2-rc3');
+
 context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', '{broken');
 assert.doesNotThrow(() => context.loadGameForTest(), 'corrupt save should fail gracefully');
