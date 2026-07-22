@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Koryto 0.14.3 TEST.10: modulární questy, události, frakce, společníci, mobilní UX a stabilizační audit.">
-<title>Koryto 0.14.3 TEST.10 – kompletní modulární test</title>
+<meta name="description" content="Koryto 0.14.4 TEST.10: modulární questy, události, frakce, společníci, mobilní UX a stabilizační audit.">
+<title>Koryto 0.14.4 TEST.10 – kompletní modulární test</title>
 <link rel="stylesheet" href="styles/base.css">
 
 <!-- Compatibility marker for pre-RC1 regression tests: 0.14.2 TEST.10 -->
@@ -12,7 +12,7 @@
 <body>
 <div id="app" class="app">
 <header class="topbar">
-  <div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.14.3 TEST.10</span></h1></div>
+  <div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.14.4 TEST.10</span></h1></div>
   <div class="actions">
     <button id="mapBtn" class="btn small hidden">Mapa</button>
     <button id="saveBtn" class="btn small hidden">Uložit</button>
@@ -137,9 +137,17 @@
   <div class="dialog"><p class="eyebrow">ZKOUŠKA SCHOPNOSTI</p><h2 id="diceTitle"></h2><div id="d20" class="d20">20</div><p id="diceFormula"></p><p id="diceOutcome"></p><button id="diceClose" class="btn primary hidden">Pokračovat</button></div>
 </div>
 
-<script src="src/app.js"></script>
+<script src="src/core-data.js"></script>
+<script src="src/companion-data.js"></script>
+<script src="src/faction-data.js"></script>
+<script src="src/debate-data.js"></script>
 <script src="src/quest-data.js"></script>
+<script src="src/event-data.js"></script>
 <script src="src/quest-runtime.js"></script>
+<script src="src/debate-system.js"></script>
+<script src="src/election-system.js"></script>
+<script src="src/game-engine.js"></script>
+<script src="src/app.js"></script>
 <script src="src/event-system.js"></script>
 <script src="src/faction-system.js"></script>
 <script src="src/companion-system.js"></script>
@@ -157,6 +165,8 @@
 <script src="src/v0143-test3.js"></script>
 <script src="src/ux-system.js"></script>
 <script src="src/v0143-test10.js"></script>
+<script src="src/balance-system.js"></script>
+<script src="src/v0144-test10.js"></script>
 
 </body>
 </html>
