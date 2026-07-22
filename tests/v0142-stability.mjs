@@ -8,7 +8,7 @@ for (const file of ['src/v0142.js', 'src/v0142c.js', 'src/v0142d.js', 'src/v0142
 }
 
 assert.ok(context.KorytoStability, 'stability API must be exposed');
-assert.equal(context.KorytoStability.VERSION, '0.14.2 TEST.9');
+assert.equal(context.KorytoStability.VERSION, '0.14.2 TEST.10');
 
 const state = context.getStateForTest();
 state.day = '8';
@@ -30,7 +30,7 @@ context.KorytoStability.normalizeStateExtensions(state);
 
 assert.equal(state.day, 8);
 assert.equal(state.actions, 2);
-assert.equal(state.flags.v0142StableVersion, '0.14.2 TEST.9');
+assert.equal(state.flags.v0142StableVersion, '0.14.2 TEST.10');
 assert.equal(state.flags.v0142Promise.status, 'active');
 assert.equal(state.flags.v0142Promise.due, 13);
 assert.equal(state.flags.v0142Promise.postponed, true);
@@ -51,7 +51,7 @@ assert.ok(roundTrip.bytes > 100);
 assert.equal(context.KorytoStability.validateState(state).length, 0);
 
 const index = readText('index.html');
-assert.match(index, /0\.14\.2 TEST\.9/);
+assert.match(index, /0\.14\.2 TEST\.10/);
 assert.match(index, /src\/v0142-stability\.js/);
 assert.ok(index.indexOf('src/v0142-stability.js') > index.indexOf('src/v0142d.js'));
 
