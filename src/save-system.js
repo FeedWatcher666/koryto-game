@@ -11,6 +11,7 @@
     "koryto_v011", "koryto_v011_auto",
     "koryto_v010", "koryto_v091", "koryto_v09"
   ];
+  const CORE_STAT_KEYS = ["support", "trust", "funds", "heat", "influence", "integrity", "leverage"];
 
   const isObject = value => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
@@ -41,15 +42,22 @@
     }
   }
 
-  function readLoadable() {
-    const candidates = readCandidates();
-    const invalid = [];
-    for (const stored of candidates) {
-      const parsed = parse(stored.raw);
-      if (parsed.ok) return {stored, parsed, invalid};
-      invalid.push({key:stored.key, error:parsed.error});
-    }
-    return {stored:null, parsed:null, invalid};
+  function hasSaveSignature(value) {
+    if (!isObject(value)) return false;
+    const hero = value.hero;
+    const stats = value.stats;
+    const heroSignal = isObject(hero) && (
+      typeof hero.name === "string" ||
+      typeof hero.classId === "string"
+    );
+    const statSignal = isObject(stats) && CORE_STAT_KEYS.some(key => {
+      const stat = stats[key];
+      return stat !== null && stat !== "" && Number.isFinite(Number(stat));
+    });
+    const progressSignal = (
+      value.day !== null && value.day !== "" && Number.isFinite(Number(value.day))
+    ) || typeof value.version === "string" || typeof value.phase === "string";
+    return heroSignal && statSignal && progressSignal;
   }
 
   function applyExtensionNormalizers(target) {
@@ -58,6 +66,51 @@
     if (globalThis.KorytoTest9?.normalizeUiState) globalThis.KorytoTest9.normalizeUiState(target);
     if (globalThis.KorytoTest10?.normalizeClarityState) globalThis.KorytoTest10.normalizeClarityState(target);
     return target;
+  }
+
+  function migrateCandidate(value) {
+    if (!hasSaveSignature(value)) return {ok:false, error:"signature", issues:["chybí rozpoznatelná struktura uložené hry"]};
+    if (!globalThis.KorytoState) return {ok:false, error:"state-module", issues:["KorytoState není načten"]};
+    const previous = state;
+    try {
+      state = globalThis.KorytoState.normalizeCollections(value);
+      if (typeof normalizeState === "function") normalizeState();
+      state = globalThis.KorytoState.normalizeCollections(state, {defaults:globalThis.KorytoState.base});
+      applyExtensionNormalizers(state);
+      state.flags = state.flags && typeof state.flags === "object" ? state.flags : {};
+      state.flags.v0143SaveSystem = VERSION;
+      state.version = SAVE_VERSION;
+      if (globalThis.KorytoTest143?.normalizeReleaseState) state = globalThis.KorytoTest143.normalizeReleaseState(state);
+      const issues = globalThis.KorytoState.validate(state);
+      const prepared = globalThis.KorytoState.clone(state);
+      return {
+        ok:issues.length === 0,
+        value:prepared,
+        issues,
+        error:issues.length ? "validation" : null
+      };
+    } catch (error) {
+      const message = String(error?.message || error);
+      return {ok:false, error:message, issues:[message]};
+    } finally {
+      state = previous;
+    }
+  }
+
+  function readLoadable() {
+    const candidates = readCandidates();
+    const invalid = [];
+    for (const stored of candidates) {
+      const parsed = parse(stored.raw);
+      if (!parsed.ok) {
+        invalid.push({key:stored.key, error:parsed.error});
+        continue;
+      }
+      const migrated = migrateCandidate(parsed.value);
+      if (migrated.ok) return {stored, parsed:{ok:true, value:migrated.value}, migrated, invalid};
+      invalid.push({key:stored.key, error:migrated.error, issues:migrated.issues});
+    }
+    return {stored:null, parsed:null, migrated:null, invalid};
   }
 
   function normalize(next = state) {
@@ -210,8 +263,9 @@
   }
 
   const api = {
-    VERSION, SAVE_VERSION, MANUAL_KEY, AUTO_KEY, LEGACY_KEYS:[...LEGACY_KEYS],
-    readCandidates, readRaw, readLoadable, parse, normalize, serialize, canWrite, write, manualSave, autoSaveGame, loadGame,
+    VERSION, SAVE_VERSION, MANUAL_KEY, AUTO_KEY, LEGACY_KEYS:[...LEGACY_KEYS], CORE_STAT_KEYS:[...CORE_STAT_KEYS],
+    readCandidates, readRaw, readLoadable, parse, hasSaveSignature, migrateCandidate,
+    normalize, serialize, canWrite, write, manualSave, autoSaveGame, loadGame,
     roundTrip, installControls, normalizeNewGame, activateLoadedGame
   };
   globalThis.KorytoSaveSystem = api;
