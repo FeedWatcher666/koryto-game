@@ -18,6 +18,7 @@ assert.equal(context.KorytoTest1433.VERSION, '0.14.3 TEST.3');
 assert.equal(context.KorytoTest1433.SAVE_VERSION, '0.14.3-test.2', 'TEST.3 must not bump save schema');
 assert.equal(context.KorytoSaveSystem.SAVE_SCHEMA, 1);
 assert.equal(context.KorytoTest1433.summaryLayoutInstalled, true, 'day summary layout must install during release initialization');
+assert.equal(context.KorytoTest1433.questSaveGuardInstalled, true, 'quest save guard must install during release initialization');
 
 const summaryStyle = context.document.head.children.find(node => node.id === context.KorytoTest1433.SUMMARY_STYLE_ID);
 assert.ok(summaryStyle, 'day summary layout style must be attached to the document head');
@@ -69,12 +70,40 @@ const unknownQuest = context.deep(context.getStateForTest());
 unknownQuest.quests.secretTender = {status:'active', stage:0};
 assert.match(context.KorytoQuestSystem.validateState(unknownQuest).join(' '), /secretTender: stav nemá definici/);
 
+context.clearStoredSavesForTest();
+const numericStringSave = context.deep(context.getStateForTest());
+numericStringSave.hero.name = 'Quest s číselným textem';
+numericStringSave.phase = 'map';
+numericStringSave.ended = false;
+numericStringSave.quests.register.stage = '0';
+numericStringSave.quests.register.deadlineBonus = '2';
+context.setStoredSaveForTest('koryto_v014', numericStringSave);
+let loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Quest s číselným textem');
+assert.equal(loaded.quests.register.stage, 0, 'numeric string quest stage must be normalized to an integer');
+assert.equal(typeof loaded.quests.register.stage, 'number');
+assert.equal(loaded.quests.register.deadlineBonus, 2, 'numeric string deadline bonus must be normalized to an integer');
+assert.equal(context.KorytoQuestSystem.deadline('register', loaded), definitions.register.deadline + 2);
+
+context.clearStoredSavesForTest();
+const invalidManual = context.deep(context.getStateForTest());
+invalidManual.hero.name = 'Rozbitý ruční quest';
+invalidManual.quests.roof.stage = 'není číslo';
+const validAutosave = context.deep(context.getStateForTest());
+validAutosave.hero.name = 'Záchranný quest autosave';
+context.setStoredSaveForTest('koryto_v014', invalidManual);
+context.setStoredSaveForTest('koryto_v014_auto', validAutosave);
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Záchranný quest autosave', 'invalid quest progress must not hide a valid autosave');
+assert.equal(context.KorytoQuestSystem.validateState(loaded).length, 0);
+
 const summary = context.KorytoQuestSystem.summary(context.getStateForTest());
 assert.equal(Object.values(summary).reduce((sum, value) => sum + value, 0), expectedQuestIds.length);
 
 const release = context.KorytoTest1433.runReleaseCheck();
 assert.equal(release.ok, true);
 assert.equal(release.questContract, 'external-domain-api');
+assert.equal(release.questSaveGuard, 'normalize-and-validate');
 assert.equal(release.daySummaryLayout, 'scrollable-sticky-action');
 assert.equal(release.quests.definitions, expectedQuestIds.length);
 assert.equal(release.saveVersion, '0.14.3-test.2');
@@ -97,10 +126,11 @@ assert.doesNotMatch(releaseSource, /setInterval\s*\(/);
 assert.doesNotMatch(releaseSource, /MutationObserver/);
 assert.match(releaseSource, /overflow-y:auto/);
 assert.match(releaseSource, /position:sticky/);
+assert.match(releaseSource, /installQuestSaveGuard/);
 
 const workflow = readText('.github/workflows/v0142-stability.yml');
 assert.match(workflow, /Koryto v0\.14\.3 TEST\.3/);
 assert.match(workflow, /test\/v0\.14\.3-test3/);
 assert.match(workflow, /koryto-v0\.14\.3-test\.3/);
 
-console.log('v0.14.3 TEST.3 quest domain contract and day summary layout checks ok');
+console.log('v0.14.3 TEST.3 quest domain, save guard and day summary layout checks ok');
