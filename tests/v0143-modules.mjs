@@ -93,6 +93,23 @@ assert.equal(loaded.hero.name, 'Záchranný autosave', 'corrupt manual save must
 assert.equal(loaded.day, 6);
 
 context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', {});
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po prázdném JSON', 6));
+const emptyObjectFallback = context.KorytoSaveSystem.readLoadable();
+assert.equal(emptyObjectFallback.invalid[0].key, 'koryto_v014');
+assert.equal(emptyObjectFallback.invalid[0].error, 'signature');
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Autosave po prázdném JSON', 'empty JSON object must not hide a valid autosave');
+assert.equal(loaded.day, 6);
+
+context.clearStoredSavesForTest();
+context.setStoredSaveForTest('koryto_v014', {version:'0.14', day:8, hero:{}, stats:{}});
+context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po falešném savu', 8));
+loaded = context.KorytoSaveSystem.loadGame();
+assert.equal(loaded.hero.name, 'Autosave po falešném savu', 'JSON without core save fields must be skipped');
+assert.equal(loaded.day, 8);
+
+context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', '{broken');
 context.setStoredSaveForTest('koryto_v014_auto', '[broken');
 context.setStoredSaveForTest('koryto_v013', saveFixture('Záchranný legacy save', 7));
@@ -102,7 +119,8 @@ assert.equal(loaded.day, 7);
 
 context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', '{broken');
-assert.equal(context.KorytoSaveSystem.loadGame(), false, 'all-corrupt saves must fail gracefully');
+context.setStoredSaveForTest('koryto_v014_auto', {});
+assert.equal(context.KorytoSaveSystem.loadGame(), false, 'all syntactically or structurally corrupt saves must fail gracefully');
 
 const simulations = context.runSimulationForTest(100, 24000);
 assert.equal(simulations.length, 100);
