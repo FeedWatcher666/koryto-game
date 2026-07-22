@@ -1,8 +1,10 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.2 TEST.3";
+  const VERSION = "0.14.2 TEST.4";
   const BRIEFING_FLAG = "v0142BriefingDay";
   const MEDIA_FLAG = "v0142MediaDay";
+  const POLL_PREFIX = "v0142PollDay";
+  const POLL_DAYS = [4, 8, 12];
 
   const gameScreenActive = () =>
     typeof state !== "undefined" &&
@@ -11,12 +13,13 @@
 
   const mapReady = () => gameScreenActive() && state.phase === "map";
   const usedToday = flag => state?.flags?.[flag] === state.day;
+  const pollCheckpoint = () => POLL_DAYS.find(day => state?.day >= day && !state?.flags?.[`${POLL_PREFIX}${day}`]);
 
   function addStyles() {
     const style = document.createElement("style");
     style.textContent = `
-      #briefingBtn.used,#mediaBtn.used{opacity:.58}
-      #briefingOverlay .dialog,#mediaOverlay .dialog{max-width:760px;text-align:left}
+      #briefingBtn.used,#mediaBtn.used,#pollBtn.used{opacity:.58}
+      #briefingOverlay .dialog,#mediaOverlay .dialog,#pollOverlay .dialog{max-width:820px;text-align:left}
       .v0142-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
       .v0142-stat{border:2px solid var(--line,#2b2b2b);padding:10px;background:rgba(255,255,255,.04)}
       .v0142-stat small{display:block;opacity:.75;margin-bottom:4px}
@@ -26,6 +29,10 @@
       .v0142-option strong,.v0142-option small{display:block}
       .v0142-option small{margin-top:5px;opacity:.8;line-height:1.35}
       .v0142-close{margin-top:14px}
+      .v0142-poll-row{display:grid;grid-template-columns:minmax(150px,1fr) 2fr 56px;gap:10px;align-items:center;margin:8px 0}
+      .v0142-poll-bar{height:12px;border:1px solid currentColor;background:rgba(255,255,255,.08)}
+      .v0142-poll-bar i{display:block;height:100%;background:currentColor}
+      .v0142-estimate{font-size:2rem;margin:8px 0}
     `;
     document.head.appendChild(style);
   }
@@ -74,7 +81,6 @@
       briefing.classList.toggle("used", used);
       briefing.disabled = !mapReady() || state.actions < 1 || used;
       briefing.textContent = used ? "Štáb dnes proběhl" : "Krizový štáb";
-      briefing.title = used ? "Další porada bude dostupná zítra." : "Jedna taktická porada za den; spotřebuje jednu akci.";
     }
 
     const media = document.getElementById("mediaBtn");
@@ -85,7 +91,16 @@
       media.classList.toggle("used", used);
       media.disabled = !mapReady() || state.actions < 1 || used;
       media.textContent = used ? "Média dnes řešena" : "Mediální krize";
-      media.title = used ? "Další reakce bude dostupná zítra." : "Reagujte na mediální tlak dřív, než tiskovka začne bez vás.";
+    }
+
+    const poll = document.getElementById("pollBtn");
+    if (poll) {
+      const checkpoint = gameScreenActive() ? pollCheckpoint() : null;
+      const visible = Boolean(checkpoint);
+      poll.classList.toggle("hidden", !visible);
+      poll.disabled = !visible || !mapReady() || state.actions < 1 || state.stats?.funds < 2;
+      poll.textContent = checkpoint ? `Průzkum · den ${checkpoint}` : "Volební průzkum";
+      poll.title = state.stats?.funds < 2 ? "Průzkum stojí 2 peníze." : "Zjistí podporu po blocích a umožní změnit cílení kampaně.";
     }
   }
 
@@ -116,10 +131,7 @@
       </div>
       <button class="btn small v0142-close" data-close="briefingOverlay">Zrušit poradu</button>`;
 
-    dialog.querySelectorAll("[data-choice]").forEach(button =>
-      button.addEventListener("click", () => resolveBriefing(button.dataset.choice))
-    );
-    dialog.querySelector("[data-close]").addEventListener("click", () => closeOverlay("briefingOverlay"));
+    bindChoices(dialog, resolveBriefing);
     overlay.classList.remove("hidden");
   }
 
@@ -175,10 +187,7 @@
       </div>
       <button class="btn small v0142-close" data-close="mediaOverlay">Nechat telefony zvonit</button>`;
 
-    dialog.querySelectorAll("[data-choice]").forEach(button =>
-      button.addEventListener("click", () => resolveMedia(button.dataset.choice))
-    );
-    dialog.querySelector("[data-close]").addEventListener("click", () => closeOverlay("mediaOverlay"));
+    bindChoices(dialog, resolveMedia);
     overlay.classList.remove("hidden");
   }
 
@@ -220,6 +229,109 @@
     finishAction("mediaOverlay");
   }
 
+  function ensureVoters() {
+    state.voters = state.voters || {};
+    for (const [id, def] of Object.entries(voterDefs || {})) {
+      state.voters[id] = state.voters[id] || {support:def.base,turnout:def.turnout};
+    }
+  }
+
+  function estimatePoll() {
+    ensureVoters();
+    let weighted = 0;
+    let ballots = 0;
+    const rows = [];
+    for (const [id, def] of Object.entries(voterDefs || {})) {
+      const voter = state.voters[id];
+      const turnout = Math.max(.18, Math.min(.95, voter.turnout || def.turnout));
+      const base = clamp((voter.support || def.base) + (state.stats.support - 50) * .08 + (state.stats.trust - 50) * .04 - state.stats.heat * .025, 4, 88);
+      const population = def.population * turnout;
+      weighted += population * base;
+      ballots += population;
+      rows.push({id,name:def.name,icon:def.icon,value:Math.round(base)});
+    }
+    return {estimate:Math.round(weighted / Math.max(1, ballots)),rows};
+  }
+
+  function openPoll() {
+    const checkpoint = pollCheckpoint();
+    if (!checkpoint) return alert("Další průzkum zatím není připraven.");
+    if (!mapReady()) return alert("Průzkum lze objednat pouze na mapě.");
+    if (state.actions < 1) return alert("Na průzkum už dnes nezbývá akce.");
+    if (state.stats.funds < 2) return alert("Průzkum stojí 2 peníze.");
+
+    const result = estimatePoll();
+    const overlay = document.getElementById("pollOverlay");
+    const dialog = overlay.querySelector(".dialog");
+    const rows = result.rows.map(row => `
+      <div class="v0142-poll-row">
+        <span>${row.icon} ${row.name}</span>
+        <span class="v0142-poll-bar"><i style="width:${row.value}%"></i></span>
+        <strong>${row.value}%</strong>
+      </div>`).join("");
+
+    dialog.innerHTML = `
+      <p class="eyebrow">PRŮZKUM BEZ HOSPODSKÉHO VZORKU</p>
+      <h2>Model podpory · kontrolní den ${checkpoint}</h2>
+      <div class="v0142-estimate">Odhad: <strong>${result.estimate} %</strong></div>
+      <p>Číslo je model, ne výsledek. Přesto už ho všichni ve štábu používají jako důkaz své pravdy.</p>
+      ${rows}
+      <div class="v0142-options">
+        ${optionButton("families", "🎒 Přesměrovat kampaň na rodiny", "+7 rodiče, +4 nerozhodnutí, +2 důvěra, ale −3 podnikatelé.")}
+        ${optionButton("rural", "🚜 Vsadit na venkov a pořádek", "+7 lidé kolem JZD, +5 senioři, +2 vliv, ale −3 tisk.")}
+        ${optionButton("protest", "🔥 Rozjet protestní vlnu", "+8 naštvaní nevoliči, +5 nerozhodnutí, +4 podpora, ale +5 tlak a −4 důvěra.")}
+      </div>
+      <button class="btn small v0142-close" data-close="pollOverlay">Neobjednávat změnu cílení</button>`;
+
+    bindChoices(dialog, choice => resolvePoll(choice, checkpoint));
+    overlay.classList.remove("hidden");
+  }
+
+  function shiftVoter(id, amount) {
+    ensureVoters();
+    const def = voterDefs[id];
+    if (!def || !state.voters[id]) return;
+    state.voters[id].support = clamp((state.voters[id].support ?? def.base) + amount, 0, 100);
+  }
+
+  function resolvePoll(choice, checkpoint) {
+    if (!mapReady() || state.actions < 1 || state.stats.funds < 2 || !pollCheckpoint()) return closeOverlay("pollOverlay");
+    state.flags = state.flags || {};
+    state.flags[`${POLL_PREFIX}${checkpoint}`] = true;
+    state.actions -= 1;
+    effect({funds:-2});
+
+    if (choice === "families") {
+      shiftVoter("parents",7);
+      shiftVoter("undecided",4);
+      shiftVoter("entrepreneurs",-3);
+      effect({trust:2});
+      addNews("Kampaň přesunula rozpočet k rodinám, škole a lidem, kteří znají všechny termíny prázdnin.","normal");
+      log("Průzkum: kampaň změnila cílení na rodiny a nerozhodnuté.");
+    } else if (choice === "rural") {
+      shiftVoter("jzdWorkers",7);
+      shiftVoter("seniors",5);
+      effect({influence:2,press:-3});
+      addNews("Kandidát zahájil venkovskou ofenzivu. Každý traktor nyní vypadá jako mobilní billboard.","normal");
+      log("Průzkum: kampaň vsadila na venkov, seniory a pořádek.");
+    } else {
+      shiftVoter("disengaged",8);
+      shiftVoter("undecided",5);
+      effect({support:4,heat:5,trust:-4});
+      addNews("Protestní video probudilo i občany, kteří dosud volby považovali za cizí koníček.","bad");
+      log("Průzkum: kampaň rozjela protestní mobilizaci nevoličů.");
+    }
+
+    finishAction("pollOverlay");
+  }
+
+  function bindChoices(dialog, handler) {
+    dialog.querySelectorAll("[data-choice]").forEach(button =>
+      button.addEventListener("click", () => handler(button.dataset.choice))
+    );
+    dialog.querySelector("[data-close]")?.addEventListener("click", () => closeOverlay(dialog.closest(".overlay").id));
+  }
+
   function finishAction(overlayId) {
     closeOverlay(overlayId);
     if (typeof renderAll === "function") renderAll();
@@ -232,14 +344,16 @@
     const brand = document.querySelector(".brand h1 span");
     if (brand) brand.textContent = `Dolní Vejprnice ${VERSION}`;
     const description = document.querySelector('meta[name="description"]');
-    if (description) description.content = `Koryto ${VERSION}: krizový štáb, mediální reakce, živé frakce a operace soupeře.`;
+    if (description) description.content = `Koryto ${VERSION}: krizový štáb, mediální reakce, volební průzkumy a operace soupeře.`;
   }
 
   addStyles();
   addTopbarButton("briefingBtn","Krizový štáb",openBriefing);
   addTopbarButton("mediaBtn","Mediální krize",openMedia);
+  addTopbarButton("pollBtn","Volební průzkum",openPoll);
   addOverlay("briefingOverlay");
   addOverlay("mediaOverlay");
+  addOverlay("pollOverlay");
   updateVersionLabels();
   updateButtons();
   setInterval(updateButtons,500);
@@ -247,6 +361,7 @@
     if (event.key === "Escape") {
       closeOverlay("briefingOverlay");
       closeOverlay("mediaOverlay");
+      closeOverlay("pollOverlay");
     }
   });
 })();
