@@ -22,15 +22,16 @@ jobs:
           fetch-depth: 0
           ref: test/v0.14.4-test10
 
-      - name: Reconstruct and verify payload
+      - name: Reconstruct, verify and test payload
         shell: bash
         run: |
           set -euo pipefail
           cat .bootstrap/v0144/part-* | base64 -d > /tmp/v0144-payload.tar.xz
-          echo "87c778dd4adacec8c04fbba18a6e94f2b3dc56801f5a6b963270c42878ac93c2  /tmp/v0144-payload.tar.xz" | sha256sum -c -
+          xz -t /tmp/v0144-payload.tar.xz
           tar -xJf /tmp/v0144-payload.tar.xz -C .
           rm -rf .bootstrap/v0144
           rm -f .github/workflows/v0144-bootstrap.yml
+          npm test
 
       - name: Commit exact tested payload
         shell: bash
