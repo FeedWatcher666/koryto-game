@@ -14,15 +14,21 @@
 
   const isObject = value => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
-  function readRaw() {
-    let raw = typeof memorySave !== "undefined" ? memorySave : null;
+  function readCandidates() {
+    const candidates = [];
+    const memory = typeof memorySave !== "undefined" ? memorySave : null;
     try {
       for (const key of LEGACY_KEYS) {
         const stored = localStorage.getItem(key);
-        if (stored) return {key, raw:stored};
+        if (stored) candidates.push({key, raw:stored});
       }
     } catch (_) {}
-    return raw ? {key:"memory", raw} : null;
+    if (memory) candidates.push({key:"memory", raw:memory});
+    return candidates;
+  }
+
+  function readRaw() {
+    return readCandidates()[0] || null;
   }
 
   function parse(raw) {
@@ -33,6 +39,17 @@
     } catch (error) {
       return {ok:false, error:String(error?.message || error)};
     }
+  }
+
+  function readLoadable() {
+    const candidates = readCandidates();
+    const invalid = [];
+    for (const stored of candidates) {
+      const parsed = parse(stored.raw);
+      if (parsed.ok) return {stored, parsed, invalid};
+      invalid.push({key:stored.key, error:parsed.error});
+    }
+    return {stored:null, parsed:null, invalid};
   }
 
   function applyExtensionNormalizers(target) {
@@ -117,18 +134,16 @@
   }
 
   function loadGame() {
-    const stored = readRaw();
-    if (!stored) {
-      if (typeof alert === "function") alert("Žádná uložená hra nebyla nalezena.");
-      return false;
-    }
-    const parsed = parse(stored.raw);
-    if (!parsed.ok) {
-      if (typeof alert === "function") alert("Uložená hra je poškozená a nelze ji načíst.");
+    const loadable = readLoadable();
+    if (!loadable.stored) {
+      const message = loadable.invalid.length
+        ? "Všechny nalezené uložené hry jsou poškozené a nelze je načíst."
+        : "Žádná uložená hra nebyla nalezena.";
+      if (typeof alert === "function") alert(message);
       return false;
     }
 
-    normalize(parsed.value);
+    normalize(loadable.parsed.value);
     if (!state.ended && state.phase !== "map") state.phase = "map";
     if (state.phase === "map") {
       state.currentLocation = null;
@@ -196,7 +211,7 @@
 
   const api = {
     VERSION, SAVE_VERSION, MANUAL_KEY, AUTO_KEY, LEGACY_KEYS:[...LEGACY_KEYS],
-    readRaw, parse, normalize, serialize, canWrite, write, manualSave, autoSaveGame, loadGame,
+    readCandidates, readRaw, readLoadable, parse, normalize, serialize, canWrite, write, manualSave, autoSaveGame, loadGame,
     roundTrip, installControls, normalizeNewGame, activateLoadedGame
   };
   globalThis.KorytoSaveSystem = api;
