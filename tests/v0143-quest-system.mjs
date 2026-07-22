@@ -17,6 +17,15 @@ assert.equal(context.KorytoQuestSystem.SAVE_VERSION, '0.14.3-test.2');
 assert.equal(context.KorytoTest1433.VERSION, '0.14.3 TEST.3');
 assert.equal(context.KorytoTest1433.SAVE_VERSION, '0.14.3-test.2', 'TEST.3 must not bump save schema');
 assert.equal(context.KorytoSaveSystem.SAVE_SCHEMA, 1);
+assert.equal(context.KorytoTest1433.summaryLayoutInstalled, true, 'day summary layout must install during release initialization');
+
+const summaryStyle = context.document.head.children.find(node => node.id === context.KorytoTest1433.SUMMARY_STYLE_ID);
+assert.ok(summaryStyle, 'day summary layout style must be attached to the document head');
+assert.match(summaryStyle.textContent, /max-height:calc\(100dvh - 32px\)/, 'day summary must fit inside the dynamic viewport');
+assert.match(summaryStyle.textContent, /overflow-y:auto/, 'day summary must own its vertical scroll');
+assert.match(summaryStyle.textContent, /position:sticky/, 'continue button must remain attached to the visible dialog edge');
+assert.match(summaryStyle.textContent, /bottom:0/, 'sticky continue button must stay at the bottom');
+assert.match(summaryStyle.textContent, /safe-area-inset-bottom/, 'mobile safe area must remain clickable');
 
 const expectedQuestIds = [
   'register','diesel','roof','meadow','paper','oldfiles',
@@ -66,6 +75,7 @@ assert.equal(Object.values(summary).reduce((sum, value) => sum + value, 0), expe
 const release = context.KorytoTest1433.runReleaseCheck();
 assert.equal(release.ok, true);
 assert.equal(release.questContract, 'external-domain-api');
+assert.equal(release.daySummaryLayout, 'scrollable-sticky-action');
 assert.equal(release.quests.definitions, expectedQuestIds.length);
 assert.equal(release.saveVersion, '0.14.3-test.2');
 assert.equal(context.getStateForTest().version, '0.14.3-test.2');
@@ -85,10 +95,12 @@ assert.doesNotMatch(questSource, /setInterval\s*\(/);
 assert.doesNotMatch(questSource, /MutationObserver/);
 assert.doesNotMatch(releaseSource, /setInterval\s*\(/);
 assert.doesNotMatch(releaseSource, /MutationObserver/);
+assert.match(releaseSource, /overflow-y:auto/);
+assert.match(releaseSource, /position:sticky/);
 
 const workflow = readText('.github/workflows/v0142-stability.yml');
 assert.match(workflow, /Koryto v0\.14\.3 TEST\.3/);
 assert.match(workflow, /test\/v0\.14\.3-test3/);
 assert.match(workflow, /koryto-v0\.14\.3-test\.3/);
 
-console.log('v0.14.3 TEST.3 quest domain contract checks ok');
+console.log('v0.14.3 TEST.3 quest domain contract and day summary layout checks ok');
