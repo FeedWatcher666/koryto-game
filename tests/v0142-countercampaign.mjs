@@ -16,7 +16,7 @@ for (const file of [
 const api = context.KorytoCounterCampaign;
 assert.ok(api, 'counter-campaign API must be exposed');
 assert.equal(api.VERSION, '0.14.2 TEST.8');
-assert.equal(context.KorytoStability.VERSION, '0.14.2 TEST.9');
+assert.equal(context.KorytoStability.VERSION, '0.14.2 TEST.10');
 
 const state = context.getStateForTest();
 state.day = 4;
@@ -72,7 +72,7 @@ const roundTrip = context.KorytoStability.roundTripCheck(state);
 assert.equal(roundTrip.ok, true, roundTrip.issues.join(', '));
 
 const index = readText('index.html');
-assert.match(index, /0\.14\.2 TEST\.9/);
+assert.match(index, /0\.14\.2 TEST\.10/);
 assert.match(index, /src\/v0142-countercampaign\.js/);
 assert.ok(index.indexOf('src/v0142-countercampaign.js') > index.indexOf('src/v0142-stability.js'));
 
