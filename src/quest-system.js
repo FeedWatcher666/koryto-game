@@ -17,11 +17,26 @@
     return definitions()[id] || null;
   }
 
+  function normalizeState(target = state) {
+    if (!isObject(target?.quests)) return target;
+    for (const id of Object.keys(definitions())) {
+      const quest = target.quests[id];
+      if (!isObject(quest)) continue;
+      const stage = Number(quest.stage);
+      if (Number.isInteger(stage) && stage >= 0) quest.stage = stage;
+      if (quest.deadlineBonus !== undefined) {
+        const bonus = Number(quest.deadlineBonus);
+        if (Number.isInteger(bonus) && bonus >= 0) quest.deadlineBonus = bonus;
+      }
+    }
+    return target;
+  }
+
   function deadline(id, target = state) {
     const def = definition(id);
     if (!def) return null;
-    const bonus = Number(target?.quests?.[id]?.deadlineBonus);
-    return Math.max(1, Math.floor(Number(def.deadline) + (Number.isFinite(bonus) ? bonus : 0)));
+    const bonus = target?.quests?.[id]?.deadlineBonus;
+    return Math.max(1, Math.floor(Number(def.deadline) + (Number.isInteger(bonus) ? bonus : 0)));
   }
 
   function validateDefinitions() {
@@ -61,8 +76,8 @@
         continue;
       }
       if (!ALLOWED_STATUS.has(quest.status)) issues.push(`${id}: neplatný stav ${String(quest.status)}`);
-      if (!Number.isFinite(Number(quest.stage)) || Number(quest.stage) < 0) issues.push(`${id}: neplatná fáze`);
-      if (quest.deadlineBonus !== undefined && (!Number.isFinite(Number(quest.deadlineBonus)) || Number(quest.deadlineBonus) < 0)) {
+      if (!Number.isInteger(quest.stage) || quest.stage < 0) issues.push(`${id}: neplatná fáze`);
+      if (quest.deadlineBonus !== undefined && (!Number.isInteger(quest.deadlineBonus) || quest.deadlineBonus < 0)) {
         issues.push(`${id}: neplatné prodloužení termínu`);
       }
     }
@@ -93,6 +108,7 @@
   }
 
   function runIntegrityCheck(target = state) {
+    normalizeState(target);
     const definitionIssues = validateDefinitions();
     const stateIssues = validateState(target);
     const issues = [...new Set([...definitionIssues, ...stateIssues])];
@@ -110,7 +126,7 @@
 
   globalThis.KorytoQuestSystem = {
     VERSION, BUILD_VERSION, SAVE_VERSION,
-    definitions, cloneDefinitions, definition, deadline,
+    definitions, cloneDefinitions, definition, normalizeState, deadline,
     validateDefinitions, validateState, active, summary, runIntegrityCheck
   };
 })();
