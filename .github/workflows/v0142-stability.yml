@@ -31,19 +31,19 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.2-test.8-diagnostics
+          name: koryto-v0.14.2-test.9-diagnostics
           path: test-output.txt
           if-no-files-found: warn
 
       - name: Build offline package
         run: |
-          mkdir -p dist/koryto-v0.14.2-test.8
-          cp index.html VERSION README.md dist/koryto-v0.14.2-test.8/
-          cp -R src styles dist/koryto-v0.14.2-test.8/
+          mkdir -p dist/koryto-v0.14.2-test.9
+          cp index.html VERSION README.md dist/koryto-v0.14.2-test.9/
+          cp -R src styles dist/koryto-v0.14.2-test.9/
 
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.2-test.8
-          path: dist/koryto-v0.14.2-test.8
+          name: koryto-v0.14.2-test.9
+          path: dist/koryto-v0.14.2-test.9
           if-no-files-found: error
