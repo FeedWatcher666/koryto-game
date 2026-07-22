@@ -87,9 +87,29 @@
     return target;
   }
 
+  function candidateShapeIssues(value) {
+    if (!globalThis.KorytoState || !isObject(value)) return [];
+    const issues = [];
+    for (const key of globalThis.KorytoState.ARRAY_KEYS || []) {
+      if (value[key] !== undefined && !Array.isArray(value[key])) issues.push(`${key} není pole`);
+    }
+    for (const key of globalThis.KorytoState.OBJECT_KEYS || []) {
+      if (value[key] !== undefined && !isObject(value[key])) issues.push(`${key} není objekt`);
+    }
+    for (const key of globalThis.KorytoState.OBJECT_ENTRY_MAPS || []) {
+      if (!isObject(value[key])) continue;
+      for (const [entryKey, entry] of Object.entries(value[key])) {
+        if (!isObject(entry)) issues.push(`${key}.${entryKey} není objekt`);
+      }
+    }
+    return [...new Set(issues)];
+  }
+
   function migrateCandidate(value) {
     if (!hasSaveSignature(value)) return {ok:false, error:"signature", issues:["chybí rozpoznatelná struktura uložené hry"]};
     if (!globalThis.KorytoState) return {ok:false, error:"state-module", issues:["KorytoState není načten"]};
+    const shapeIssues = candidateShapeIssues(value);
+    if (shapeIssues.length) return {ok:false, error:"shape-validation", issues:shapeIssues};
     const previous = state;
     try {
       state = globalThis.KorytoState.normalizeCollections(value);

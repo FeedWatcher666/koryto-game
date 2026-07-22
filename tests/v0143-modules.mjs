@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { loadGameContext, readText } from './helpers.mjs';
 const context=loadGameContext();
-for(const file of ['src/event-system.js','src/faction-system.js','src/companion-system.js','src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js','src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js','src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js','src/ux-system.js','src/v0143-test10.js','src/balance-system.js','src/v0144-test10.js','src/v0145-campaign.js']) vm.runInContext(readText(file),context,{filename:file});
+for(const file of ['src/event-system.js','src/faction-system.js','src/companion-system.js','src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js','src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js','src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js','src/ux-system.js','src/v0143-test10.js','src/balance-system.js','src/v0144-test10.js','src/v0145-campaign.js','src/v0146-playtest.js']) vm.runInContext(readText(file),context,{filename:file});
 assert.equal(context.KorytoState.VERSION,'0.14.3 TEST.2');
 assert.equal(context.KorytoSaveSystem.SAVE_VERSION,'0.14.3-test.2');
 assert.equal(context.KorytoSaveSystem.SAVE_SCHEMA,1);
@@ -11,6 +11,6 @@ context.clearStoredSavesForTest();context.setStoredSaveForTest('koryto_v014','{b
 context.clearStoredSavesForTest();context.setStoredSaveForTest('koryto_v014',{...fixture('Poškozená družina'),party:{marie:null}});context.setStoredSaveForTest('koryto_v014_auto',fixture('Autosave po družině'));loaded=context.KorytoSaveSystem.loadGame();assert.equal(loaded.hero.name,'Autosave po družině');
 context.clearStoredSavesForTest();const quests=context.KorytoQuestRuntime.initialState();context.setStoredSaveForTest('koryto_v014',{...fixture('Číselné questy'),quests:{...quests,register:{status:'active',stage:'2',deadlineBonus:'1'}}});loaded=context.KorytoSaveSystem.loadGame();assert.equal(loaded.quests.register.stage,2);assert.equal(loaded.quests.register.deadlineBonus,1);
 const simulations=context.runSimulationForTest(200,24000);assert.equal(simulations.every(result=>result.ended),true);for(const result of simulations)for(const value of Object.values(result))if(typeof value==='number')assert.equal(Number.isFinite(value),true);
-const index=readText('index.html');assert.match(index,/src\/core-data\.js/);assert.match(index,/src\/v0145-campaign\.js/);assert.match(index,/0\.14\.5 TEST\.10/);assert.equal(readText('VERSION').trim(),'0.14.5-test.10');
-const workflow=readText('.github/workflows/v0142-stability.yml');assert.match(workflow,/Koryto v0\.14\.5 TEST\.10/);assert.match(workflow,/test\/v0\.14\.5-test10/);assert.match(workflow,/koryto-v0\.14\.5-test\.10/);
-console.log('v0.14.3 save contract remains stable inside v0.14.5 TEST.10');
+const index=readText('index.html');assert.match(index,/src\/core-data\.js/);assert.match(index,/src\/v0146-playtest\.js/);assert.match(index,/0\.14\.6 TEST\.10/);assert.equal(readText('VERSION').trim(),'0.14.6-test.10');
+const workflow=readText('.github/workflows/v0142-stability.yml');assert.match(workflow,/Koryto v0\.14\.6 TEST\.10/);assert.match(workflow,/test\/v0\.14\.6-test10/);assert.match(workflow,/koryto-v0\.14\.6-test\.10/);
+console.log('v0.14.3 save contract remains stable inside v0.14.6 TEST.10');
