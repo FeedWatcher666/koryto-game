@@ -1,0 +1,43 @@
+name: Build playable test
+
+on:
+  push:
+    branches:
+      - 'codex/execute-github-issue-#1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: node --check src/app.js
+
+      - name: Run tests
+        run: npm test
+
+      - name: Assemble playable build
+        run: |
+          mkdir -p dist/koryto-v0.14.1-test/styles dist/koryto-v0.14.1-test/src
+          cp index.html dist/koryto-v0.14.1-test/
+          cp styles/base.css dist/koryto-v0.14.1-test/styles/
+          cp src/app.js dist/koryto-v0.14.1-test/src/
+          printf 'Koryto v0.14.1 TEST\nOpen index.html in a modern browser.\n' > dist/koryto-v0.14.1-test/README.txt
+
+      - name: Upload playable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.14.1-test
+          path: dist/koryto-v0.14.1-test
+          if-no-files-found: error
