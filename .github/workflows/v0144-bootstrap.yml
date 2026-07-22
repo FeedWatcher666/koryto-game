@@ -1,0 +1,42 @@
+name: Apply v0.14.4 payload
+
+on:
+  push:
+    branches:
+      - test/v0.14.4-test10
+    paths:
+      - .bootstrap/v0144/READY
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: test/v0.14.4-test10
+
+      - name: Reconstruct and verify payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/v0144/part-* | base64 -d > /tmp/v0144-payload.tar.xz
+          echo "87c778dd4adacec8c04fbba18a6e94f2b3dc56801f5a6b963270c42878ac93c2  /tmp/v0144-payload.tar.xz" | sha256sum -c -
+          tar -xJf /tmp/v0144-payload.tar.xz -C .
+          rm -rf .bootstrap/v0144
+          rm -f .github/workflows/v0144-bootstrap.yml
+
+      - name: Commit exact tested payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "v0.14.4 TEST.10: physical monolith extraction"
+          git push origin HEAD:test/v0.14.4-test10
