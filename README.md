@@ -18,9 +18,9 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
-## Kandidát na vydání v0.14.2 RC2
+## Kandidát na vydání v0.14.2 RC3
 
-RC2 opravuje ukládání verze kandidáta na vydání do ručních i automatických pozic. Současně zachovává obnovu poškozeného stavu, stabilní rozhraní a regresní průchody čisté i korupční kampaně. Build zůstává oddělený od stabilní verze v `main`.
+RC3 opravuje ukládání verze kandidáta na vydání do ručních i automatických pozic. Současně zachovává obnovu poškozeného stavu, stabilní rozhraní a regresní průchody čisté i korupční kampaně. Build zůstává oddělený od stabilní verze v `main`.
 
 ## Struktura repozitáře
 
