@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  const VERSION = "0.14.2 TEST.7";
+  const VERSION = "0.14.2 TEST.8";
   const STATE_MARKER = "v0142StableVersion";
   const VALID_PROMISES = new Set(["school", "fees", "meadow"]);
   const VALID_PROMISE_STATUS = new Set(["active", "fulfilled", "broken"]);
@@ -96,6 +96,7 @@
     normalizeFeatureFlags(target);
     normalizeVoters(target);
     normalizeCommitments(target);
+    if (globalThis.KorytoCounterCampaign?.normalizeCampaignState) globalThis.KorytoCounterCampaign.normalizeCampaignState(target);
     return target;
   }
 
@@ -112,6 +113,8 @@
       const value = target.flags?.[`v0142Endorsement${day}`];
       if (value !== undefined && !VALID_ENDORSEMENTS.has(value)) issues.push(`neplatná podpora dne ${day}`);
     }
+    const counter = target.flags?.v0142CounterCampaign;
+    if (counter && typeof counter !== "object") issues.push("neplatná protikampaň");
     return issues;
   }
 
@@ -158,15 +161,17 @@
   }
 
   function updateVersionLabels() {
-    document.title = `Koryto ${VERSION} – Živý politický svět`;
+    document.title = `Koryto ${VERSION} – Věčného protikampaň`;
     const brand = document.querySelector?.(".brand h1 span");
     if (brand) brand.textContent = `Dolní Vejprnice ${VERSION}`;
     const description = document.querySelector?.('meta[name="description"]');
-    if (description) description.content = `Koryto ${VERSION}: stabilizovaná testovací verze s ověřením ukládání, slibů, průzkumů a patronů.`;
+    if (description) description.content = `Koryto ${VERSION}: stabilizovaná verze s dvoufázovou Věčného protikampaní a místy zásahu.`;
     const footer = document.querySelector?.(".footer-note");
     if (footer && !footer.dataset.stabilityLabel) {
       footer.dataset.stabilityLabel = "1";
       footer.textContent += ` · ${VERSION}`;
+    } else if (footer && /0\.14\.2 TEST\.[4-7]/.test(footer.textContent || "")) {
+      footer.textContent = footer.textContent.replace(/0\.14\.2 TEST\.[4-7]/g,VERSION);
     }
   }
 
@@ -175,7 +180,7 @@
     const nodes = [root, ...root.querySelectorAll("*")];
     for (const node of nodes) {
       if (node.children?.length || typeof node.textContent !== "string") continue;
-      if (/0\.14\.2 TEST\.[456]/.test(node.textContent)) node.textContent = node.textContent.replace(/0\.14\.2 TEST\.[456]/g, VERSION);
+      if (/0\.14\.2 TEST\.[4-7]/.test(node.textContent)) node.textContent = node.textContent.replace(/0\.14\.2 TEST\.[4-7]/g, VERSION);
     }
   }
 
@@ -226,7 +231,7 @@
   updateVersionLabels();
   installButtonGuards();
   healthTick();
-  if (typeof setInterval === "function") setInterval(healthTick, 750);
+  if (typeof setInterval === "function") setInterval(healthTick,750);
 
   if (typeof MutationObserver === "function" && document.body) {
     const observer = new MutationObserver(() => rewriteLegacyVersionText());
