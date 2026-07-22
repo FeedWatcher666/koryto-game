@@ -18,6 +18,10 @@ Hlavní systémy:
 - migrace uložených her,
 - první pixel-artová mapová vrstva.
 
+## Testovací větev v0.14.2 TEST.10
+
+Aktuální kandidát přidává průvodce prvním dnem, denní souhrny změn, jasnou prioritu dalšího tahu a vysvětlení volebního výsledku. Testovací build zůstává oddělený od stabilní verze v `main`.
+
 ## Struktura repozitáře
 
 ```text
