@@ -16,16 +16,22 @@ export function loadGameContext() {
     innerHTML: '',
     textContent: '',
     value: '',
+    content: '',
     disabled: false,
     dataset: {},
+    children: [],
     style: { setProperty() {} },
     classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
     addEventListener() {},
-    appendChild() {},
+    appendChild(child) { this.children.push(child); return child; },
+    insertBefore(child) { this.children.unshift(child); return child; },
     querySelector() { return makeEl(); },
-    querySelectorAll() { return []; }
+    querySelectorAll() { return []; },
+    closest() { return null; }
   });
   const document = {
+    title: '',
+    head: makeEl('head'),
     body: makeEl('body'),
     getElementById(id) {
       if (!elements.has(id)) elements.set(id, makeEl(id));
@@ -51,13 +57,15 @@ export function loadGameContext() {
     prompt(_m, fallback = '') { return fallback; },
     setTimeout(fn) { if (typeof fn === 'function') fn(); return 0; },
     clearTimeout() {},
+    setInterval() { return 0; },
+    clearInterval() {},
     Math,
     JSON,
     Date
   };
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(app + '\nfunction migrateSaveForTest(save){ state=deep(baseState); Object.assign(state, save); normalizeState(); return deep(state); }\nfunction getStateForTest(){ return state; }\nfunction setStateForTest(next){ state=next; return state; }\nfunction startCampaignForTest(){ newGame(); return state; }\nfunction startQuestForTest(id){ showEvent(id); return state; }\nfunction calculateElectionForTest(){ finalizeElection(); return { vote: state.flags.vote, playerSeats: state.flags.seats, majority: state.flags.majority }; }\nfunction startCoalitionForTest(result){ initCoalition({ seats: Math.max(1, Math.min(6, result?.playerSeats || 5)), majority: result?.majority || 8 }, { emoji: "🧪", title: "Test", lead: "Test", story: "Test" }, 10, true); return state.coalition; }\nfunction runSimulationForTest(count=3, seed=0){ return Array.from({ length: count }, (_, i) => simulateStrategy("mixed", seed + i)); }\nObject.assign(globalThis, {\n  baseState, locations, events, questDefs, factions: factionPlanDefs, companions,\n  deep, migrateSaveForTest, getStateForTest, setStateForTest, startCampaignForTest,\n  startQuestForTest, showMap, startDebate, calculateElectionForTest, startCoalitionForTest, runSimulationForTest\n});\n', sandbox, { filename: 'src/app.js' });
+  vm.runInContext(app + '\nfunction migrateSaveForTest(save){ state=deep(baseState); Object.assign(state, save); normalizeState(); return deep(state); }\nfunction getStateForTest(){ return state; }\nfunction setStateForTest(next){ state=next; return state; }\nfunction startCampaignForTest(){ newGame(); return state; }\nfunction startQuestForTest(id){ showEvent(id); return state; }\nfunction calculateElectionForTest(){ finalizeElection(); return { vote: state.flags.vote, playerSeats: state.flags.seats, majority: state.flags.majority }; }\nfunction startCoalitionForTest(result){ initCoalition({ seats: Math.max(1, Math.min(6, result?.playerSeats || 5)), majority: result?.majority || 8 }, { emoji: "🧪", title: "Test", lead: "Test", story: "Test" }, 10, true); return state.coalition; }\nfunction runSimulationForTest(count=3, seed=0){ return Array.from({ length: count }, (_, i) => simulateStrategy("mixed", seed + i)); }\nObject.assign(globalThis, {\n  baseState, locations, events, questDefs, factions: factionPlanDefs, companions, voterDefs,\n  deep, migrateSaveForTest, getStateForTest, setStateForTest, startCampaignForTest,\n  startQuestForTest, showMap, startDebate, calculateElectionForTest, startCoalitionForTest, runSimulationForTest\n});\n', sandbox, { filename: 'src/app.js' });
   return sandbox;
 }
 
