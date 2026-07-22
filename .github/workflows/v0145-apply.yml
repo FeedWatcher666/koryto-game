@@ -39,6 +39,16 @@ jobs:
           set +e
           tar -xJf /tmp/v0145-payload.tar.xz -C .
           sed -i "s/context.KorytoReleaseCandidate.VERSION,'0.14.5 TEST.10'/context.KorytoReleaseCandidate.VERSION,'0.14.4 TEST.10'/" tests/v0143-test10.mjs
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/v0143-test10.mjs')
+          text = path.read_text()
+          old = "const source=readText('src/v0144-test10.js');assert.doesNotMatch(source,/setInterval\\s*\\(/);assert.doesNotMatch(source,/MutationObserver/);const ux=readText('src/v0145-campaign.js');assert.match(ux,/100dvh/);assert.match(ux,/safe-area-inset-bottom/);assert.match(readText('styles/base.css'),/position:sticky/);"
+          new = "const source=readText('src/v0144-test10.js');assert.doesNotMatch(source,/setInterval\\s*\\(/);assert.doesNotMatch(source,/MutationObserver/);const ux=readText('src/v0145-campaign.js');assert.match(ux,/prioritySnapshot/);const campaignCss=readText('styles/v0145.css');assert.match(campaignCss,/100dvh/);assert.match(campaignCss,/safe-area-inset-bottom/);assert.match(campaignCss,/position:sticky/);"
+          if old not in text:
+              raise SystemExit('v0145 CSS assertion target not found')
+          path.write_text(text.replace(old, new))
+          PY
           npm test 2>&1 | tee /tmp/v0145-test-output.txt
           status=${PIPESTATUS[0]}
           if [ "$status" -eq 0 ]; then
