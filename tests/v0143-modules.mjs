@@ -32,6 +32,8 @@ const legacy = {
   stats:{influence:12, trust:67},
   flags:{legacyMarker:true, nested:{kept:'ano'}}
 };
+assert.equal(context.KorytoSaveSystem.hasSaveSignature(legacy), true);
+assert.equal(context.KorytoSaveSystem.hasSaveSignature({}), false);
 context.setStoredSaveForTest('koryto_v013', legacy);
 let loaded;
 assert.doesNotThrow(() => { loaded = context.KorytoSaveSystem.loadGame(); });
@@ -95,7 +97,9 @@ assert.equal(loaded.day, 6);
 context.clearStoredSavesForTest();
 context.setStoredSaveForTest('koryto_v014', {});
 context.setStoredSaveForTest('koryto_v014_auto', saveFixture('Autosave po prázdném JSON', 6));
+const activeBeforeInspection = JSON.stringify(context.getStateForTest());
 const emptyObjectFallback = context.KorytoSaveSystem.readLoadable();
+assert.equal(JSON.stringify(context.getStateForTest()), activeBeforeInspection, 'slot inspection must not mutate active state');
 assert.equal(emptyObjectFallback.invalid[0].key, 'koryto_v014');
 assert.equal(emptyObjectFallback.invalid[0].error, 'signature');
 loaded = context.KorytoSaveSystem.loadGame();
