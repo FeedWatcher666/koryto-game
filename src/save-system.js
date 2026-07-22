@@ -47,11 +47,12 @@
     if (!globalThis.KorytoState) throw new Error("KorytoState není načten.");
     state = globalThis.KorytoState.normalizeCollections(next);
     if (typeof normalizeState === "function") normalizeState();
-    globalThis.KorytoState.normalizeCollections(state, {defaults:globalThis.KorytoState.base});
+    state = globalThis.KorytoState.normalizeCollections(state, {defaults:globalThis.KorytoState.base});
     applyExtensionNormalizers(state);
     state.flags = state.flags && typeof state.flags === "object" ? state.flags : {};
     state.flags.v0143SaveSystem = VERSION;
     state.version = SAVE_VERSION;
+    if (globalThis.KorytoTest143?.normalizeReleaseState) state = globalThis.KorytoTest143.normalizeReleaseState(state);
     return state;
   }
 
@@ -60,6 +61,7 @@
     prepared.flags = prepared.flags && typeof prepared.flags === "object" ? prepared.flags : {};
     prepared.flags.v0143SaveSystem = VERSION;
     prepared.version = SAVE_VERSION;
+    if (globalThis.KorytoTest143?.normalizeReleaseState) globalThis.KorytoTest143.normalizeReleaseState(prepared);
     return JSON.stringify(prepared);
   }
 
@@ -145,9 +147,12 @@
       const raw = serialize(target);
       const parsed = parse(raw);
       if (!parsed.ok) return {ok:false, error:parsed.error};
-      const restored = globalThis.KorytoState.normalizeCollections(parsed.value);
+      let restored = globalThis.KorytoState.normalizeCollections(parsed.value);
       applyExtensionNormalizers(restored);
+      restored.flags = restored.flags && typeof restored.flags === "object" ? restored.flags : {};
+      restored.flags.v0143SaveSystem = VERSION;
       restored.version = SAVE_VERSION;
+      if (globalThis.KorytoTest143?.normalizeReleaseState) restored = globalThis.KorytoTest143.normalizeReleaseState(restored);
       const issues = globalThis.KorytoState.validate(restored);
       return {ok:issues.length === 0, raw, restored, issues};
     } catch (error) {
