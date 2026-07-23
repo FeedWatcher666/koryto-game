@@ -79,6 +79,7 @@ function makeDocument() {
   const brand = { textContent: "" };
   const meta = { content: "", setAttribute(name, value) { if (name === "content") this.attributeContent = value; } };
   const titleNode = { textContent: "" };
+  const footer = { textContent: "Fiktivní postavy. Fiktivní obec. · 0.14.4 TEST.10" };
   const root = {
     style: {
       setProperty(name, value) { styleValues.set(name, value); },
@@ -96,6 +97,7 @@ function makeDocument() {
       if (selector === "title") return titleNode;
       if (selector === ".brand h1 span") return brand;
       if (selector === 'meta[name="description"]') return meta;
+      if (selector === ".footer-note") return footer;
       return null;
     },
     querySelectorAll() { return []; },
@@ -108,7 +110,7 @@ function makeDocument() {
     },
     addEventListener() {}
   };
-  return { document, root, brand, meta, titleNode, styleValues, rootClassList };
+  return { document, root, brand, meta, titleNode, footer, styleValues, rootClassList };
 }
 
 function runRuntime(chunks) {
@@ -149,12 +151,15 @@ assert.equal(current.dom.document.title, "Koryto 0.14.9 TEST.10 – komunální 
 assert.equal(current.dom.titleNode.textContent, "Koryto 0.14.9 TEST.10 – komunální politické RPG");
 assert.equal(current.dom.brand.textContent, "Dolní Vejprnice 0.14.9 TEST.10");
 assert.match(current.dom.meta.content, /0\.14\.9 TEST\.10/);
+assert.equal(current.dom.footer.textContent, "Fiktivní postavy. Fiktivní obec. · 0.14.9 TEST.10");
 current.dom.document.title = "Koryto 0.14.2 TEST.10 – legacy";
 current.dom.brand.textContent = "Dolní Vejprnice 0.14.2 TEST.10";
 current.dom.meta.content = "legacy metadata";
+current.dom.footer.textContent = "Fiktivní postavy. Fiktivní obec. · 0.14.4 TEST.10";
 assert.equal(current.dom.document.title, "Koryto 0.14.9 TEST.10 – komunální politické RPG");
 assert.equal(current.dom.brand.textContent, "Dolní Vejprnice 0.14.9 TEST.10");
 assert.match(current.dom.meta.content, /0\.14\.9 TEST\.10/);
+assert.equal(current.dom.footer.textContent, "Fiktivní postavy. Fiktivní obec. · 0.14.9 TEST.10");
 
 const valid = runRuntime({ atlas: [atlasBase64], village: [atlasBase64], scenes: [], logo: [] });
 assert.equal(valid.api.validatePngBase64(atlasBase64).ok, true);
