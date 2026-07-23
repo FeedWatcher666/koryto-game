@@ -75,11 +75,11 @@ assert.match(fullReport, /Event coverage: 95\/101 \(94\.1 %\)/);
 assert.match(fullReport, /No P1\/P2 findings/);
 
 const index = readText('index.html');
-assert.match(index, /0\.14\.6 TEST\.10/);
+assert.match(index, /0\.14\.7 TEST\.10/);
 assert.match(index, /styles\/v0146\.css/);
 assert.match(index, /src\/v0146-playtest\.js/);
 assert.ok(index.indexOf('src/v0146-playtest.js') > index.indexOf('src/v0145-campaign.js'));
-assert.equal(readText('VERSION').trim(), '0.14.6-test.10');
+assert.equal(readText('VERSION').trim(), '0.14.7-test.10');
 assert.ok(readText('src/app.js').split('\n').length < 1000);
 for (const source of ['src/v0146-playtest.js','styles/v0146.css']) {
   assert.doesNotMatch(readText(source), /MutationObserver/);
