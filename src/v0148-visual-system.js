@@ -10,6 +10,7 @@
   const stateOf = () => globalThis.KorytoApp?.getState?.() || (typeof state !== "undefined" ? state : null);
   const questDefsOf = () => globalThis.KorytoQuestData?.definitions || (typeof questDefs !== "undefined" ? questDefs : {});
   const companionDefsOf = () => globalThis.KorytoCompanionData?.companions || (typeof companions !== "undefined" ? companions : {});
+  let repaintQueued = false;
 
   const locationMeta = {
     pub:{label:"Hospoda",icon:"🍺",x:10,y:28}, townhall:{label:"Radnice",icon:"🏛️",x:39,y:23}, school:{label:"Škola",icon:"🏫",x:67,y:26},
@@ -85,9 +86,19 @@
     return `${deskHeader("ŠTÁB KANDIDÁTA","Lidé, loajalita a konflikty","Každý člen má vlastní hranici a ambici.","staff")}<div class="v0148-staff-grid">${Object.entries(target.party||{}).map(([id,p])=>{const d=defs[id]||{};const tension=target.companionAmbitions?.[id]?.tension||0;return `<article><div class="portrait">${d.icon||"👤"}</div><h3>${esc(p.name||d.name||id)}</h3><small>${esc(d.role||"Člen štábu")}</small>${cardMeter("Loajalita",p.loyalty||50,"good")}${cardMeter("Stres",tension,"bad")}<footer><button>Promluvit</button><button>Nasadit</button></footer></article>`;}).join("")}</div>`;
   }
 
+  function powerSnapshot(target = stateOf()) {
+    if (!target) return [];
+    const refreshed = globalThis.KorytoConsequences?.updatePowerMap?.(target);
+    const powerMap = refreshed && Object.keys(refreshed).length ? refreshed : (target.campaignMemory?.powerMap || {});
+    return Object.values(powerMap).map(item => ({
+      label:item?.label || "Mocenský blok", icon:item?.icon || "♟️", owner:item?.owner || "sporné",
+      player:clamp(item?.player), rival:clamp(item?.rival), faction:item?.faction || "Věčný"
+    }));
+  }
+
   function influenceDesk(target){
-    const power=target.campaignMemory?.power||{}; const rows=[["Média","📰","press"],["Úřad","🏛️","officials"],["Podnikatelé","💼","business"],["Spolky","🏘️","citizens"],["Senioři","👵","seniors"],["Rodiče","👨‍👩‍👧","parents"]];
-    return `${deskHeader("MAPA VLIVU","Kdo drží Dolní Vejprnice","Mocenské bloky a operace Vladimíra Věčného.","influence")}<div class="v0148-power-grid">${rows.map(([l,i,k])=>`<article><span>${i}</span><h3>${l}</h3>${cardMeter("Podpora",power[k]||target.stats?.[k]||50,"good")}</article>`).join("")}</div><section class="v0148-rival"><h3>🕴️ Vladimír Věčný</h3><p>${esc(target.campaignMemory?.doctrine?.label||target.rivalOperation?.id||"Buduje zákulisní tlak")}</p>${cardMeter("Postup operace",target.rivalOperation?.progress||0,"bad")}</section>`;
+    const rows=powerSnapshot(target);
+    return `${deskHeader("MAPA VLIVU","Kdo drží Dolní Vejprnice","Mocenské bloky a operace Vladimíra Věčného.","influence")}<div class="v0148-power-grid">${rows.map(item=>`<article class="owner-${item.owner==="hráč"?"player":item.owner==="sporné"?"contested":"rival"}"><span>${item.icon}</span><h3>${esc(item.label)}</h3><small>${esc(item.owner)}</small>${cardMeter("Kandidát",item.player,"good")}${cardMeter(item.faction,item.rival,"bad")}</article>`).join("")||"<p>Mocenská mapa zatím čeká na první tah.</p>"}</div><section class="v0148-rival"><h3>🕴️ Vladimír Věčný</h3><p>${esc(target.campaignMemory?.doctrine?.label||target.rivalOperation?.id||"Buduje zákulisní tlak")}</p>${cardMeter("Postup operace",target.rivalOperation?.progress||0,"bad")}</section>`;
   }
 
   function archiveDesk(target){
@@ -113,9 +124,19 @@
   function dispatch(action){if(action==="close")return closeDesk();if(action==="map"){closeDesk();globalThis.showMap?.();return;}openDesk(action);}
 
   function repaint(){renderHud();decorateMap();}
-  function wrap(name){const original=globalThis[name];if(typeof original!=="function"||original.__v0148)return;const wrapped=function(...args){const result=original.apply(this,args);setTimeout(repaint,0);return result};wrapped.__v0148=true;globalThis[name]=wrapped;}
-  function install(){if(typeof document==="undefined")return false;shell();hud();["renderAll","renderMap","showMap","showLocation","showEvent","renderDebate","renderCoalition","newGame","load"].forEach(wrap);setTimeout(repaint,0);return true;}
+  function queueRepaint(){if(repaintQueued)return;repaintQueued=true;setTimeout(()=>{repaintQueued=false;repaint();},0);}
+  function wrap(name){const original=globalThis[name];if(typeof original!=="function"||original.__v0148)return;const wrapped=function(...args){const result=original.apply(this,args);queueRepaint();return result};wrapped.__v0148=true;globalThis[name]=wrapped;}
+  function install(){
+    if(typeof document==="undefined")return false;
+    shell();hud();["renderAll","renderMap","showMap","showLocation","showEvent","renderDebate","renderCoalition","newGame","load"].forEach(wrap);
+    if(!document.documentElement.dataset.v0148RefreshBound){
+      document.addEventListener("click",queueRepaint);
+      document.addEventListener("change",queueRepaint);
+      document.documentElement.dataset.v0148RefreshBound="1";
+    }
+    queueRepaint();return true;
+  }
 
-  const api={VERSION,BUILD_VERSION,SAVE_VERSION,SAVE_SCHEMA,activeQuests,openDesk,repaint,install,visualAudit:(target=stateOf())=>({version:VERSION,buildVersion:BUILD_VERSION,saveVersion:SAVE_VERSION,saveSchema:SAVE_SCHEMA,screens:8,activeQuests:activeQuests(target).length,companions:Object.keys(target?.party||{}).length,ready:Boolean(target)})};
+  const api={VERSION,BUILD_VERSION,SAVE_VERSION,SAVE_SCHEMA,activeQuests,powerSnapshot,openDesk,repaint,install,visualAudit:(target=stateOf())=>({version:VERSION,buildVersion:BUILD_VERSION,saveVersion:SAVE_VERSION,saveSchema:SAVE_SCHEMA,screens:8,activeQuests:activeQuests(target).length,companions:Object.keys(target?.party||{}).length,powerBlocks:powerSnapshot(target).length,ready:Boolean(target)})};
   globalThis.KorytoVisual148=api; globalThis.KorytoTest148=api; install();
 })();
