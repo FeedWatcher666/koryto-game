@@ -27,11 +27,12 @@ function chunkPayload(path, kind) {
 const atlasParts = chunkSpecs.filter(([, kind]) => kind === "atlas").map(([path, kind]) => chunkPayload(path, kind));
 const villageParts = chunkSpecs.filter(([, kind]) => kind === "village").map(([path, kind]) => chunkPayload(path, kind));
 const atlasBase64 = atlasParts.join("");
-const villageBase64 = villageParts.join("");
 const atlasBytes = Buffer.from(atlasBase64, "base64");
 
 assert.equal(read("VERSION").trim(), "0.14.9-test.10");
 assert.match(html, /0\.14\.9 TEST\.10/);
+assert.match(html, /komunální politické RPG/);
+assert.match(html, /Vizuální režim: Koryto/);
 assert.match(html, /styles\/v0149\.css/);
 assert.match(workflow, /Koryto v0\.14\.9 TEST\.10/);
 assert.match(workflow, /koryto-v0\.14\.9-test\.10/);
@@ -49,26 +50,15 @@ const positions = orderedAssets.map(file => html.indexOf(file));
 assert.ok(positions.every((value, index) => value >= 0 && (index === 0 || value > positions[index - 1])), "chunks must load before the v0.14.9 runtime");
 
 for (const token of [
-  ".v0149-assets-fallback",
-  "#11100d",
-  "#211e18",
-  "#2c281f",
-  "#d8aa38",
-  "#e9dfc7",
-  "#f4ecd9",
-  "#514936",
-  "v0149-village-map",
-  "v0149-location-node",
-  "prefers-reduced-motion",
-  "focus-visible"
+  ".v0149-assets-fallback", "#11100d", "#211e18", "#2c281f", "#d8aa38",
+  "#e9dfc7", "#f4ecd9", "#514936", "v0149-village-map", "v0149-location-node",
+  "prefers-reduced-motion", "focus-visible"
 ]) assert.ok(css.includes(token), `missing CSS contract token ${token}`);
 
-assert.match(runtime, /validatePngBase64/);
-assert.match(runtime, /crc32/);
-assert.match(runtime, /IHDR/);
-assert.match(runtime, /IDAT/);
-assert.match(runtime, /IEND/);
-assert.match(runtime, /KorytoCanonicalBuild149/);
+for (const token of [
+  "validatePngBase64", "crc32", "ALLOWED_BIT_DEPTHS", "IHDR", "PLTE", "IDAT", "IEND",
+  "nonconsecutive-idat", "KorytoCanonicalBuild149"
+]) assert.ok(runtime.includes(token), `missing runtime validation token ${token}`);
 assert.doesNotMatch(runtime, /MutationObserver/);
 assert.doesNotMatch(runtime, /setInterval\s*\(/);
 assert.doesNotMatch(runtime, /https?:\/\//);
@@ -112,15 +102,8 @@ function makeDocument() {
     getElementById() { return null; },
     createElement() {
       return {
-        className: "",
-        classList: makeClassList(),
-        dataset: {},
-        style: { setProperty() {} },
-        children: [],
-        prepend() {},
-        appendChild() {},
-        querySelector() { return null; },
-        querySelectorAll() { return []; }
+        className: "", classList: makeClassList(), dataset: {}, style: { setProperty() {} }, children: [],
+        prepend() {}, appendChild() {}, querySelector() { return null; }, querySelectorAll() { return []; }
       };
     },
     addEventListener() {}
@@ -156,7 +139,7 @@ const currentAudit = current.api.visualAudit();
 assert.equal(currentAudit.validation.atlas.ok, true, currentAudit.validation.atlas.reason);
 assert.equal(currentAudit.validation.atlas.width, 1024);
 assert.equal(currentAudit.validation.atlas.height, 1024);
-assert.equal(currentAudit.validation.village.ok, false, "the bundled village payload is intentionally quarantined until replaced");
+assert.equal(currentAudit.validation.village.ok, false, "the bundled village payload must remain quarantined");
 assert.match(currentAudit.validation.village.reason, /^truncated-/);
 assert.equal(currentAudit.assetsReady, false);
 assert.equal(current.dom.rootClassList.contains("v0149-assets-fallback"), true);
@@ -185,30 +168,65 @@ assert.equal(valid.dom.styleValues.get("--v0149-atlas"), "none");
 
 const prefixAndZeros = Buffer.concat([atlasBytes.subarray(0, 8), Buffer.alloc(64)]).toString("base64");
 assert.equal(valid.api.validatePngBase64(prefixAndZeros).ok, false, "PNG prefix alone must not enable art");
-
 const truncatedIdat = atlasBytes.subarray(0, atlasBytes.length - 20).toString("base64");
 assert.equal(valid.api.validatePngBase64(truncatedIdat).ok, false, "truncated IDAT/IEND must fail");
-
 const badCrcBytes = Buffer.from(atlasBytes);
 badCrcBytes[64] ^= 1;
 const badCrc = valid.api.validatePngBase64(badCrcBytes.toString("base64"));
 assert.equal(badCrc.ok, false);
 assert.match(badCrc.reason, /^crc-/);
-
 const missingIend = atlasBytes.subarray(0, atlasBytes.length - 12).toString("base64");
 assert.equal(valid.api.validatePngBase64(missingIend).reason, "missing-iend");
 
+const CRC_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let index = 0; index < 256; index += 1) {
+    let value = index;
+    for (let bit = 0; bit < 8; bit += 1) value = value & 1 ? 0xedb88320 ^ value >>> 1 : value >>> 1;
+    table[index] = value >>> 0;
+  }
+  return table;
+})();
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) crc = CRC_TABLE[(crc ^ byte) & 255] ^ crc >>> 8;
+  return (crc ^ 0xffffffff) >>> 0;
+}
+function makeChunk(type, data) {
+  const typeBytes = Buffer.from(type, "ascii");
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(data.length);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([typeBytes, data])));
+  return Buffer.concat([length, typeBytes, data, crc]);
+}
 function pngChunks(bytes) {
   const chunks = [];
   let offset = 8;
   while (offset < bytes.length) {
     const length = bytes.readUInt32BE(offset);
     const end = offset + 12 + length;
-    chunks.push({ type: bytes.subarray(offset + 4, offset + 8).toString("ascii"), bytes: bytes.subarray(offset, end) });
+    chunks.push({
+      type: bytes.subarray(offset + 4, offset + 8).toString("ascii"),
+      data: bytes.subarray(offset + 8, offset + 8 + length),
+      bytes: bytes.subarray(offset, end)
+    });
     offset = end;
   }
   return chunks;
 }
+function mutateIhdr(base64, bitDepth, colorType) {
+  const bytes = Buffer.from(base64, "base64");
+  assert.equal(bytes.subarray(12, 16).toString("ascii"), "IHDR");
+  bytes[24] = bitDepth;
+  bytes[25] = colorType;
+  bytes.writeUInt32BE(crc32(bytes.subarray(12, 29)), 29);
+  return bytes.toString("base64");
+}
+
+assert.equal(valid.api.validatePngBase64(mutateIhdr(atlasBase64, 8, 7)).reason, "unsupported-ihdr", "unknown color type must fail");
+assert.equal(valid.api.validatePngBase64(mutateIhdr(atlasBase64, 4, 2)).reason, "unsupported-ihdr", "invalid bit-depth/color-type pair must fail");
+
 const chunks = pngChunks(atlasBytes);
 const reordered = Buffer.concat([
   atlasBytes.subarray(0, 8),
@@ -217,6 +235,26 @@ const reordered = Buffer.concat([
   chunks.find(chunk => chunk.type === "IEND").bytes
 ]).toString("base64");
 assert.equal(valid.api.validatePngBase64(reordered).reason, "ihdr-not-first");
+
+const firstIdatIndex = chunks.findIndex(chunk => chunk.type === "IDAT");
+const lastIdatIndex = chunks.map(chunk => chunk.type).lastIndexOf("IDAT");
+const idatData = Buffer.concat(chunks.filter(chunk => chunk.type === "IDAT").map(chunk => chunk.data));
+const split = Math.max(1, Math.floor(idatData.length / 2));
+const signature = atlasBytes.subarray(0, 8);
+const prefixChunks = chunks.slice(0, firstIdatIndex).map(chunk => chunk.bytes);
+const iend = chunks.find(chunk => chunk.type === "IEND").bytes;
+const consecutiveIdat = Buffer.concat([
+  signature, ...prefixChunks, makeChunk("IDAT", idatData.subarray(0, split)),
+  makeChunk("IDAT", idatData.subarray(split)), iend
+]).toString("base64");
+assert.equal(valid.api.validatePngBase64(consecutiveIdat).ok, true, "consecutive IDAT chunks must remain valid");
+const separatedIdat = Buffer.concat([
+  signature, ...prefixChunks, makeChunk("IDAT", idatData.subarray(0, split)),
+  makeChunk("tEXt", Buffer.from("audit\0separator", "latin1")),
+  makeChunk("IDAT", idatData.subarray(split)), iend
+]).toString("base64");
+assert.equal(valid.api.validatePngBase64(separatedIdat).reason, "nonconsecutive-idat", "separated IDAT chunks must fail");
+assert.ok(lastIdatIndex >= firstIdatIndex);
 
 const incomplete = runRuntime({ atlas: atlasParts.slice(0, 2), village: [atlasBase64], scenes: [], logo: [] });
 assert.equal(incomplete.api.preload(), false);

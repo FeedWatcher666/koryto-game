@@ -11,6 +11,13 @@
   const DISPLAY_TITLE = `Koryto ${VERSION} – komunální politické RPG`;
   const DISPLAY_DESCRIPTION = `Koryto ${VERSION}: třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.`;
   const BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  const ALLOWED_BIT_DEPTHS = {
+    0: [1, 2, 4, 8, 16],
+    2: [8, 16],
+    3: [1, 2, 4, 8],
+    4: [8, 16],
+    6: [8, 16]
+  };
 
   const assets = { atlas: "", village: "", scenes: "", logo: "" };
   const assetState = {
@@ -81,9 +88,13 @@
     let offset = 8;
     let first = true;
     let seenHeader = false;
+    let seenPalette = false;
     let seenData = false;
+    let dataSequenceClosed = false;
     let width = 0;
     let height = 0;
+    let bitDepth = 0;
+    let colorType = -1;
     const chunks = [];
 
     while (offset < bytes.length) {
@@ -107,11 +118,22 @@
         if (seenHeader || length !== 13) return result(false, "invalid-ihdr", { chunks });
         width = readU32(bytes, dataStart);
         height = readU32(bytes, dataStart + 4);
+        bitDepth = bytes[dataStart + 8];
+        colorType = bytes[dataStart + 9];
         if (!width || !height || width > MAX_PNG_DIMENSION || height > MAX_PNG_DIMENSION) return result(false, "invalid-dimensions", { width, height, chunks });
-        if (bytes[dataStart + 10] !== 0 || bytes[dataStart + 11] !== 0 || bytes[dataStart + 12] > 1) return result(false, "unsupported-ihdr", { width, height, chunks });
+        if (!ALLOWED_BIT_DEPTHS[colorType]?.includes(bitDepth) || bytes[dataStart + 10] !== 0 || bytes[dataStart + 11] !== 0 || bytes[dataStart + 12] > 1) {
+          return result(false, "unsupported-ihdr", { width, height, bitDepth, colorType, chunks });
+        }
         seenHeader = true;
+      } else if (type === "PLTE") {
+        if (!seenHeader || seenPalette || seenData || length === 0 || length % 3 !== 0 || length > 768 || colorType === 0 || colorType === 4) {
+          return result(false, "invalid-plte", { width, height, bitDepth, colorType, chunks });
+        }
+        seenPalette = true;
       } else if (type === "IDAT") {
         if (!seenHeader || length === 0) return result(false, "invalid-idat", { width, height, chunks });
+        if (dataSequenceClosed) return result(false, "nonconsecutive-idat", { width, height, chunks });
+        if (colorType === 3 && !seenPalette) return result(false, "missing-plte", { width, height, chunks });
         seenData = true;
       } else if (type === "IEND") {
         if (!seenHeader || !seenData || length !== 0) return result(false, "invalid-iend", { width, height, chunks });
@@ -119,6 +141,7 @@
         return result(true, "ok", { width, height, byteLength: bytes.length, chunks });
       }
 
+      if (seenData && type !== "IDAT" && type !== "IEND") dataSequenceClosed = true;
       first = false;
       offset = next;
     }
