@@ -1,0 +1,18 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const js=fs.readFileSync("src/v0148-visual-system.js","utf8");
+const css=fs.readFileSync("styles/v0148.css","utf8");
+const html=fs.readFileSync("index.html","utf8");
+assert.match(js,/0\.14\.8 TEST\.10/);
+assert.match(js,/SAVE_VERSION = "0\.14\.3-test\.2"/);
+assert.match(js,/KorytoVisual148/);
+assert.match(js,/activeQuests/);
+assert.match(js,/campaignMemory/);
+for(const screen of ["map","quests","staff","influence","debate","elections","archive","settings"]) assert.ok(js.includes(screen),`missing ${screen}`);
+for(const token of ["v0148-hud","v0148-map","v0148-nav","v0148-shell","v0148-staff-grid","v0148-power-grid","v0148-timeline"]) assert.ok(css.includes(token),`missing ${token}`);
+assert.match(css,/@media\(max-width:700px\)/);
+assert.match(css,/safe-area-inset-bottom/);
+assert.match(css,/v0148-reducedMotion/);
+assert.match(html,/styles\/v0148\.css/);
+assert.match(html,/src\/v0148-visual-system\.js/);
+console.log("v0.14.8 visual contract passed");
