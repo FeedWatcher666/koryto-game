@@ -4,41 +4,40 @@ Satirické české politické RPG o třináctidenní komunální kampani v Doln�
 
 ## Aktuální testovací verze
 
-**v0.14.7 TEST.10 – Následky a znovuhratelnost**
+**v0.14.9 TEST.10 – produkční pixel-artový asset pass**
 
-Hra si nyní pamatuje důležité volby a vrací je později jako politické následky. Tři hlavní kauzy mají vlastní cestu, Vladimír Věčný používá jednu z pěti strategií, společníci mohou položit ultimátum nebo odejít a závěr kampaně rozlišuje několik typů vítězství, opozice i veřejného pádu.
+Tato verze nahrazuje provizorní emoji vrstvu lokálními pixel-artovými assety, ale zachovává existující herní logiku, save schema a plně offline spuštění přes `file://`.
 
-### Série TEST.1–TEST.10
+### Hlavní změny
 
-- **TEST.1:** audit skutečných a falešných rozhodnutí.
-- **TEST.2:** jednotná paměť kampaně, laskavostí, nepřátel a svědků.
-- **TEST.3:** návraty starších rozhodnutí.
-- **TEST.4:** větvení Kandidátky, Střechy a Poslední louky.
-- **TEST.5:** pět strategií Vladimíra Věčného.
-- **TEST.6:** ultimáta, odchody a přeběhnutí družiny.
-- **TEST.7:** mocenská mapa šesti oblastí obce.
-- **TEST.8:** debata používající historii kampaně.
-- **TEST.9:** osm hlavních typů zakončení a fallback opozice.
-- **TEST.10:** párový replay audit 240 kampaní.
+- panorama Dolních Vejprnic pro mapu a scénické hlavičky,
+- osm lokálních budov pro mapu,
+- portréty šesti tříd kandidáta, členů štábu a Vladimíra Věčného,
+- pixelové ikony navigace a mocenských bloků,
+- sestavení PNG assetů z lokálních JavaScript chunků do datových URL bez síťových požadavků,
+- bezpečný fallback na původní funkční UI, pokud assety nejsou dostupné,
+- responzivní desktop, tablet a mobil,
+- klávesový focus, minimální výška hlavních ovládacích prvků 48 px a podpora `prefers-reduced-motion`.
 
 ## Hlavní soubory
 
-- `src/v0147-consequences.js` – paměť, následky, soupeř, ultimáta, konce a replay audit.
-- `styles/v0147.css` – mocenská mapa, debatní paměť a závěrečný přehled.
-- `docs/v0.14/v0147-consequence-report.md` – úplný audit verze.
+- `src/v0149-assets/` – lokální PNG chunky atlasu a vesnického panoramatu,
+- `src/v0149-pixel-assets.js` – sestavení datových URL a napojení assetů na runtime,
+- `styles/v0149.css` – sprite atlas, panorama, portréty, mapové uzly a responzivní pravidla,
+- `tests/v0149-assets.mjs` – integrita PNG, pořadí offline načítání, CSS wiring a fallback.
 
 ## Kompatibilita
 
-- build: `0.14.7-test.10`,
+- build: `0.14.9-test.10`,
 - save verze: `0.14.3-test.2`,
 - save schema: `1`,
 - historické savy v0.09–v0.14 zůstávají podporované.
 
 ## Spuštění
 
-Rozbalte ZIP a otevřete `index.html`. Hra funguje offline bez instalace a serveru.
+Rozbalte ZIP a otevřete `index.html`. Hra funguje offline bez instalace, serveru, externích fontů nebo síťových assetů.
 
-Pro zobrazení replay QA přidejte k adrese `?replayqa=1`. Základní laboratoř v0.14.6 zůstává dostupná přes `?qa=1`.
+Diagnostika assetové vrstvy je dostupná v konzoli přes `KorytoPixelAssets149.visualAudit()`.
 
 ## Stav projektu
 
