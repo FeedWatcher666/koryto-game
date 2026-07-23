@@ -233,6 +233,22 @@ assert.equal(valid.api.validatePngBase64(mutateIhdr(atlasBase64, 8, 7)).reason, 
 assert.equal(valid.api.validatePngBase64(mutateIhdr(atlasBase64, 4, 2)).reason, "unsupported-ihdr", "invalid bit-depth/color-type pair must fail");
 
 const chunks = pngChunks(atlasBytes);
+function indexedPng(bitDepth, paletteEntries) {
+  const ihdr = Buffer.from(chunks.find(chunk => chunk.type === "IHDR").data);
+  ihdr[8] = bitDepth;
+  ihdr[9] = 3;
+  const palette = Buffer.alloc(paletteEntries * 3);
+  for (let index = 0; index < palette.length; index += 1) palette[index] = index * 37 & 255;
+  return Buffer.concat([
+    atlasBytes.subarray(0, 8),
+    makeChunk("IHDR", ihdr),
+    makeChunk("PLTE", palette),
+     ...chunks.filter(chunk => chunk.type === "IDAT").map(chunk => chunk.bytes),
+    chunks.find(chunk => chunk.type === "IEND").bytes
+  ]).toString("base64");
+}
+assert.equal(valid.api.validatePngBase64(indexedPng(1, 2)).ok, true, "a 1-bit indexed PNG may contain two palette entries");
+assert.equal(valid.api.validatePngBase64(indexedPng(1, 3)).reason, "invalid-plte", "a 1-bit indexed PNG must reject a third palette entry");
 const reordered = Buffer.concat([
   atlasBytes.subarray(0, 8),
   chunks.find(chunk => chunk.type === "IDAT").bytes,
@@ -266,4 +282,4 @@ assert.equal(incomplete.api.preload(), false);
 assert.equal(incomplete.dom.rootClassList.contains("v0149-assets-fallback"), true);
 assert.equal(incomplete.dom.rootClassList.contains("v0149-production-art"), false);
 
-console.log(`v0.14.9 safe fallback ok: atlas ${atlasBytes.length} B valid, village quarantined (${currentAudit.validation.village.reason})`);
+console.log(`v0.14.9 safe fallback ok: atlas ${atlasBytes.length} B valid, village quarantined (${currentAudit.validation.village.reason})`i;
