@@ -90,6 +90,7 @@
     let seenHeader = false;
     let seenPalette = false;
     let seenData = false;
+    let idatBytes = 0;
     let dataSequenceClosed = false;
     let width = 0;
     let height = 0;
@@ -133,12 +134,13 @@
         }
         seenPalette = true;
       } else if (type === "IDAT") {
-        if (!seenHeader || length === 0) return result(false, "invalid-idat", { width, height, chunks });
+        if (!seenHeader) return result(false, "invalid-idat", { width, height, chunks });
         if (dataSequenceClosed) return result(false, "nonconsecutive-idat", { width, height, chunks });
         if (colorType === 3 && !seenPalette) return result(false, "missing-plte", { width, height, chunks });
         seenData = true;
+        idatBytes += length;
       } else if (type === "IEND") {
-        if (!seenHeader || !seenData || length !== 0) return result(false, "invalid-iend", { width, height, chunks });
+        if (!seenHeader || !seenData || idatBytes === 0 || length !== 0) return result(false, "invalid-iend", { width, height, chunks });
         if (next !== bytes.length) return result(false, "trailing-data", { width, height, chunks });
         return result(true, "ok", { width, height, byteLength: bytes.length, chunks });
       }
@@ -149,6 +151,11 @@
     }
 
     return result(false, "missing-iend", { width, height, chunks });
+  }
+
+  function chunksProvided(name) {
+    const list = chunksOf()[name];
+    return Array.isArray(list) ? list.length > 0 : list !== undefined && list !== null;
   }
 
   function assemblePng(name) {
@@ -239,6 +246,12 @@
     const invalidRequired = ["atlas", "village"].filter(name => !assembled[name]);
     if (invalidRequired.length) {
       const reason = invalidRequired.map(name => `${name}:${assetState.validation[name]?.reason || "invalid"}`).join(",");
+      return fallback(reason);
+    }
+
+    const invalidOptional = ["scenes", "logo"].filter(name => chunksProvided(name) && !assembled[name]);
+    if (invalidOptional.length) {
+      const reason = invalidOptional.map(name => `${name}:${assetState.validation[name]?.reason || "invalid"}`).join(",");
       return fallback(reason);
     }
 
