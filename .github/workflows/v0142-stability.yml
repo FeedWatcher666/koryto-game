@@ -1,12 +1,13 @@
-name: Koryto v0.14.8 TEST.10
+name: Koryto v0.14.9 TEST.10
 
 on:
   push:
     branches:
-      - test/v0.14.8-test10-clean
+      - test/v0.14.9-test10
+      - fix/pr19-v0149-wiring
   pull_request:
     branches:
-      - test/v0.14.7-playable
+      - test/v0.14.8-playable
       - main
   workflow_dispatch:
 
@@ -29,22 +30,29 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.8-test.10-diagnostics
+          name: koryto-v0.14.9-test.10-diagnostics
           path: test-output.txt
           if-no-files-found: warn
       - name: Build offline package
         run: |
-          mkdir -p dist/koryto-v0.14.8-test.10
-          cp index.html VERSION README.md dist/koryto-v0.14.8-test.10/
-          cp -R src styles dist/koryto-v0.14.8-test.10/
-          mkdir -p dist/koryto-v0.14.8-test.10/docs/v0.14
-          cp docs/v0.14/v0146-playtest-report.md dist/koryto-v0.14.8-test.10/docs/v0.14/
-          cp docs/v0.14/v0147-consequence-report.md dist/koryto-v0.14.8-test.10/docs/v0.14/
-          rm -f dist/koryto-v0.14.8-test.10/src/v0142-rc2.js
-          rm -f dist/koryto-v0.14.8-test.10/src/v0142-rc3.js
+          mkdir -p dist/koryto-v0.14.9-test.10
+          cp index.html VERSION README.md dist/koryto-v0.14.9-test.10/
+          cp -R src styles dist/koryto-v0.14.9-test.10/
+          mkdir -p dist/koryto-v0.14.9-test.10/docs/v0.14
+          cp docs/v0.14/v0146-playtest-report.md dist/koryto-v0.14.9-test.10/docs/v0.14/
+          cp docs/v0.14/v0147-consequence-report.md dist/koryto-v0.14.9-test.10/docs/v0.14/
+          rm -f dist/koryto-v0.14.9-test.10/src/v0142-rc2.js
+          rm -f dist/koryto-v0.14.9-test.10/src/v0142-rc3.js
+          test -f dist/koryto-v0.14.9-test.10/styles/v0149.css
+          test -f dist/koryto-v0.14.9-test.10/src/v0149-pixel-assets.js
+          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/atlas-1.js
+          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/atlas-2.js
+          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/atlas-3.js
+          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/village-1.js
+          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/village-2.js
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.8-test.10
-          path: dist/koryto-v0.14.8-test.10
+          name: koryto-v0.14.9-test.10
+          path: dist/koryto-v0.14.9-test.10
           if-no-files-found: error
