@@ -243,7 +243,7 @@ function indexedPng(bitDepth, paletteEntries) {
     atlasBytes.subarray(0, 8),
     makeChunk("IHDR", ihdr),
     makeChunk("PLTE", palette),
-     ...chunks.filter(chunk => chunk.type === "IDAT").map(chunk => chunk.bytes),
+    ...chunks.filter(chunk => chunk.type === "IDAT").map(chunk => chunk.bytes),
     chunks.find(chunk => chunk.type === "IEND").bytes
   ]).toString("base64");
 }
@@ -282,4 +282,4 @@ assert.equal(incomplete.api.preload(), false);
 assert.equal(incomplete.dom.rootClassList.contains("v0149-assets-fallback"), true);
 assert.equal(incomplete.dom.rootClassList.contains("v0149-production-art"), false);
 
-console.log(`v0.14.9 safe fallback ok: atlas ${atlasBytes.length} B valid, village quarantined (${currentAudit.validation.village.reason})`i;
+console.log(`v0.14.9 safe fallback ok: atlas ${atlasBytes.length} B valid, village quarantined (${currentAudit.validation.village.reason})`);
