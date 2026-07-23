@@ -1,0 +1,27 @@
+/* Clears the legacy v0.14 map prototype layers that would otherwise darken the v0.15 village art. */
+.v0149-production-art .v0150-map.v0149-village-map::before {
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  background:linear-gradient(180deg,transparent 0 82%,#12090624 100%) !important;
+  background-image:linear-gradient(180deg,transparent 0 82%,#12090624 100%) !important;
+  opacity:1 !important;
+  filter:none !important;
+  pointer-events:none !important;
+}
+.v0150-map::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:none !important;
+  color:transparent !important;
+  font-size:0 !important;
+  letter-spacing:0 !important;
+  pointer-events:none !important;
+  box-shadow:inset 0 0 28px #1b0c0855,inset 0 -28px 40px #170a0738 !important;
+}

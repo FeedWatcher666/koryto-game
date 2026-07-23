@@ -1,12 +1,12 @@
-name: Koryto v0.14.9 TEST.10
+name: Koryto v0.15.0 TEST.1
 
 on:
   push:
     branches:
-      - test/v0.14.9-test10
-      - fix/pr19-v0149-wiring
+      - test/v0.15.0-test1-visual-foundation
   pull_request:
     branches:
+      - fix/pr19-v0149-wiring
       - test/v0.14.8-playable
       - main
   workflow_dispatch:
@@ -30,29 +30,52 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.9-test.10-diagnostics
+          name: koryto-v0.15.0-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
       - name: Build offline package
+        shell: bash
         run: |
-          mkdir -p dist/koryto-v0.14.9-test.10
-          cp index.html VERSION README.md dist/koryto-v0.14.9-test.10/
-          cp -R src styles dist/koryto-v0.14.9-test.10/
-          mkdir -p dist/koryto-v0.14.9-test.10/docs/v0.14
-          cp docs/v0.14/v0146-playtest-report.md dist/koryto-v0.14.9-test.10/docs/v0.14/
-          cp docs/v0.14/v0147-consequence-report.md dist/koryto-v0.14.9-test.10/docs/v0.14/
-          rm -f dist/koryto-v0.14.9-test.10/src/v0142-rc2.js
-          rm -f dist/koryto-v0.14.9-test.10/src/v0142-rc3.js
-          test -f dist/koryto-v0.14.9-test.10/styles/v0149.css
-          test -f dist/koryto-v0.14.9-test.10/src/v0149-pixel-assets.js
-          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/atlas-1.js
-          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/atlas-2.js
-          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/atlas-3.js
-          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/village-1.js
-          test -f dist/koryto-v0.14.9-test.10/src/v0149-assets/village-2.js
+          set -euo pipefail
+          target=dist/koryto-v0.15.0-test.1
+          mkdir -p "$target"
+          cp index.html VERSION README.md "$target/"
+          cp -R src styles assets "$target/"
+          mkdir -p "$target/docs/v0.14" "$target/docs/v0.15"
+          cp docs/v0.14/v0146-playtest-report.md "$target/docs/v0.14/"
+          cp docs/v0.14/v0147-consequence-report.md "$target/docs/v0.14/"
+          cp docs/v0.15/v0150-visual-identity.md "$target/docs/v0.15/"
+          rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
+          test "$(cat "$target/VERSION")" = "0.15.0-test.1"
+          test -f "$target/styles/v0150.css"
+          test -f "$target/styles/v0150-core.css"
+          test -f "$target/styles/v0150-layout.css"
+          test -f "$target/styles/v0150-screens.css"
+          test -f "$target/styles/v0150-responsive.css"
+          test -f "$target/src/v0150-visual-core.js"
+          test -f "$target/src/v0150-visual-shell.js"
+          test -f "$target/src/v0150-visual-content.js"
+          test -f "$target/src/v0150-visual-foundation.js"
+          test -f "$target/assets/v0150/dolni-vejprnice.svg"
+          test -f "$target/styles/v0149.css"
+          test -f "$target/src/v0149-pixel-assets.js"
+          test -f "$target/src/v0149-assets/atlas-1.js"
+          test -f "$target/src/v0149-assets/atlas-2.js"
+          test -f "$target/src/v0149-assets/atlas-3.js"
+          test -f "$target/src/v0149-assets/village-1.js"
+          test -f "$target/src/v0149-assets/village-2.js"
+          grep -q 'styles/v0150.css' "$target/index.html"
+          grep -q 'src/v0150-visual-core.js' "$target/index.html"
+          grep -q 'src/v0150-visual-shell.js' "$target/index.html"
+          grep -q 'src/v0150-visual-content.js' "$target/index.html"
+          grep -q 'src/v0150-visual-foundation.js' "$target/index.html"
+          if grep -R -E 'https?://(fonts|cdn|unpkg|jsdelivr)' "$target/index.html" "$target/styles" "$target/src"; then
+            echo "Release contains a forbidden network dependency" >&2
+            exit 1
+          fi
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.9-test.10
-          path: dist/koryto-v0.14.9-test.10
+          name: koryto-v0.15.0-test.1
+          path: dist/koryto-v0.15.0-test.1
           if-no-files-found: error

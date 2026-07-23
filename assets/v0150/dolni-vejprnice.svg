@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Pixel-artová mapa Dolních Vejprnic</title>
+  <desc id="desc">Česká obec s radnicí, hospodou, školou, redakcí, JZD, loukou, hřištěm a volebním štábem.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#77c7e8"/><stop offset="1" stop-color="#c8e7ce"/></linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#79a948"/><stop offset="1" stop-color="#3f7b38"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d7b177"/><stop offset="1" stop-color="#a77a4b"/></linearGradient>
+    <pattern id="field" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#b9b956"/><rect width="9" height="9" fill="#d0c967"/><rect x="9" y="9" width="9" height="9" fill="#959d45"/></pattern>
+    <pattern id="roof" width="12" height="8" patternUnits="userSpaceOnUse"><rect width="12" height="8" fill="#a94727"/><rect width="6" height="4" fill="#cc6240"/><rect x="6" y="4" width="6" height="4" fill="#7c2f21"/></pattern>
+    <pattern id="stone" width="12" height="10" patternUnits="userSpaceOnUse"><rect width="12" height="10" fill="#b79a73"/><path d="M0 5h12M6 0v5M2 5v5M10 5v5" stroke="#80664d" stroke-width="1"/></pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="7" stdDeviation="0" flood-color="#25140c" flood-opacity=".45"/></filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#sky)"/>
+  <path d="M0 170L130 80 250 150 365 62 500 160 620 92 760 162 905 76 1040 160 1170 95 1280 150V280H0Z" fill="#568e6d"/>
+  <path d="M0 205L115 135 250 215 390 115 520 220 660 140 805 225 945 125 1080 220 1210 145 1280 200V310H0Z" fill="#3f7658"/>
+  <path d="M0 248L120 205 245 255 370 190 505 260 645 205 790 270 930 195 1070 260 1215 215 1280 250V340H0Z" fill="#315e45"/>
+
+  <path d="M0 290C155 245 268 258 408 310C575 372 737 296 886 282C1052 266 1156 301 1280 351V720H0Z" fill="url(#grass)"/>
+  <path d="M0 350C170 315 287 350 430 402C575 456 740 405 880 392C1041 377 1167 413 1280 467V720H0Z" fill="#568e40" opacity=".78"/>
+
+  <path d="M0 270H300L248 382H0Z" fill="url(#field)"/>
+  <path d="M1000 250H1280V390L1115 350Z" fill="url(#field)"/>
+  <path d="M990 560H1280V720H920Z" fill="#b6a54b" opacity=".75"/>
+  <path d="M0 610L330 545 390 720H0Z" fill="#2c6b37"/>
+
+  <path d="M600 720C602 605 610 515 624 435C639 352 680 316 720 290" fill="none" stroke="#6b4c32" stroke-width="72"/>
+  <path d="M600 720C602 605 610 515 624 435C639 352 680 316 720 290" fill="none" stroke="url(#road)" stroke-width="57"/>
+  <path d="M600 490C440 485 340 430 215 390" fill="none" stroke="#6b4c32" stroke-width="58"/>
+  <path d="M600 490C440 485 340 430 215 390" fill="none" stroke="url(#road)" stroke-width="44"/>
+  <path d="M640 430C790 430 915 390 1100 352" fill="none" stroke="#6b4c32" stroke-width="58"/>
+  <path d="M640 430C790 430 915 390 1100 352" fill="none" stroke="url(#road)" stroke-width="44"/>
+
+  <g stroke="#3a2617" stroke-width="4">
+    <g transform="translate(235 190)"><rect x="0" y="35" width="64" height="42" fill="#ead49b"/><polygon points="-6,35 32,6 70,35" fill="#a94b2b"/><rect x="10" y="48" width="12" height="12" fill="#7ec6df"/><rect x="42" y="48" width="12" height="12" fill="#7ec6df"/></g>
+    <g transform="translate(324 170)"><rect x="0" y="38" width="70" height="44" fill="#d8c08f"/><polygon points="-7,38 35,8 77,38" fill="#8f3d26"/><rect x="12" y="52" width="13" height="13" fill="#87cde3"/><rect x="46" y="52" width="13" height="13" fill="#87cde3"/></g>
+    <g transform="translate(865 185)"><rect x="0" y="35" width="64" height="42" fill="#efdb9b"/><polygon points="-6,35 32,7 70,35" fill="#a64625"/><rect x="10" y="48" width="12" height="12" fill="#7fc7df"/><rect x="42" y="48" width="12" height="12" fill="#7fc7df"/></g>
+  </g>
+
+  <g transform="translate(405 118)" stroke="#382419" stroke-width="5" filter="url(#shadow)">
+    <rect x="25" y="65" width="74" height="100" fill="#eee0bc"/>
+    <rect x="47" y="12" width="32" height="72" fill="#f2e6c7"/>
+    <polygon points="42,15 63,-20 84,15" fill="#3b4c43"/>
+    <rect x="59" y="-42" width="8" height="24" fill="#382419"/>
+    <rect x="41" y="92" width="16" height="24" fill="#71b6d0"/><rect x="69" y="92" width="16" height="24" fill="#71b6d0"/>
+    <rect x="52" y="126" width="22" height="39" fill="#6b3b23"/>
+  </g>
+
+  <g transform="translate(80 285)" stroke="#382217" stroke-width="6" filter="url(#shadow)">
+    <rect x="0" y="62" width="226" height="112" fill="#d0a86d"/>
+    <polygon points="-14,62 112,4 240,62" fill="url(#roof)"/>
+    <rect x="28" y="98" width="48" height="45" fill="#6e3d22"/><rect x="151" y="96" width="44" height="40" fill="#7cc0d4"/>
+    <rect x="68" y="66" width="98" height="28" fill="#50301d"/><text x="117" y="86" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="18" fill="#f6dda4">U KORYTA</text>
+    <rect x="188" y="24" width="17" height="45" fill="#8b5730"/>
+  </g>
+
+  <g transform="translate(470 245)" stroke="#352116" stroke-width="6" filter="url(#shadow)">
+    <rect x="0" y="65" width="230" height="172" fill="#e5c996"/>
+    <polygon points="-15,65 115,8 245,65" fill="url(#roof)"/>
+    <rect x="94" y="-18" width="42" height="92" fill="#efd9a8"/>
+    <polygon points="88,-18 115,-54 142,-18" fill="#3e5246"/>
+    <circle cx="115" cy="20" r="14" fill="#f0e2bd"/><path d="M115 20l7-5M115 20v-9" stroke="#342319" stroke-width="3"/>
+    <rect x="18" y="104" width="34" height="36" fill="#78bdd1"/><rect x="176" y="104" width="34" height="36" fill="#78bdd1"/>
+    <rect x="86" y="146" width="58" height="91" fill="#6d3b22"/>
+    <rect x="22" y="160" width="36" height="40" fill="#7ec4d8"/><rect x="170" y="160" width="36" height="40" fill="#7ec4d8"/>
+    <rect x="110" y="100" width="10" height="31" fill="#f0f0e8"/><rect x="120" y="100" width="22" height="13" fill="#d92828"/>
+  </g>
+
+  <g transform="translate(760 275)" stroke="#382217" stroke-width="6" filter="url(#shadow)">
+    <rect x="0" y="52" width="225" height="128" fill="#e5c75f"/>
+    <polygon points="-12,52 112,5 237,52" fill="url(#roof)"/>
+    <g fill="#75bdd5"><rect x="24" y="83" width="35" height="35"/><rect x="76" y="83" width="35" height="35"/><rect x="128" y="83" width="35" height="35"/><rect x="180" y="83" width="25" height="35"/></g>
+    <rect x="92" y="127" width="48" height="53" fill="#704022"/>
+    <rect x="160" y="18" width="14" height="43" fill="#8b5730"/>
+  </g>
+
+  <g transform="translate(1010 310)" stroke="#342117" stroke-width="6" filter="url(#shadow)">
+    <rect x="0" y="47" width="190" height="128" fill="#c6aa85"/>
+    <polygon points="-10,47 95,2 200,47" fill="#753223"/>
+    <rect x="26" y="70" width="138" height="54" fill="#eee1bf"/>
+    <text x="95" y="91" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="16" fill="#222">VEJPRNICKÝ</text>
+    <text x="95" y="111" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="17" fill="#9b2f23">ZPRAVODAJ</text>
+    <rect x="74" y="130" width="42" height="45" fill="#6d3a23"/>
+    <path d="M168 57v-66M168-9h10M168-9l-12-12" stroke="#3a3a35" stroke-width="6"/>
+  </g>
+
+  <g transform="translate(40 480)" stroke="#342117" stroke-width="6" filter="url(#shadow)">
+    <rect x="0" y="28" width="240" height="132" fill="#a49b78"/>
+    <polygon points="-10,28 120,-10 250,28" fill="#5c4330"/>
+    <rect x="28" y="74" width="95" height="86" fill="#5c3822"/><rect x="150" y="70" width="58" height="45" fill="#7eb6b8"/>
+    <text x="178" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="24" fill="#2e6b39">JZD</text>
+    <text x="178" y="64" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="13" fill="#2e6b39">VEJPRNICE</text>
+    <g transform="translate(170 122)"><rect x="0" y="15" width="92" height="35" fill="#315e2f"/><rect x="25" y="0" width="38" height="29" fill="#4f7b34"/><circle cx="22" cy="52" r="18" fill="#222"/><circle cx="74" cy="52" r="22" fill="#222"/><circle cx="22" cy="52" r="9" fill="#a37f40"/><circle cx="74" cy="52" r="11" fill="#a37f40"/></g>
+  </g>
+
+  <g transform="translate(395 500)">
+    <rect x="0" y="0" width="300" height="155" rx="8" fill="#6da848" stroke="#34572d" stroke-width="7"/>
+    <g fill="#f2dd65"><circle cx="32" cy="34" r="5"/><circle cx="72" cy="80" r="5"/><circle cx="116" cy="42" r="5"/><circle cx="171" cy="104" r="5"/><circle cx="229" cy="52" r="5"/><circle cx="272" cy="118" r="5"/></g>
+    <rect x="20" y="25" width="128" height="72" fill="#eee1b8" stroke="#3a281c" stroke-width="5" transform="rotate(-4 84 61)"/>
+    <text x="84" y="54" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="16" fill="#a62d22" transform="rotate(-4 84 61)">LOUKA NENÍ</text>
+    <text x="84" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="16" fill="#a62d22" transform="rotate(-4 84 61)">NA PRODEJ!</text>
+    <g transform="translate(170 35)"><rect x="0" y="26" width="108" height="44" fill="#d8d4c8" stroke="#4c4136" stroke-width="5"/><rect x="15" y="0" width="76" height="30" fill="#eae5d8" stroke="#4c4136" stroke-width="5"/><text x="53" y="20" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="800" fill="#34302a">VILADOMY</text></g>
+  </g>
+
+  <g transform="translate(765 430)" stroke="#34512b" stroke-width="6">
+    <rect x="0" y="0" width="190" height="110" fill="#4b963f"/>
+    <rect x="16" y="12" width="158" height="86" fill="none" stroke="#e5f0cf" stroke-width="4"/>
+    <circle cx="95" cy="55" r="20" fill="none" stroke="#e5f0cf" stroke-width="4"/>
+    <path d="M16 36h22v38H16M174 36h-22v38h22" fill="none" stroke="#e5f0cf" stroke-width="4"/>
+  </g>
+
+  <g transform="translate(905 525)" stroke="#342117" stroke-width="6" filter="url(#shadow)">
+    <rect x="0" y="22" width="250" height="104" rx="8" fill="#dedbd0"/>
+    <rect x="16" y="42" width="70" height="52" fill="#79b7cb"/>
+    <rect x="102" y="39" width="80" height="70" fill="#eee4cf"/>
+    <text x="142" y="61" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="#b82d23">VOLTE</text>
+    <text x="142" y="92" text-anchor="middle" font-family="Arial,sans-serif" font-size="33" font-weight="900" fill="#b82d23">Č.1</text>
+    <rect x="202" y="42" width="32" height="52" fill="#79b7cb"/>
+    <circle cx="56" cy="131" r="23" fill="#222"/><circle cx="202" cy="131" r="23" fill="#222"/>
+    <circle cx="56" cy="131" r="11" fill="#a9824d"/><circle cx="202" cy="131" r="11" fill="#a9824d"/>
+    <path d="M230 18l35-30v54z" fill="#d9d5c8"/><rect x="246" y="0" width="12" height="35" fill="#777"/>
+  </g>
+
+  <g fill="#285f35" stroke="#234326" stroke-width="4">
+    <circle cx="340" cy="410" r="34"/><circle cx="370" cy="430" r="28"/><circle cx="1110" cy="480" r="36"/><circle cx="1160" cy="455" r="31"/>
+    <circle cx="330" cy="592" r="28"/><circle cx="730" cy="615" r="34"/>
+  </g>
+  <g fill="#704522"><rect x="333" y="430" width="14" height="42"/><rect x="1103" y="502" width="14" height="42"/><rect x="724" y="642" width="14" height="42"/></g>
+  <g stroke="#2d1a12" stroke-width="4">
+    <g transform="translate(385 460)"><circle cx="0" cy="0" r="10" fill="#f0ba82"/><rect x="-8" y="11" width="16" height="29" fill="#274f8a"/><path d="M-8 38l-7 22M8 38l7 22"/></g>
+    <g transform="translate(705 365)"><circle cx="0" cy="0" r="10" fill="#e6aa78"/><rect x="-8" y="11" width="16" height="29" fill="#8c2d23"/><path d="M-8 38l-7 22M8 38l7 22"/></g>
+    <g transform="translate(980 460)"><circle cx="0" cy="0" r="10" fill="#efbc83"/><rect x="-8" y="11" width="16" height="29" fill="#6a3f90"/><path d="M-8 38l-7 22M8 38l7 22"/></g>
+  </g>
+
+  <rect x="3" y="3" width="1274" height="714" fill="none" stroke="#29170e" stroke-width="6"/>
+  <path d="M0 0h1280v18H0zM0 702h1280v18H0z" fill="#2a170e" opacity=".35"/>
+</svg>
