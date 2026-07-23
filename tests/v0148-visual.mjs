@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+const js=fs.readFileSync('src/v0148-visual-system.js','utf8');
+const css=fs.readFileSync('styles/v0148.css','utf8');
+const html=fs.readFileSync('index.html','utf8');
+for(const token of ['KorytoVisualSystem','questScreen','staffScreen','influenceScreen','debateScreen','electionScreen','archiveScreen','ensureUiState'])if(!js.includes(token))throw new Error(`missing ${token}`);
+for(const token of ['v0148-bottomnav','v0148-modal','v0148-debate-stage','@media(max-width:760px)','high-contrast','reduce-motion'])if(!css.includes(token))throw new Error(`missing css ${token}`);
+if(!html.includes('styles/v0148.css')||!html.includes('src/v0148-visual-system.js'))throw new Error('v0148 not wired');
+if(!html.includes('0.14.8 TEST.10'))throw new Error('version metadata missing');
+const sandbox={globalThis:{},document:{readyState:'loading',addEventListener(){}},location:{search:''},AudioContext:undefined,setTimeout,clearTimeout};sandbox.globalThis=sandbox;vm.runInNewContext(js,sandbox);const api=sandbox.KorytoVisualSystem;if(!api||api.BUILD_VERSION!=='0.14.8-test.10'||api.SAVE_VERSION!=='0.14.3-test.2')throw new Error('public contract mismatch');
+const state={ui:null};const prefs=api.ensureUiState(state);if(!prefs.sound||prefs.screen!=='map')throw new Error('ui defaults broken');
+console.log('v0.14.8 visual system checks passed');

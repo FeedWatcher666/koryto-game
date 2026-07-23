@@ -1,55 +1,49 @@
-name: Koryto v0.14.7 TEST.10
-
+name: Koryto v0.14.8 TEST.10
 on:
   push:
     branches:
-      - test/v0.14.7-test10
+      - test/v0.14.8-test10
   pull_request:
     branches:
-      - test/v0.14.6-playable
+      - test/v0.14.7-playable
       - main
   workflow_dispatch:
-
 jobs:
   test-and-package:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Run tests
         shell: bash
         run: |
           set -o pipefail
           npm test 2>&1 | tee test-output.txt
-
       - name: Upload test diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.7-test.10-diagnostics
+          name: koryto-v0.14.8-test.10-diagnostics
           path: test-output.txt
           if-no-files-found: warn
-
       - name: Build offline package
         run: |
-          mkdir -p dist/koryto-v0.14.7-test.10
-          cp index.html VERSION README.md dist/koryto-v0.14.7-test.10/
-          cp -R src styles dist/koryto-v0.14.7-test.10/
-          mkdir -p dist/koryto-v0.14.7-test.10/docs/v0.14
-          cp docs/v0.14/v0146-playtest-report.md dist/koryto-v0.14.7-test.10/docs/v0.14/
-          cp docs/v0.14/v0147-consequence-report.md dist/koryto-v0.14.7-test.10/docs/v0.14/
-          rm -f dist/koryto-v0.14.7-test.10/src/v0142-rc2.js
-          rm -f dist/koryto-v0.14.7-test.10/src/v0142-rc3.js
-
+          mkdir -p dist/koryto-v0.14.8-test.10
+          cp index.html VERSION README.md dist/koryto-v0.14.8-test.10/
+          cp -R src styles dist/koryto-v0.14.8-test.10/
+          mkdir -p dist/koryto-v0.14.8-test.10/docs/v0.14
+          cp docs/v0.14/v0146-playtest-report.md dist/koryto-v0.14.8-test.10/docs/v0.14/
+          cp docs/v0.14/v0147-consequence-report.md dist/koryto-v0.14.8-test.10/docs/v0.14/
+          cp docs/v0.14/v0148-visual-design.md dist/koryto-v0.14.8-test.10/docs/v0.14/
+          rm -f dist/koryto-v0.14.8-test.10/src/v0142-rc2.js
+          rm -f dist/koryto-v0.14.8-test.10/src/v0142-rc3.js
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.14.7-test.10
-          path: dist/koryto-v0.14.7-test.10
+          name: koryto-v0.14.8-test.10
+          path: dist/koryto-v0.14.8-test.10
           if-no-files-found: error
