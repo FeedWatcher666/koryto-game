@@ -24,19 +24,11 @@ function chunkPayload(path, kind) {
   return match[1];
 }
 
-const atlasBase64 = chunkSpecs.filter(([, kind]) => kind === "atlas").map(([path, kind]) => chunkPayload(path, kind)).join("");
-const villageBase64 = chunkSpecs.filter(([, kind]) => kind === "village").map(([path, kind]) => chunkPayload(path, kind)).join("");
-
-function assertPng(base64, label) {
-  assert.equal(base64.length % 4, 0, `${label} base64 must be complete`);
-  const bytes = Buffer.from(base64, "base64");
-  assert.equal(bytes.subarray(0, 8).toString("hex"), "89504e470d0a1a0a", `${label} must be a PNG`);
-  assert.ok(bytes.readUInt32BE(16) > 0, `${label} width must be positive`);
-  assert.ok(bytes.readUInt32BE(20) > 0, `${label} height must be positive`);
-}
-
-assertPng(atlasBase64, "atlas");
-assertPng(villageBase64, "village");
+const atlasParts = chunkSpecs.filter(([, kind]) => kind === "atlas").map(([path, kind]) => chunkPayload(path, kind));
+const villageParts = chunkSpecs.filter(([, kind]) => kind === "village").map(([path, kind]) => chunkPayload(path, kind));
+const atlasBase64 = atlasParts.join("");
+const villageBase64 = villageParts.join("");
+const atlasBytes = Buffer.from(atlasBase64, "base64");
 
 assert.equal(read("VERSION").trim(), "0.14.9-test.10");
 assert.match(html, /0\.14\.9 TEST\.10/);
@@ -54,23 +46,29 @@ const orderedAssets = [
   "src/v0149-pixel-assets.js"
 ];
 const positions = orderedAssets.map(file => html.indexOf(file));
-assert.ok(positions.every((value, index) => value >= 0 && (index === 0 || value > positions[index - 1])), "v0.14.9 scripts must load after v0.14.8 and chunks must load before the runtime");
+assert.ok(positions.every((value, index) => value >= 0 && (index === 0 || value > positions[index - 1])), "chunks must load before the v0.14.9 runtime");
 
 for (const token of [
+  ".v0149-assets-fallback",
+  "#11100d",
+  "#211e18",
+  "#2c281f",
+  "#d8aa38",
+  "#e9dfc7",
+  "#f4ecd9",
+  "#514936",
   "v0149-village-map",
   "v0149-location-node",
-  "v0149-sprite",
-  "--v0149-atlas",
-  "--v0149-village",
   "prefers-reduced-motion",
   "focus-visible"
-]) assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `missing CSS token ${token}`);
+]) assert.ok(css.includes(token), `missing CSS contract token ${token}`);
 
-assert.match(runtime, /KorytoAssetChunks149/);
-assert.match(runtime, /data:image\/png;base64,/);
-assert.match(runtime, /--v0149-atlas/);
-assert.match(runtime, /--v0149-village/);
-assert.doesNotMatch(runtime, /embedded-css:/);
+assert.match(runtime, /validatePngBase64/);
+assert.match(runtime, /crc32/);
+assert.match(runtime, /IHDR/);
+assert.match(runtime, /IDAT/);
+assert.match(runtime, /IEND/);
+assert.match(runtime, /KorytoCanonicalBuild149/);
 assert.doesNotMatch(runtime, /MutationObserver/);
 assert.doesNotMatch(runtime, /setInterval\s*\(/);
 assert.doesNotMatch(runtime, /https?:\/\//);
@@ -88,6 +86,9 @@ function makeClassList() {
 function makeDocument() {
   const styleValues = new Map();
   const rootClassList = makeClassList();
+  const brand = { textContent: "" };
+  const meta = { content: "", setAttribute(name, value) { if (name === "content") this.attributeContent = value; } };
+  const titleNode = { textContent: "" };
   const root = {
     style: {
       setProperty(name, value) { styleValues.set(name, value); },
@@ -97,10 +98,16 @@ function makeDocument() {
     classList: rootClassList
   };
   const document = {
+    title: "",
     documentElement: root,
     body: { appendChild() {} },
     head: { appendChild() {} },
-    querySelector() { return null; },
+    querySelector(selector) {
+      if (selector === "title") return titleNode;
+      if (selector === ".brand h1 span") return brand;
+      if (selector === 'meta[name="description"]') return meta;
+      return null;
+    },
     querySelectorAll() { return []; },
     getElementById() { return null; },
     createElement() {
@@ -118,58 +125,102 @@ function makeDocument() {
     },
     addEventListener() {}
   };
-  return { document, root, styleValues, rootClassList };
+  return { document, root, brand, meta, titleNode, styleValues, rootClassList };
 }
 
-const dom = makeDocument();
-const context = vm.createContext({
-  console,
-  document: dom.document,
-  location: { search: "" },
-  setTimeout(fn) { if (typeof fn === "function") fn(); return 0; },
-  clearTimeout() {}
-});
-context.globalThis = context;
-context.window = context;
-for (const [path] of chunkSpecs) vm.runInContext(read(path), context, { filename: path });
-vm.runInContext(runtime, context, { filename: "src/v0149-pixel-assets.js" });
+function runRuntime(chunks) {
+  const dom = makeDocument();
+  const context = vm.createContext({
+    console,
+    document: dom.document,
+    location: { search: "" },
+    setTimeout(fn) { if (typeof fn === "function") fn(); return 0; },
+    clearTimeout() {}
+  });
+  context.globalThis = context;
+  context.window = context;
+  context.KorytoAssetChunks149 = chunks;
+  vm.runInContext(runtime, context, { filename: "src/v0149-pixel-assets.js" });
+  return { context, dom, api: context.KorytoPixelAssets149 };
+}
 
-const api = context.KorytoPixelAssets149;
-assert.ok(api, "v0.14.9 API must be installed");
-assert.equal(api.VERSION, "0.14.9 TEST.10");
-assert.equal(api.BUILD_VERSION, "0.14.9-test.10");
-assert.equal(api.SAVE_VERSION, "0.14.3-test.2");
-assert.equal(api.SAVE_SCHEMA, 1);
-assert.equal(api.preload(), true);
-assert.match(api.atlas, /^data:image\/png;base64,/);
-assert.match(api.village, /^data:image\/png;base64,/);
-assert.match(dom.styleValues.get("--v0149-atlas"), /^url\("data:image\/png;base64,/);
-assert.match(dom.styleValues.get("--v0149-village"), /^url\("data:image\/png;base64,/);
-assert.equal(dom.root.dataset.korytoAssets, "v0149-production-pass-1");
-assert.equal(dom.rootClassList.contains("v0149-production-art"), true);
+const current = runRuntime({ atlas: atlasParts, village: villageParts, scenes: [], logo: [] });
+assert.ok(current.api, "v0.14.9 API must be installed even in fallback mode");
+assert.equal(current.api.VERSION, "0.14.9 TEST.10");
+assert.equal(current.api.BUILD_VERSION, "0.14.9-test.10");
+assert.equal(current.api.SAVE_VERSION, "0.14.3-test.2");
+assert.equal(current.api.SAVE_SCHEMA, 1);
+assert.equal(current.api.preload(), false);
 
-const audit = api.visualAudit();
-assert.equal(audit.assetsReady, true);
-assert.equal(audit.chunkCounts.atlas, 3);
-assert.equal(audit.chunkCounts.village, 2);
-assert.equal(audit.classSprites, 6);
-assert.equal(audit.companionSprites, 5);
-assert.equal(audit.locationSprites, 8);
-assert.equal(audit.navigationSprites, 8);
+const currentAudit = current.api.visualAudit();
+assert.equal(currentAudit.validation.atlas.ok, true, currentAudit.validation.atlas.reason);
+assert.equal(currentAudit.validation.atlas.width, 1024);
+assert.equal(currentAudit.validation.atlas.height, 1024);
+assert.equal(currentAudit.validation.village.ok, false, "the bundled village payload is intentionally quarantined until replaced");
+assert.match(currentAudit.validation.village.reason, /^truncated-/);
+assert.equal(currentAudit.assetsReady, false);
+assert.equal(current.dom.rootClassList.contains("v0149-assets-fallback"), true);
+assert.equal(current.dom.rootClassList.contains("v0149-production-art"), false);
+assert.equal(current.dom.styleValues.get("--v0149-atlas"), "none");
+assert.equal(current.dom.document.title, "Koryto 0.14.9 TEST.10 – komunální politické RPG");
+assert.equal(current.dom.titleNode.textContent, "Koryto 0.14.9 TEST.10 – komunální politické RPG");
+assert.equal(current.dom.brand.textContent, "Dolní Vejprnice 0.14.9 TEST.10");
+assert.match(current.dom.meta.content, /0\.14\.9 TEST\.10/);
+current.dom.document.title = "Koryto 0.14.2 TEST.10 – legacy";
+current.dom.brand.textContent = "Dolní Vejprnice 0.14.2 TEST.10";
+current.dom.meta.content = "legacy metadata";
+assert.equal(current.dom.document.title, "Koryto 0.14.9 TEST.10 – komunální politické RPG");
+assert.equal(current.dom.brand.textContent, "Dolní Vejprnice 0.14.9 TEST.10");
+assert.match(current.dom.meta.content, /0\.14\.9 TEST\.10/);
 
-const fallbackDom = makeDocument();
-const fallbackContext = vm.createContext({
-  console,
-  document: fallbackDom.document,
-  location: { search: "" },
-  setTimeout(fn) { if (typeof fn === "function") fn(); return 0; },
-  clearTimeout() {}
-});
-fallbackContext.globalThis = fallbackContext;
-fallbackContext.window = fallbackContext;
-vm.runInContext(runtime, fallbackContext, { filename: "src/v0149-pixel-assets.js" });
-assert.equal(fallbackContext.KorytoPixelAssets149.visualAudit().assetsReady, false);
-assert.equal(fallbackDom.rootClassList.contains("v0149-assets-fallback"), true);
-assert.equal(fallbackDom.rootClassList.contains("v0149-production-art"), false);
+const valid = runRuntime({ atlas: [atlasBase64], village: [atlasBase64], scenes: [], logo: [] });
+assert.equal(valid.api.validatePngBase64(atlasBase64).ok, true);
+assert.equal(valid.api.preload(), false, "valid PNGs remain quarantined until the art direction is approved");
+assert.equal(valid.api.ART_DIRECTION_APPROVED, false);
+assert.equal(valid.api.visualAudit().fallbackReason, "art-direction-not-approved");
+assert.equal(valid.dom.rootClassList.contains("v0149-production-art"), false);
+assert.equal(valid.dom.rootClassList.contains("v0149-assets-fallback"), true);
+assert.equal(valid.api.atlas, "");
+assert.equal(valid.dom.styleValues.get("--v0149-atlas"), "none");
 
-console.log(`v0.14.9 asset wiring ok: atlas ${Buffer.from(atlasBase64, "base64").length} B, village ${Buffer.from(villageBase64, "base64").length} B`);
+const prefixAndZeros = Buffer.concat([atlasBytes.subarray(0, 8), Buffer.alloc(64)]).toString("base64");
+assert.equal(valid.api.validatePngBase64(prefixAndZeros).ok, false, "PNG prefix alone must not enable art");
+
+const truncatedIdat = atlasBytes.subarray(0, atlasBytes.length - 20).toString("base64");
+assert.equal(valid.api.validatePngBase64(truncatedIdat).ok, false, "truncated IDAT/IEND must fail");
+
+const badCrcBytes = Buffer.from(atlasBytes);
+badCrcBytes[64] ^= 1;
+const badCrc = valid.api.validatePngBase64(badCrcBytes.toString("base64"));
+assert.equal(badCrc.ok, false);
+assert.match(badCrc.reason, /^crc-/);
+
+const missingIend = atlasBytes.subarray(0, atlasBytes.length - 12).toString("base64");
+assert.equal(valid.api.validatePngBase64(missingIend).reason, "missing-iend");
+
+function pngChunks(bytes) {
+  const chunks = [];
+  let offset = 8;
+  while (offset < bytes.length) {
+    const length = bytes.readUInt32BE(offset);
+    const end = offset + 12 + length;
+    chunks.push({ type: bytes.subarray(offset + 4, offset + 8).toString("ascii"), bytes: bytes.subarray(offset, end) });
+    offset = end;
+  }
+  return chunks;
+}
+const chunks = pngChunks(atlasBytes);
+const reordered = Buffer.concat([
+  atlasBytes.subarray(0, 8),
+  chunks.find(chunk => chunk.type === "IDAT").bytes,
+  chunks.find(chunk => chunk.type === "IHDR").bytes,
+  chunks.find(chunk => chunk.type === "IEND").bytes
+]).toString("base64");
+assert.equal(valid.api.validatePngBase64(reordered).reason, "ihdr-not-first");
+
+const incomplete = runRuntime({ atlas: atlasParts.slice(0, 2), village: [atlasBase64], scenes: [], logo: [] });
+assert.equal(incomplete.api.preload(), false);
+assert.equal(incomplete.dom.rootClassList.contains("v0149-assets-fallback"), true);
+assert.equal(incomplete.dom.rootClassList.contains("v0149-production-art"), false);
+
+console.log(`v0.14.9 safe fallback ok: atlas ${atlasBytes.length} B valid, village quarantined (${currentAudit.validation.village.reason})`);
