@@ -1,55 +1,45 @@
 # Koryto
 
-Satiricke ceske politicke RPG o trinactidenni komunalni kampani v Dolnich Vejprnicich.
+Satirické české politické RPG o třináctidenní komunální kampani v Dolních Vejprnicích.
 
-## Aktualni testovaci verze
+## Aktuální testovací verze
 
-**v0.14.6 TEST.10 - AI playtest a hluboke QA**
+**v0.14.7 TEST.10 – Následky a znovuhratelnost**
 
-Tato verze pridava autonomni playtestovaci laborator, ktera umi hrat kampan jako osm rozdilnych typu hracu a porovnat vsech sest trid. Laborator meri trasy, questy, volby, udalosti, slepe stavy, dominantni rozhodnuti, balans trid a odolnost poskozenych savu.
+Hra si nyní pamatuje důležité volby a vrací je později jako politické následky. Tři hlavní kauzy mají vlastní cestu, Vladimír Věčný používá jednu z pěti strategií, společníci mohou položit ultimátum nebo odejít a závěr kampaně rozlišuje několik typů vítězství, opozice i veřejného pádu.
 
-### Iterace v0.14.6
+### Série TEST.1–TEST.10
 
-- TEST.1: telemetrie rozhodnuti a tras.
-- TEST.2: osm modelovych typu hracu.
-- TEST.3: matice vsech sesti trid.
-- TEST.4: questova uspesnost a terminy.
-- TEST.5: pokryti udalosti a dominantni volby.
-- TEST.6: chaos testy a poskozene savy.
-- TEST.7: obsahovy a UX audit.
-- TEST.8: oprava normalizace kolekci a neznamych questu.
-- TEST.9: odemceni questu Posledni louka, koalicni doporuceni a vyvazeni predvolebniho specialu.
-- TEST.10: 2400 kampani, release report a offline ZIP.
+- **TEST.1:** audit skutečných a falešných rozhodnutí.
+- **TEST.2:** jednotná paměť kampaně, laskavostí, nepřátel a svědků.
+- **TEST.3:** návraty starších rozhodnutí.
+- **TEST.4:** větvení Kandidátky, Střechy a Poslední louky.
+- **TEST.5:** pět strategií Vladimíra Věčného.
+- **TEST.6:** ultimáta, odchody a přeběhnutí družiny.
+- **TEST.7:** mocenská mapa šesti oblastí obce.
+- **TEST.8:** debata používající historii kampaně.
+- **TEST.9:** osm hlavních typů zakončení a fallback opozice.
+- **TEST.10:** párový replay audit 240 kampaní.
 
-## Vysledek laboratore
+## Hlavní soubory
 
-- 2400 dokoncenych kampani z 2400.
-- 8 hracskych archetypu.
-- 6 trid.
-- 2400 unikatnich tras.
-- 95 ze 101 udalosti navstiveno, tedy 94,1 %.
-- prumerny vysledek 32,4 % hlasu a 4,9 mandatu.
-- rozdil prumerneho vysledku trid 5 procentnich bodu.
-- zadny zbyvajici P1 ani P2 nalez.
-
-Plny report je v `docs/v0.14/v0146-playtest-report.md`.
-
-## Spusteni QA laboratore
-
-Hru lze otevrit normalne pres `index.html`. Pro interni QA panel pridejte k URL parametr `?qa=1`. Laborator lze take volat z konzole:
-
-```js
-KorytoPlaytestLab.runLab({ runs: 400, seed: 146000 })
-```
+- `src/v0147-consequences.js` – paměť, následky, soupeř, ultimáta, konce a replay audit.
+- `styles/v0147.css` – mocenská mapa, debatní paměť a závěrečný přehled.
+- `docs/v0.14/v0147-consequence-report.md` – úplný audit verze.
 
 ## Kompatibilita
 
-- Save format: `koryto`.
-- Save schema: `1`.
-- Save verze: `0.14.3-test.2`.
-- Historicke savy v0.09-v0.14 zustavaji podporovane.
-- Build verze: `0.14.6-test.10`.
+- build: `0.14.7-test.10`,
+- save verze: `0.14.3-test.2`,
+- save schema: `1`,
+- historické savy v0.09–v0.14 zůstávají podporované.
 
-## Spusteni hry
+## Spuštění
 
-Rozbalte ZIP a otevřete `index.html`. Hra nevyzaduje server ani instalaci.
+Rozbalte ZIP a otevřete `index.html`. Hra funguje offline bez instalace a serveru.
+
+Pro zobrazení replay QA přidejte k adrese `?replayqa=1`. Základní laboratoř v0.14.6 zůstává dostupná přes `?qa=1`.
+
+## Stav projektu
+
+Projekt je soukromý a zatím bez licence. Zdrojový kód ani grafické podklady nejsou určeny k dalšímu šíření bez souhlasu vlastníka.
