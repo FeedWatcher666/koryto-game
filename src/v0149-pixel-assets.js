@@ -192,6 +192,11 @@
     const description = document.querySelector?.('meta[name="description"]');
     lockCanonicalValue(description, "content", DISPLAY_DESCRIPTION);
     description?.setAttribute?.("content", DISPLAY_DESCRIPTION);
+    const footer = document.querySelector?.(".footer-note");
+    if (footer) {
+      const cleanFooter = String(footer.textContent || "").replace(/\s*·\s*0\.14(?:\.\d+)?\s+(?:TEST\.\d+|RC\d+)$/u, "");
+      lockCanonicalValue(footer, "textContent", `${cleanFooter} · ${VERSION}`);
+    }
     if (document.documentElement?.dataset) document.documentElement.dataset.korytoBuild = BUILD_VERSION;
     return true;
   }
