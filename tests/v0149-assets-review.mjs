@@ -99,6 +99,25 @@ const onlyEmptyIdat = Buffer.concat([
 ]).toString("base64");
 assert.equal(api.validatePngBase64(onlyEmptyIdat).reason, "invalid-iend", "a PNG still needs actual compressed image data");
 
+const originalIdats = chunks.filter(chunk => chunk.type === "IDAT").map(chunk => chunk.bytes);
+const unknownCritical = Buffer.concat([
+  signature,
+  ...prefixChunks,
+  makeChunk("ABCD", Buffer.from([1, 2, 3])),
+  ...originalIdats,
+  iend
+]).toString("base64");
+assert.equal(api.validatePngBase64(unknownCritical).reason, "unknown-critical-chunk", "unknown critical chunks must quarantine a browser-incompatible PNG");
+
+const invalidReservedBit = Buffer.concat([
+  signature,
+  ...prefixChunks,
+  makeChunk("abcd", Buffer.from([1])),
+  ...originalIdats,
+  iend
+]).toString("base64");
+assert.equal(api.validatePngBase64(invalidReservedBit).reason, "invalid-chunk-reserved-bit", "lowercase PNG reserved bits must be rejected");
+
 const corruptOptional = Buffer.concat([signature, Buffer.alloc(64)]).toString("base64");
 const invalidScenes = runRuntime({ atlas: [atlasBase64], village: [atlasBase64], scenes: [corruptOptional], logo: [] });
 assert.equal(invalidScenes.preload(), false);
