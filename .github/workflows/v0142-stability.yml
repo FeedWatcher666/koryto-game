@@ -1,98 +1,55 @@
-name: Koryto v0.14.7 TEST.10 payload gate
+name: Koryto v0.14.7 TEST.10
 
 on:
   push:
     branches:
       - test/v0.14.7-test10
+  pull_request:
+    branches:
+      - test/v0.14.6-playable
+      - main
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  apply-v0147:
-    if: github.actor != 'github-actions[bot]'
+  test-and-package:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout feature branch
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-          ref: test/v0.14.7-test10
+          node-version: 22
 
-      - name: Reconstruct and verify payload
+      - name: Run tests
         shell: bash
         run: |
-          set -euo pipefail
-          cat .bootstrap/v0147/part-* > /tmp/v0147-payload.b64
-          base64 -d /tmp/v0147-payload.b64 > /tmp/v0147-payload.tar.xz
-          echo "efba39492f2054d6664c4bc11452ed6c0cf0d652aba987f7a80a9bd78e796ce1  /tmp/v0147-payload.tar.xz" | sha256sum -c -
-          xz -t /tmp/v0147-payload.tar.xz
+          set -o pipefail
+          npm test 2>&1 | tee test-output.txt
 
-      - name: Apply and run complete regression suite
-        shell: bash
-        run: |
-          set +e
-          tar -xJf /tmp/v0147-payload.tar.xz -C .
-          python - <<'PY'
-          from pathlib import Path
-          replacements = [
-              ('0\\.14\\.6 TEST\\.10', '0\\.14\\.7 TEST\\.10'),
-              ('0.14.6 TEST.10', '0.14.7 TEST.10'),
-              ('0\\.14\\.6-test\\.10', '0\\.14\\.7-test\\.10'),
-              ('0.14.6-test.10', '0.14.7-test.10'),
-              ('test/v0\\.14\\.6-test10', 'test/v0\\.14\\.7-test10'),
-              ('test/v0.14.6-test10', 'test/v0.14.7-test10'),
-              ('koryto-v0\\.14\\.6-test\\.10', 'koryto-v0\\.14\\.7-test\\.10'),
-              ('koryto-v0.14.6-test.10', 'koryto-v0.14.7-test.10'),
-              ('test/v0\\.14\\.5-playable', 'test/v0\\.14\\.6-playable'),
-              ('test/v0.14.5-playable', 'test/v0.14.6-playable'),
-          ]
-          for path in Path('tests').glob('*.mjs'):
-              lines = path.read_text().splitlines(keepends=True)
-              output = []
-              for line in lines:
-                  preserve_module_version = (
-                      'KorytoPlaytestLab' in line and ('VERSION' in line or 'BUILD_VERSION' in line)
-                  ) or (
-                      path.name == 'v0146-playtest.mjs' and ('api.VERSION' in line or 'api.BUILD_VERSION' in line)
-                  )
-                  if not preserve_module_version:
-                      for old, new in replacements:
-                          line = line.replace(old, new)
-                  output.append(line)
-              path.write_text(''.join(output))
-          PY
-          npm test 2>&1 | tee /tmp/v0147-test-output.txt
-          status=${PIPESTATUS[0]}
-          if [ "$status" -eq 0 ]; then
-            echo "TEST_OK=1" >> "$GITHUB_ENV"
-          else
-            echo "TEST_OK=0" >> "$GITHUB_ENV"
-          fi
-          exit 0
-
-      - name: Commit tested payload or diagnostics
+      - name: Upload test diagnostics
         if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ "${TEST_OK:-0}" = "1" ]; then
-            rm -rf .bootstrap/v0147
-            git add -A
-            git commit -m "v0.14.7 TEST.10: consequences and replayability"
-          else
-            git reset --hard HEAD
-            git clean -fd
-            mkdir -p .bootstrap/v0147
-            cp /tmp/v0147-test-output.txt .bootstrap/v0147/test-output.txt
-            git add .bootstrap/v0147/test-output.txt
-            git commit -m "capture v0.14.7 full test failure"
-          fi
-          git push origin HEAD:test/v0.14.7-test10
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.14.7-test.10-diagnostics
+          path: test-output.txt
+          if-no-files-found: warn
 
-      - name: Reject failed tests
-        if: env.TEST_OK != '1'
-        run: exit 1
+      - name: Build offline package
+        run: |
+          mkdir -p dist/koryto-v0.14.7-test.10
+          cp index.html VERSION README.md dist/koryto-v0.14.7-test.10/
+          cp -R src styles dist/koryto-v0.14.7-test.10/
+          mkdir -p dist/koryto-v0.14.7-test.10/docs/v0.14
+          cp docs/v0.14/v0146-playtest-report.md dist/koryto-v0.14.7-test.10/docs/v0.14/
+          cp docs/v0.14/v0147-consequence-report.md dist/koryto-v0.14.7-test.10/docs/v0.14/
+          rm -f dist/koryto-v0.14.7-test.10/src/v0142-rc2.js
+          rm -f dist/koryto-v0.14.7-test.10/src/v0142-rc3.js
+
+      - name: Upload playable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.14.7-test.10
+          path: dist/koryto-v0.14.7-test.10
+          if-no-files-found: error
