@@ -18,6 +18,7 @@
     4: [8, 16],
     6: [8, 16]
   };
+  const KNOWN_CRITICAL_CHUNKS = new Set(["IHDR", "PLTE", "IDAT", "IEND"]);
 
   const assets = { atlas: "", village: "", scenes: "", logo: "" };
   const assetState = {
@@ -109,6 +110,8 @@
       const type = String.fromCharCode(bytes[typeStart], bytes[typeStart + 1], bytes[typeStart + 2], bytes[typeStart + 3]);
 
       if (!/^[A-Za-z]{4}$/.test(type)) return result(false, "invalid-chunk-type", { width, height, chunks });
+      if (type[2] !== type[2].toUpperCase()) return result(false, "invalid-chunk-reserved-bit", { width, height, chunks });
+      if (/^[A-Z]/.test(type) && !KNOWN_CRITICAL_CHUNKS.has(type)) return result(false, "unknown-critical-chunk", { width, height, chunks, type });
       if (length > bytes.length || next > bytes.length) return result(false, `truncated-${type.toLowerCase()}`, { width, height, chunks });
       if (readU32(bytes, crcOffset) !== crc32(bytes, typeStart, dataEnd)) return result(false, `crc-${type.toLowerCase()}`, { width, height, chunks });
 
