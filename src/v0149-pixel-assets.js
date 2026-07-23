@@ -211,4 +211,108 @@
   function fallback(reason) {
     for (const name of Object.keys(assets)) assets[name] = "";
     assetState.ready = false;
-    assetState.fallbackReasom¸€ôÉ•…Í½¸ì(€€€…ÍÍ•ÑMÑ…Ñ”¹ÅÕ…É…¹Ñ¥¹•€ô=‰©•Ð¹•¹ÑÉ¥•Ì¡…ÍÍ•ÑMÑ…Ñ”¹Ù…±¥‘…Ñ¥½¸¤(€€€€€€¹™¥±Ñ•È ¡m¹…µ”°Ù…±¥‘…Ñ¥½¹t¤€ôøÙ…±¥‘…Ñ¥½¸€˜˜€…Ù…±¥‘…Ñ¥½¸¹½¬€˜˜…ÍÍ•ÑMÑ…Ñ”¹¡Õ¹­½Õ¹ÑÍm¹…µ•t€ø€À¤(€€€€€€¹µ…À ¡m¹…µ•t¤€ôø¹…µ”¤ì(€€€¥˜€¡ÑåÁ•½˜‘½Õµ•¹Ð€„ôô€‰Õ¹‘•™¥¹•ˆ¤ì(€€€€€½¹ÍÐÉ½½Ð€ô‘½Õµ•¹Ð¹‘½Õµ•¹Ñ±•µ•¹Ðì(€€€€€±•…ÉÍÍ•ÑY…É¥…‰±•Ì ¤ì(€€€€€É½½Ðü¹±…ÍÍ1¥ÍÐü¹É•µ½Ù” ‰ØÀÄÐäµÁÉ½‘ÕÑ¥½¸µ…ÉÐˆ¤ì(€€€€€É½½Ðü¹±…ÍÍ1¥ÍÐü¹…‘ ‰ØÀÄÐäµ…ÍÍ•ÑÌµ™…±±‰…¬ˆ¤ì(€€€€€¥˜€¡É½½Ðü¹‘…Ñ…Í•Ð¤ì(€€€€€€€É½½Ð¹‘…Ñ…Í•Ð¹­½ÉåÑ½ÍÍ•ÑÌ€ô€‰ÅÕ…É…¹Ñ¥¹•ˆì(€€€€€€€É½½Ð¹‘…Ñ…Í•Ð¹­½ÉåÑ½ÍÍ•ÑI•…Í½¸€ôÉ•…Í½¸ì(€€€€€ô(€€€ô(€€€É•ÑÕÉ¸™…±Í”ì(€ô((€™Õ¹Ñ¥½¸ÁÉ•±½… ¤ì(€€€½¹ÍÐ…ÍÍ•µ‰±•€ôì(€€€€€…Ñ±…Ìè…ÍÍ•µ‰±•A¹œ ‰…Ñ±…Ìˆ¤°(€€€€€Ù¥±±…”è…ÍÍ•µ‰±•A¹œ ‰Ù¥±±…”ˆ¤°(€€€€€Í•¹•Ìè…ÍÍ•µ‰±•A¹œ ‰Í•¹•Ìˆ¤°(€€€€€±½¼è…ÍÍ•µ‰±•A¹œ ‰±½¼ˆ¤(€€€ôì((€€€½¹ÍÐ¥¹Ù…±¥‘I•ÅÕ¥É•€ôl‰…Ñ±…Ìˆ°€‰Ù¥±±…”‰t¹™¥±Ñ•È¡¹…µ”€ôø€……ÍÍ•µ‰±•‘m¹…µ•t¤ì(€€€¥˜€¡¥¹Ù…±¥‘I•ÅÕ¥É•¹±•¹Ñ ¤ì(€€€€€½¹ÍÐÉ•…Í½¸€ô¥¹Ù…±¥‘I•ÅÕ¥É•¹µ…À¡¹…µ”€ôø€‘í¹…µ•ôè‘í…ÍÍ•ÑMÑ…Ñ”¹Ù…±¥‘…Ñ¥½¹m¹…µ•tü¹É•…Í½¸ñð€‰¥¹Ù…±¥‰õ€¤¹©½¥¸ ˆ°ˆ¤ì(€€€€€É•ÑÕÉ¸™…±±‰…¬¡É•…Í½¸¤ì(€€€ô((€€€¥˜€ …IQ}%IQ%=9}AAI=Y¤É•ÑÕÉ¸™…±±‰…¬ ‰…ÉÐµ‘¥É•Ñ¥½¸µ¹½Ðµ…ÁÁÉ½Ù•ˆ¤ì((€€€=‰©•Ð¹…ÍÍ¥¸¡…ÍÍ•ÑÌ°ì(€€€€€…Ñ±…Ìè…ÍÍ•µ‰±•¹…Ñ±…Ì°(€€€€€Ù¥±±…”è…ÍÍ•µ‰±•¹Ù¥±±…”°(€€€€€Í•¹•Ìè…ÍÍ•µ‰±•¹Í•¹•Ìñð…ÍÍ•µ‰±•¹Ù¥±±…”°(€€€€€±½¼è…ÍÍ•µ‰±•¹±½¼ñð…ÍÍ•µ‰±•¹…Ñ±…Ì(€€€ô¤ì(€€€…ÍÍ•ÑMÑ…Ñ”¹É•…‘ä€ôÑÉÕ”ì(€€€…ÍÍ•ÑMÑ…Ñ”¹™…±±‰…­I•…Í½¸€ô€ˆˆì(€€€…ÍÍ•ÑMÑ…Ñ”¹ÅÕ…É…¹Ñ¥¹•€ômtì(€€€¥˜€¡ÑåÁ•½˜‘½Õµ•¹Ð€„ôô€‰Õ¹‘•™¥¹•ˆ¤ì(€€€€€½¹ÍÐÉ½½Ð€ô‘½Õµ•¹Ð¹‘½Õµ•¹Ñ±•µ•¹Ðì(€€€€€™½È€¡½¹ÍÐm¹…µ”°Ù…±Õ•t½˜=‰©•Ð¹•¹ÑÉ¥•Ì¡…ÍÍ•ÑÌ¤¤É½½Ð¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä¡€´µØÀÄÐä´‘í¹…µ•õ€°ÕÉ° ˆ‘íÙ…±Õ•ôˆ¥€¤ì(€€€€€É½½Ð¹±…ÍÍ1¥ÍÐ¹É•µ½Ù” ‰ØÀÄÐäµ…ÍÍ•ÑÌµ™…±±‰…¬ˆ¤ì(€€€€€É½½Ð¹±…ÍÍ1¥ÍÐ¹…‘ ‰ØÀÄÐäµÁÉ½‘ÕÑ¥½¸µ…ÉÐˆ¤ì(€€€€€É½½Ð¹‘…Ñ…Í•Ð¹­½ÉåÑ½ÍÍ•ÑÌ€ôMMQ}YIM%=8ì(€€€ô(€€€É•ÑÕÉ¸ÑÉÕ”ì(€ô((€™Õ¹Ñ¥½¸Ù¥ÍÕ…±Õ‘¥Ð ¤ì(€€€É•ÑÕÉ¸ì(€€€€€Ù•ÉÍ¥½¸èYIM%=8°(€€€€€‰Õ¥±‘Y•ÉÍ¥½¸è	U%1}YIM%=8°(€€€€€Í…Ù•Y•ÉÍ¥½¸èMY}YIM%=8°(€€€€€Í…Ù•M¡•µ„èMY}M!5°(€€€€€…ÍÍ•ÑY•ÉÍ¥½¸èMMQ}YIM%=8°(€€€€€…ÉÑ¥É•Ñ¥½¹ÁÁÉ½Ù•èIQ}%IQ%=9}AAI=Y°(€€€€€…ÍÍ•ÑÍI•…‘äè…ÍÍ•ÑMÑ…Ñ”¹É•…‘ä°(€€€€€™…±±‰…­I•…Í½¸è…ÍÍ•ÑMÑ…Ñ”¹™…±±‰…­I•…Í½¶âÀ¢V&çF–æVC¢²ââæ76WE7FFRçV&çF–æVEÒÀ¢6‡Væ´6÷VçG3¢²ââæ76WE7FFRæ6‡Væ´6÷VçG2ÒÀ¢&6ScDÆVæwF‡3¢²ââæ76WE7FFRæ&6ScDÆVæwF‡2ÒÀ¢fÆ–FF–öã¢ö&¦V7Bæg&öÔVçG&–W2„ö&¦V7BæVçG&–W2†76WE7FFRçfÆ–FF–öâ’æÖ‚…¶æÖRÂfÆ–FF–öåÒ’Óâ¶æÖRÂfÆ–FF–öâò²ââçfÆ–FF–öâÂ6‡Væ·3¢fÆ–FF–öâæ6‡Væ·2òfÆ–FF–öâæ6‡Væ·2æÖ†6‡Væ²Óâ‡²ââæ6‡Væ²Ò’’¢µÒÒ¢çVÆÅÒ’¢Ó°¢Ð ¢gVæ7F–öâ–ç7FÆÂ‚’°¢6æöæ–6ÄÆ&VÇ2‚“°¢–b‡G—VöbFö7VÖVçBÓÓÒ'VæFVf–æVB"’&WGW&âfÇ6S°¢–b‚76WE7FFRæ–ç7FÆÆVB’°¢Fö7VÖVçBæFDWfVçDÆ—7FVæW#òâ‚&6Æ–6²"Â6æöæ–6ÄÆ&VÇ2“°¢Fö7VÖVçBæFDWfVçDÆ—7FVæW#òâ‚&6†ævR"Â6æöæ–6ÄÆ&VÇ2“°¢76WE7FFRæ–ç7FÆÆVBÒG'VS°¢Ð¢&WGW&â&VÆöB‚“°¢Ð ¢6öç7B’Ò°¢dU%4”ôâÀ¢%T”ÄEõdU%4”ôâÀ¢4dUõdU%4”ôâÀ¢4dUõ44„TÔÀ¢54UEõdU%4”ôâÀ¢%EôD•$T5D”ôåô$õdTBÀ¢fÆ–FFUæt&6ScBÀ¢6æöæ–6ÄÆ&VÇ2À¢&VÆöBÀ¢f—7VÄVF—BÀ¢–ç7FÆÀ¢Ó°¢ö&¦V7BæFVf–æU&÷W'F–W2†’Â°¢FÆ3¢²VçVÖW&&ÆS¢G'VRÂvWC¢‚’Óâ76WG2æFÆ2ÒÀ¢f–ÆÆvS¢²VçVÖW&&ÆS¢G'VRÂvWC¢‚’Óâ76WG2çf–ÆÆvRÒÀ¢66VæW3¢²VçVÖW&&ÆS¢G'VRÂvWC¢‚’Óâ76WG2ç66VæW2ÒÀ¢Æövó¢²VçVÖW&&ÆS¢G'VRÂvWC¢‚’Óâ76WG2æÆövòÐ¢Ò“° ¢vÆö&ÅF†—2ä¶÷'—Fô6æöæ–6Ä'V–ÆCC’Ò²fW'6–öã¢dU%4”ôâÂ'V–ÆEfW'6–öã¢%T”ÄEõdU%4”ôâÂF—FÆS¢D•5Ä•õD•DÄRÂFW67&—F–öã¢D•5Ä•ôDU45$•D”ôâÂÇ“¢6æöæ–6ÄÆ&VÇ2Ó°¢vÆö&ÅF†—2ä¶÷'—Fõ—†VÄ76WG3C’Ò“°¢vÆö&ÅF†—2ä¶÷'—FõFW7CC’Ò“°¢–ç7FÆÂ‚“°§Ò’‚“°
+    assetState.fallbackReason = reason;
+    assetState.quarantined = Object.entries(assetState.validation)
+      .filter(([name, validation]) => validation && !validation.ok && assetState.chunkCounts[name] > 0)
+      .map(([name]) => name);
+    if (typeof document !== "undefined") {
+      const root = document.documentElement;
+      clearAssetVariables();
+      root?.classList?.remove("v0149-production-art");
+      root?.classList?.add("v0149-assets-fallback");
+      if (root?.dataset) {
+        root.dataset.korytoAssets = "quarantined";
+        root.dataset.korytoAssetReason = reason;
+      }
+    }
+    return false;
+  }
+
+  function preload() {
+    const assembled = {
+      atlas: assemblePng("atlas"),
+      village: assemblePng("village"),
+      scenes: assemblePng("scenes"),
+      logo: assemblePng("logo")
+    };
+
+    const invalidRequired = ["atlas", "village"].filter(name => !assembled[name]);
+    if (invalidRequired.length) {
+      const reason = invalidRequired.map(name => `${name}:${assetState.validation[name]?.reason || "invalid"}`).join(",");
+      return fallback(reason);
+    }
+
+    if (!ART_DIRECTION_APPROVED) return fallback("art-direction-not-approved");
+
+    Object.assign(assets, {
+      atlas: assembled.atlas,
+      village: assembled.village,
+      scenes: assembled.scenes || assembled.village,
+      logo: assembled.logo || assembled.atlas
+    });
+    assetState.ready = true;
+    assetState.fallbackReason = "";
+    assetState.quarantined = [];
+    if (typeof document !== "undefined") {
+      const root = document.documentElement;
+      for (const [name, value] of Object.entries(assets)) root.style.setProperty(`--v0149-${name}`, `url("${value}")`);
+      root.classList.remove("v0149-assets-fallback");
+      root.classList.add("v0149-production-art");
+      root.dataset.korytoAssets = ASSET_VERSION;
+    }
+    return true;
+  }
+
+  function visualAudit() {
+    return {
+      version: VERSION,
+      buildVersion: BUILD_VERSION,
+      saveVersion: SAVE_VERSION,
+      saveSchema: SAVE_SCHEMA,
+      assetVersion: ASSET_VERSION,
+      artDirectionApproved: ART_DIRECTION_APPROVED,
+      assetsReady: assetState.ready,
+      fallbackReason: assetState.fallbackReason,
+      quarantined: [...assetState.quarantined],
+      chunkCounts: { ...assetState.chunkCounts },
+      base64Lengths: { ...assetState.base64Lengths },
+      validation: Object.fromEntries(Object.entries(assetState.validation).map(([name, validation]) => [name, validation ? { ...validation, chunks: validation.chunks ? validation.chunks.map(chunk => ({ ...chunk })) : [] } : null]))
+    };
+  }
+
+  function install() {
+    canonicalLabels();
+    if (typeof document === "undefined") return false;
+    if (!assetState.installed) {
+      document.addEventListener?.("click", canonicalLabels);
+      document.addEventListener?.("change", canonicalLabels);
+      assetState.installed = true;
+    }
+    return preload();
+  }
+
+  const api = {
+    VERSION,
+    BUILD_VERSION,
+    SAVE_VERSION,
+    SAVE_SCHEMA,
+    ASSET_VERSION,
+    ART_DIRECTION_APPROVED,
+    validatePngBase64,
+    canonicalLabels,
+    preload,
+    visualAudit,
+    install
+  };
+  Object.defineProperties(api, {
+    atlas: { enumerable: true, get: () => assets.atlas },
+    village: { enumerable: true, get: () => assets.village },
+    scenes: { enumerable: true, get: () => assets.scenes },
+    logo: { enumerable: true, get: () => assets.logo }
+  });
+
+  globalThis.KorytoCanonicalBuild149 = { version: VERSION, buildVersion: BUILD_VERSION, title: DISPLAY_TITLE, description: DISPLAY_DESCRIPTION, apply: canonicalLabels };
+  globalThis.KorytoPixelAssets149 = api;
+  globalThis.KorytoTest149 = api;
+  install();
+})();
