@@ -4,27 +4,38 @@ Satirické české politické RPG o třináctidenní komunální kampani v Doln�
 
 ## Aktuální testovací verze
 
-**v0.14.9 TEST.10 – produkční pixel-artový asset pass**
+**v0.14.9 TEST.10 – bezpečná vizuální stabilizace**
 
-Tato verze nahrazuje provizorní emoji vrstvu lokálními pixel-artovými assety, ale zachovává existující herní logiku, save schema a plně offline spuštění přes `file://`.
+Tato verze opravuje technickou chybu předchozího asset passu a vrací hru k původnímu tmavému vizuálnímu jazyku Koryta. Herní logika, save schema a offline spuštění přes `file://` zůstávají beze změny.
 
-### Hlavní změny
+### Stav grafiky
 
-- panorama Dolních Vejprnic pro mapu a scénické hlavičky,
-- osm lokálních budov pro mapu,
-- portréty šesti tříd kandidáta, členů štábu a Vladimíra Věčného,
-- pixelové ikony navigace a mocenských bloků,
-- sestavení PNG assetů z lokálních JavaScript chunků do datových URL bez síťových požadavků,
-- bezpečný fallback na původní funkční UI, pokud assety nejsou dostupné,
-- responzivní desktop, tablet a mobil,
-- klávesový focus, minimální výška hlavních ovládacích prvků 48 px a podpora `prefers-reduced-motion`.
+- původní tmavé uhlové pozadí, tlumená mosaz, papírové plochy a redakčně-politická typografie jsou znovu výchozí,
+- funkční obrazovky v0.14.8 zůstávají zachované, ale světlé dřevěné fantasy stylování je ve fallbacku potlačeno,
+- bitmapový atlas portrétů je technicky validní,
+- panorama vesnice je strukturálně poškozené (`truncated IDAT`) a je proto v karanténě,
+- dokud nebude dodán schválený a validní art pack, hra bezpečně ponechá textové a emoji ikony místo rozbitých obrázků,
+- současné bitmapy nejsou schválený finální art direction.
+
+### Bezpečnost asset pipeline
+
+Runtime před zapnutím obrazové vrstvy ověřuje:
+
+- PNG signaturu,
+- úplné hranice chunků,
+- `IHDR`, rozměry a podporované parametry,
+- přítomnost `IDAT` a koncového `IEND`,
+- CRC každého PNG chunku,
+- absenci trailing dat.
+
+Jakákoli chyba ponechá původní funkční UI a nezakryje ikony ani text. I technicky validní bitmapy zůstávají vypnuté, dokud není výtvarný směr výslovně schválen.
 
 ## Hlavní soubory
 
-- `src/v0149-assets/` – lokální PNG chunky atlasu a vesnického panoramatu,
-- `src/v0149-pixel-assets.js` – sestavení datových URL a napojení assetů na runtime,
-- `styles/v0149.css` – sprite atlas, panorama, portréty, mapové uzly a responzivní pravidla,
-- `tests/v0149-assets.mjs` – integrita PNG, pořadí offline načítání, CSS wiring a fallback.
+- `src/v0149-assets/` – lokální chunky kandidátních bitmap,
+- `src/v0149-pixel-assets.js` – validace PNG, karanténa a kanonické označení buildu,
+- `styles/v0149.css` – bezpečný tmavý fallback v původním stylu Koryta,
+- `tests/v0149-assets.mjs` – validní PNG, useknutý `IDAT`, špatné CRC, chybějící `IEND`, prohozené chunky a fallback.
 
 ## Kompatibilita
 
@@ -37,7 +48,7 @@ Tato verze nahrazuje provizorní emoji vrstvu lokálními pixel-artovými assety
 
 Rozbalte ZIP a otevřete `index.html`. Hra funguje offline bez instalace, serveru, externích fontů nebo síťových assetů.
 
-Diagnostika assetové vrstvy je dostupná v konzoli přes `KorytoPixelAssets149.visualAudit()`.
+Diagnostika vizuální vrstvy je dostupná v konzoli přes `KorytoPixelAssets149.visualAudit()`.
 
 ## Stav projektu
 
