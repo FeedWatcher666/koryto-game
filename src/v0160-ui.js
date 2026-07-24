@@ -198,9 +198,9 @@
         <div class="k16-map-vignette" aria-hidden="true"></div>
       </section>
       <section class="k16-map-actions" aria-label="Akce na mapÄ›">
-        <button type="button" data-k16-nav="archive">ğŸ“± <span>ZPRAVY</span></button>
-        <button type="button" class="primary" data-k16-end>ğŸ‹ <span>UKONÄŒIT DEN</span></button>
-        <button type="button" data-k16-nav="archive">ğŸ“» <span>PÅ˜EHLED DNE</span></button>
+        <button type="button" data-k16-nav="archive">ğŸ“° <span>ZPRÃVY</span></button>
+        <button type="button" class="primary" data-k16-end>ğŸ <span>UKONÄŒIT DEN</span></button>
+        <button type="button" data-k16-nav="archive">ğŸ“… <span>PÅ˜EHLED DNE</span></button>
         <button type="button" data-k16-nav="influence">â™› <span>MAPA VLIVU</span></button>
       </section>
     </main>`;
@@ -227,10 +227,10 @@
       const story = stories[id] || {};
       const known = Boolean(member);
       const location = LABELS[story.location] || "v obci";
-      const icon = companion.icon || member?.icon || "ğŸ‘„";
+      const icon = companion.icon || member?.icon || "ğŸ‘¤";
       const subtitle = known
-        ? (member?.role || companion.role || Äšlen Å¡tÃ¡bu")
-        : `PotjÃ¡te: ${location}`;
+        ? (member?.role || companion.role || "ÄŒlen Å¡tÃ¡bu")
+        : `PotkÃ¡te: ${location}`;
       const value = known ? `${Math.round(finite(member?.loyalty, 50))}%` : "?";
       return `<article class="${known ? "known" : "locked"}"><span class="avatar" aria-hidden="true">${esc(icon)}</span><span class="k16-person-copy"><b>${esc(member?.name || companion.name || id)}</b><small>${esc(subtitle)}</small></span><strong>${value}</strong></article>`;
     }).join("");
@@ -243,11 +243,196 @@
 
     return `<aside class="k16-right">
       <section class="k16-panel k16-rival-panel">
-        ${title("TLIK RIVALA", "danger")}
+        ${title("TLAK RIVALA", "danger")}
         <div class="k16-rival">
           <div class="k16-rival-head"><span class="k16-rival-face" aria-hidden="true">ğŸ•´ï¸</span><span><b>VladimÃ­r VÄ›ÄnÃ½</b><small>starosta a rival</small></span><strong>${Math.round(momentum)} %</strong></div>
           <i class="k16-track"><u style="width:${momentum}%"></u></i>
         </div>
         ${title("AKTUÃLNÃ STRATEGIE")}
-        <div class="k16-strategy"><span aria-hidden="true">${esc(definition.icon || "ğŸ¤")}</span><div><b>${esc(operation.revealed ? (definition.name || operation.id || "SoupeÅŸÅ¯v tah") : "LidovÃ½ kontakt")}</b><p>${esc(operation.id ? (operation.revealed ? (definition.stages?.[Math.max(0, finite(operation.stage, 1) - 1)] || "SoupeÅ™ pÅ™ipravuje dalÅ¡Ã­ krok.") : "SoupeÅ™ koordinuje nekolik tahÅ­ a hledÃ¡ slabinu.") : "VÄ›ÄnÃ½ sbÃ­rÃ¡ vzorec vaÅich rozhodnutÃ­ a posiluje vlastnÃ­ sÃ­Å¤¸ˆ¥ôğ½Àøğ½‘¥Øøğ½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¬ÄØµ‘•Í­Ñ½Àµ½¹±äˆø(€€€€€€€€€€‘íÑ¥Ñ±” ‰5AY1%YTˆ¥ô(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¬ÄØµ™…Ñ¥½¹Ìˆø(€€€€€€€€€€€€‘í™…Ñ¥½¹I½Ü ‰=‹5…»¤ˆ°Ñ…É•Ğ¹™…Ñ¥½¹Ìü¹¥Ñ¥é•¹Ì¥ô(€€€€€€€€€€€€‘í™…Ñ¥½¹I½Ü ‰7¥‘¥„ˆ°Ñ…É•Ğ¹™…Ñ¥½¹Ìü¹ÁÉ•ÍÌ°€‰ÁÉ•ÍÌˆ¥ô(€€€€€€€€€€€€‘í™…Ñ¥½¹I½Ü ‰)iˆ°Ñ…É•Ğ¹™…Ñ¥½¹Ìü¹©é°€‰©éˆ¥ô(€€€€€€€€€€€€‘í™…Ñ¥½¹I½Ü ‰MÑ…Ë‡
-¤ÍÑÉÕ­ÑÕÉäˆ°Ñ…É•Ğ¹™…Ñ¥½¹Ìü¹½±‘Õ…É°€‰½±‘Õ…Éˆ¥ô(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€‘íÑ¥Ñ±” ‰-34›5=[41%$ˆ¥ô(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¬ÄØµÍÑ…™˜ˆø‘í­•åA•½Á±”¡Ñ…É•Ğ¥ôğ½‘¥Øø(€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰¬ÄØµ…Ñ¥½¸Í•½¹‘…Éä¬ÄØµ‘•Í­Ñ½Àµ½¹±äˆÑåÁ”ô‰‰ÕÑÑ½¸ˆ‘…Ñ„µ¬ÄØµ¹…Øô‰¥¹™±Õ•¹”ˆùi=	Ii%P5ATY1%YTğ½‰ÕÑÑ½¸ø(€€€€€€ğ½Í•Ñ¥½¸ø(€€€€ğ½…Í¥‘”ù€ì(€ô((€™Õ¹Ñ¥½¸‘•Í­Ñ½Á9…Ø ¤ì(€€€É•ÑÕÉ¸€ñ¹…Ø±…ÍÌô‰¬ÄØµ‰½ÑÑ½´¬ÄØµ‰½ÑÑ½´µ‘•Í­Ñ½Àˆ…É¥„µ±…‰•°ô‰!±…Ù»´¹…Ù¥…”ˆø‘íM-Q=A}9X¹µ…À ¡m¥°¥½¸°±…‰•±t¤€ôø€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ±…ÍÌôˆ‘í¥€ôôô€‰µ…Àˆ€ü€‰…Ñ¥Ù”ˆ€è€ˆ‰ôˆ‘…Ñ„µ¬ÄØµ¹…Øôˆ‘í¥‘ôˆ€‘í¥€ôôô€‰µ…Àˆ€ü€…É¥„µÕÉÉ•¹Ğô‰Á…”ˆœ€è€ˆ‰ôøñÍÁ…¸…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆø‘í¥½¹ôğ½ÍÁ…¸øñˆø‘í±…‰•±ôğ½ˆøğ½‰ÕÑÑ½¸ù€¤¹©½¥¸ ˆˆ¥ôğ½¹…Øù€ì(€ô((€™Õ¹Ñ¥½¸µ½‰¥±•9…Ø ¤ì(€€€É•ÑÕÉ¸€ñ¹…Ø±…ÍÌô‰¬ÄØµ‰½ÑÑ½´¬ÄØµ‰½ÑÑ½´µµ½‰¥±”ˆ…É¥„µ±…‰•°ô‰5½‰¥±»´¹…Ù¥…”ˆø‘í5=	%1}9X¹µ…À ¡m¥°¥½¸°±…‰•±t¤€ôø€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ±…ÍÌôˆ‘í¥€ôôô€‰µ…Àˆ€ü€‰…Ñ¥Ù”ˆ€è€ˆ‰ôˆ€‘í¥€ôôô€‰µ½É”ˆ€ü€‰‘…Ñ„µ¬ÄØµµ½É”ˆ€è‘…Ñ„µ¬ÄØµ¹…Øôˆ‘í¥‘ô‰ô€‘í¥€ôôô€‰µ…Àˆ€ü€…É¥„µÕÉÉ•¹Ğô‰Á…”ˆœ€è€ˆ‰ôøñÍÁ…¸…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆø‘í¥½¹ôğ½ÍÁ…¸øñˆø‘í±…‰•±ôğ½ˆøğ½‰ÕÑÑ½¸ù€¤¹©½¥¸ ˆˆ¥ôğ½¹…Øù€ì(€ô((€™Õ¹Ñ¥½¸µ½‰¥±•É…İ•È ¤ì(€€€É•ÑÕÉ¸€ñÍ•Ñ¥½¸±…ÍÌô‰¬ÄØµµ½É”µ‘É…İ•Èˆ‘…Ñ„µ¬ÄØµ‘É…İ•È¡¥‘‘•¸…É¥„µ±…‰•°ô‰…³‡´¡•É»´Í•­”ˆøñ¡•…‘•Èøñˆù3‡4M-ğ½ˆøñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ‘…Ñ„µ¬ÄØµ±½Í”…É¥„µ±…‰•°ô‰i…ÛgµĞ¹…Ãµ‘­Ôˆû\ğ½‰ÕÑÑ½¸øğ½¡•…‘•Èøñ‘¥Øø‘í5=I}9X¹µ…À ¡m¥°¥½¸°±…‰•±t¤€ôø€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ‘…Ñ„µ¬ÄØµ¹…Øôˆ‘í¥‘ôˆøñÍÁ…¸…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆø‘í¥½¹ôğ½ÍÁ…¸øñˆø‘í±…‰•±ôğ½ˆøğ½‰ÕÑÑ½¸ù€¤¹©½¥¸ ˆˆ¥ôğ½‘¥Øøğ½Í•Ñ¥½¸ù€ì(€ô((€™Õ¹Ñ¥½¸•¹ÍÕÉ•I½½Ğ ¤ì(€€€±•ĞÉ½½Ğ€ô‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰ØÀÄØÁI½½Ğˆ¤ì(€€€¥˜€ …É½½Ğ¤ì(€€€€€É½½Ğ€ô‘½Õµ•¹Ğ¹É•…Ñ•±•µ•¹Ğ ‰‘¥Øˆ¤ì(€€€€€É½½Ğ¹¥€ô€‰ØÀÄØÁI½½Ğˆì(€€€€€É½½Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°•Ù•¹Ğ€ôø•Ù•¹Ğ¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤¤ì(€€€€€‘½Õµ•¹Ğ¹‰½‘ä¹…ÁÁ•¹‘¡¥±¡É½½Ğ¤ì(€€€ô(€€€É•ÑÕÉ¸É½½Ğì(€ô((€™Õ¹Ñ¥½¸É•¹‘•È¡Ñ…É•Ğ¤ì(€€€½¹ÍĞÉ½½Ğ€ô•¹ÍÕÉ•I½½Ğ ¤ì(€€€½¹ÍĞÅÕ•ÍÑÌ€ô…Ñ¥Ù•EÕ•ÍÑÌ¡Ñ…É•Ğ¤ì(€€€½¹ÍĞÑÉÕÍĞ€ô±…µÀ¡Ñ…É•Ğ¹ÍÑ…ÑÌü¹ÑÉÕÍĞ¤ì(€€€½¹ÍĞ¥¹™±Õ•¹”€ô±…µÀ¡Ñ…É•Ğ¹ÍÑ…ÑÌü¹¥¹™±Õ•¹”¤ì(€€€½¹ÍĞ™Õ¹‘Ì€ô5…Ñ ¹µ…à À°™¥¹¥Ñ”¡Ñ…É•Ğ¹ÍÑ…ÑÌü¹™Õ¹‘Ì¤¤ì(€€€½¹ÍĞİ••­‘…åÌ€ôl‰A½¹“m³´ˆ°€‹iÑ•Ëôˆ°€‰MÓe•‘„ˆ°€‹1ÑÙÉÑ•¬ˆ°€‰C…Ñ•¬ˆ°€‰M½‰½Ñ„ˆ°€‰9•“m±”‰tì(€€€½¹ÍĞ‘…ä€ô5…Ñ ¹µ…à Ä°™¥¹¥Ñ”¡Ñ…É•Ğ¹‘…ä°€Ä¤¤ì((€€€É½½Ğ¹¥¹¹•É!Q50€ô€ñ‘¥Ø±…ÍÌô‰¬ÄØµÍ¡•±°ˆø(€€€€€€ñ¡•…‘•È±…ÍÌô‰¬ÄØµÑ½Á‰…Èˆø(€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰¬ÄØµ‘…äˆøñÍÁ…¸±…ÍÌô‰¬ÄØµİ•…Ñ¡•Èˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆûŠb¾â<ğ½ÍÁ…¸øñ‘¥Øøñˆù•¸€‘í‘…åôğ½ˆøñÍÁ…¸ø‘íİ••­‘…åÍl¡‘…ä€´€Ä¤€”€İuôğ½ÍÁ…¸øñÍµ…±°ù-ÛmÑ•¸°É½¬€ÈƒÜ€‘í5…Ñ ¹µ…à À°™¥¹¥Ñ”¡Ñ…É•Ğ¹…Ñ¥½¹Ì¤¥ô…­”ğ½Íµ…±°øğ½‘¥Øøñ‘¥Ø±…ÍÌô‰¬ÄØµÁ±…”ˆûŠ^½±»´Y•©ÁÉ¹¥”ğ½‘¥Øøğ½Í•Ñ¥½¸ø(€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰¬ÄØµ±½¼ˆøñÍÑÉ½¹œù-=IeQ<ğ½ÍÑÉ½¹œøñÍÁ…¸ùA=1%Q%/IAMQIQ%ğ½ÍÁ…¸øğ½Í•Ñ¥½¸ø(€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰¬ÄØµÉ•Í½ÕÉ•Ìˆø‘íÉ•Í½ÕÉ” ‹Â~’tˆ°€‰i[mIˆ°€‘í5…Ñ ¹É½Õ¹¡ÑÉÕÍĞ¥õ€°ÑÉÕÍĞ¥ô‘íÉ•Í½ÕÉ” ‹Šflˆ°€‰Y1%Xˆ°€‘í5…Ñ ¹É½Õ¹¡¥¹™±Õ•¹”¥õ€°¥¹™±Õ•¹”°€‰¥¹™±Õ•¹”ˆ¥ô‘íÉ•Í½ÕÉ” ‹Â~ªdˆ°€‰A;5iˆ°µ½¹•ä¡™Õ¹‘Ì¤°5…Ñ ¹µ¥¸ ÄÀÀ°™Õ¹‘Ì€¨€Ô¤°€‰µ½¹•äˆ¥ôğ½Í•Ñ¥½¸ø(€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ±…ÍÌô‰¬ÄØµÍ•ÑÑ¥¹Ìˆ‘…Ñ„µ¬ÄØµÍ•ÑÑ¥¹Ì…É¥„µ±…‰•°ô‰9…ÍÑ…Ù•»´ˆûŠjdğ½‰ÕÑÑ½¸ø(€€€€€€ğ½¡•…‘•Èø(€€€€€€ñ‘¥Ø±…ÍÌô‰¬ÄØµ±…å½ÕĞˆø‘í±•™ÑA…¹•°¡Ñ…É•Ğ°ÅÕ•ÍÑÌ¥ô‘íµ…ÁA…¹•°¡Ñ…É•Ğ°ÅÕ•ÍÑÌ¥ô‘íÉ¥¡ÑA…¹•°¡Ñ…É•Ğ¥ôğ½‘¥Øø(€€€€€€‘í‘•Í­Ñ½Á9…Ø ¥ô(€€€€€€‘íµ½‰¥±•9…Ø ¥ô(€€€€€€‘íµ½‰¥±•É…İ•È ¥ô(€€€€ğ½‘¥Øù€ì(€€€‰¥¹¡É½½Ğ¤ì(€ô((€™Õ¹Ñ¥½¸¹…Ù¥…Ñ”¡¹…µ”¤ì(€€€¥˜€¡¹…µ”€ôôô€‰µ…Àˆ¤ì(€€€€€±½‰…±Q¡¥Ì¹Í¡½İ5…Àü¸ ¤ì(€€€€€É•ÑÕÉ¸ì(€€€ô(€€€¥˜€¡¹…µ”€ôôô€‰½…±¥Ñ¥½¸ˆ¤ì(€€€€€½¹ÍĞÑ…É•Ğ€ôÍÑ…Ñ•=˜ ¤ì(€€€€€¥˜€¡Ñ…É•Ğü¹½…±¥Ñ¥½¸ü¹…Ñ¥Ù”€˜˜ÑåÁ•½˜±½‰…±Q¡¥Ì¹Í¡½İ½…±¥Ñ¥½¹MÉ••¸€ôôô€‰™Õ¹Ñ¥½¸ˆ¤±½‰…±Q¡¥Ì¹Í¡½İ½…±¥Ñ¥½¹MÉ••¸ ¤ì(€€€€€•±Í”±½‰…±Q¡¥Ì¹-½ÉåÑ½Y¥ÍÕ…°ÄĞàü¹½Á•¹•Í¬ü¸ ‰•±•Ñ¥½¹Ìˆ¤ì(€€€€€É•ÑÕÉ¸ì(€€€ô(€€€±½‰…±Q¡¥Ì¹-½ÉåÑ½Y¥ÍÕ…°ÄĞàü¹½Á•¹•Í¬ü¸¡¹…µ”¤ì(€ô((€™Õ¹Ñ¥½¸‰¥¹¡É½½Ğ¤ì(€€€É½½Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ‰m‘…Ñ„µ¬ÄØµ±½…Ñ¥½¹tˆ¤¹™½É… ¡‰ÕÑÑ½¸€ôø‰ÕÑÑ½¸¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€ ¤€ôø±½‰…±Q¡¥Ì¹Í¡½İ1½…Ñ¥½¸ü¸¡‰ÕÑÑ½¸¹‘…Ñ…Í•Ğ¹¬ÄÙ1½…Ñ¥½¸¤¤¤ì(€€€É½½Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ‰m‘…Ñ„µ¬ÄØµ¹…Ùtˆ¤¹™½É… ¡‰ÕÑÑ½¸€ôø‰ÕÑÑ½¸¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€ ¤€ôøì(€€€€€½¹ÍĞ‘É…İ•È€ôÉ½½Ğ¹ÅÕ•ÉåM•±•Ñ½È ‰m‘…Ñ„µ¬ÄØµ‘É…İ•Étˆ¤ì(€€€€€¥˜€¡‘É…İ•È¤‘É…İ•È¹¡¥‘‘•¸€ôÑÉÕ”ì(€€€€€¹…Ù¥…Ñ”¡‰ÕÑÑ½¸¹‘…Ñ…Í•Ğ¹¬ÄÙ9…Ø¤ì(€€€ô¤¤ì(€€€É½½Ğ¹ÅÕ•ÉåM•±•Ñ½È ‰m‘…Ñ„µ¬ÄØµ•¹‘tˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€ ¤€ôø‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰•¹‘…å	Ñ¸ˆ¤ü¹±¥¬ ¤¤ì(€€€É½½Ğ¹ÅÕ•ÉåM•±•Ñ½È ‰m‘…Ñ„µ¬ÄØµÍ•ÑÑ¥¹Ítˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€ ¤€ôø‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰Á¥á•±Q½±”ˆ¤ü¹±¥¬ ¤¤ì(€€€É½½Ğ¹ÅÕ•ÉåM•±•Ñ½È¡m‘…Ñ„µ¬ÄØµµ½É•tˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€ ¤€ôøì(€€€€€½¹ÍĞ‘É…İ•È€ôÉ½½Ğ¹ÅÕ•ÉåM•±•Ñ½È¡m‘…Ñ„µ¬ÄØµ‘É…İ•Étˆ¤ì(€€€€€¥˜€ …‘É…İ•È¤É•ÑÕÉ¸ì(€€€€€‘É…İ•È¹¡¥‘‘•¸€ô€…‘É…İ•È¹¡¥‘‘•¸ì(€€€ô¤ì(€€€É½½Ğ¹ÅÕ•ÉåM•±•Ñ½È¡m‘…Ñ„µ¬ÄØµ±½Í•tˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€ ¤€ôøì(€€€€€½¹ÍĞ‘É…İ•È€ôÉ½½Ğ¹ÅÕ•ÉåM•±•Ñ½È ‰m‘…Ñ„µ¬ÄØµ‘É…İ•Étˆ¤ì(€€€€€¥˜€¡‘É…İ•È¤‘É…İ•È¹¡¥‘‘•¸€ôÑÉÕ”ì(€€€ô¤ì(€ô((€™Õ¹Ñ¥½¸…¹½¹¥…±1…‰•±Ì ¤ì(€€€½¹ÍĞÁ…•Q¥Ñ±”€ô-½ÉåÑ¼€‘íYIM%=9ôƒŠL±•…¸U$1…å½ÕĞA½±¥Í¡€ì(€€€‘½Õµ•¹Ğ¹Ñ¥Ñ±”€ôÁ…•Q¥Ñ±”ì(€€€‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È µ•Ñ…m¹…µ”ô‰‘•ÍÉ¥ÁÑ¥½¸‰tœ¤ü¹Í•ÑÑÑÉ¥‰ÕÑ” ‰½¹Ñ•¹Ğˆ°-½ÉåÑ¼€‘íYIM%=9ôèÉ•ÍÁ½¹é¥Ù»´­½µÁ½¹•¹Ñ½ÛôÉ•‰Õ¥±¡±…Ù»´µ…ÁäÁÉ¼‘•Í­Ñ½À°Ñ…‰±•Ğ„µ½‰¥°¹€¤ì(€ô((€™Õ¹Ñ¥½¸É•™É•Í  ¤ì(€€€¥˜€¡ÑåÁ•½˜‘½Õµ•¹Ğ€ôôô€‰Õ¹‘•™¥¹•ˆ¤É•ÑÕÉ¸™…±Í”ì(€€€½¹ÍĞÑ…É•Ğ€ôÍÑ…Ñ•=˜ ¤ì(€€€½¹ÍĞ…Ñ¥Ù”€ô¥Í5…ÁÑ¥Ù”¡Ñ…É•Ğ¤ì(€€€‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹Ñ½±” ‰¬ÄØµ…Ñ¥Ù”ˆ°…Ñ¥Ù”¤ì(€€€½¹ÍĞÉ½½Ğ€ô•¹ÍÕÉ•I½½Ğ ¤ì(€€€É½½Ğ¹¡¥‘‘•¸€ô€……Ñ¥Ù”ì(€€€¥˜€¡…Ñ¥Ù”¤É•¹‘•È¡Ñ…É•Ğ¤ì(€€€…¹½¹¥…±1…‰•±Ì ¤ì(€€€É•ÑÕÉ¸…Ñ¥Ù”ì(€ô((€™Õ¹Ñ¥½¸ÅÕ•Õ•I•™É•Í  ¤ì(€€€¥˜€¡ÅÕ•Õ•¤É•ÑÕÉ¸ì(€€€ÅÕ•Õ•€ôÑÉÕ”ì(€€€Í•ÑQ¥µ•½ÕĞ  ¤€ôøì(€€€€€ÅÕ•Õ•€ô™…±Í”ì(€€€€€É•™É•Í  ¤ì(€€€ô°€À¤ì(€ô((€™Õ¹Ñ¥½¸İÉ…À¡¹…µ”¤ì(€€€½¹ÍĞ½É¥¥¹…°€ô±½‰…±Q¡¥Ím¹…µ•tì(€€€¥˜€¡ÑåÁ•½˜½É¥¥¹…°€„ôô€‰™Õ¹Ñ¥½¸ˆñğ½É¥¥¹…°¹}}ØÀÄØÁ]É…ÁÁ•¤É•ÑÕÉ¸ì(€€€½¹ÍĞİÉ…ÁÁ•€ô™Õ¹Ñ¥½¸€ ¸¸¹…ÉÌ¤ì(€€€€€½¹ÍĞÉ•ÍÕ±Ğ€ô½É¥¥¹…°¹…ÁÁ±ä¡Ñ¡¥Ì°…ÉÌ¤ì(€€€€€ÅÕ•Õ•I•™É•Í  ¤ì(€€€€€É•ÑÕÉ¸É•ÍÕ±Ğì(€€€ôì(€€€İÉ…ÁÁ•¹}}ØÀÄØÁ]É…ÁÁ•€ôÑÉÕ”ì(€€€±½‰…±Q¡¥Í¹…µ•t€ôİÉ…ÁÁ•ì(€ô((€™Õ¹Ñ¥½¸Ù¥ÍÕ…±Õ‘¥Ğ¡Ñ…É•Ğ€ôÍÑ…Ñ•=˜ ¤¤ì(€€€É•ÑÕÉ¸ì(€€€€€Ù•ÉÍ¥½¸èYIM%=8°(€€€€€‰Õ¥±‘Y•ÉÍ¥½¸è	U%1}YIM%=8°(€€€€€Í…Ù•Y•ÉÍ¥½¸èMY}YIM%=8°(€€€€€Í…Ù•M¡•µ„èMY}M!5°(€€€€€…Ñ¥Ù”è¥Í5…ÁÑ¥Ù”¡Ñ…É•Ğ¤°(€€€€€É½½Ğè	½½±•…¸¡‘½Õµ•¹Ğ¹•Ñ±•µ•¹Ñ	å% ‰ØÀÄØÁI½½Ğˆ¤¤°(€€€€€¡½ÑÍÁ½ÑÌè‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ˆØÀÄØÁI½½Ğ€¹¬ÄØµ¡½ÑÍÁ½Ğˆ¤¹±•¹Ñ °(€€€€€±•…åÁÁ!¥‘‘•¸è‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ¹±…ÍÍ1¥ÍĞ¹½¹Ñ…¥¹Ì ‰¬ÄØµ…Ñ¥Ù”ˆ¤°(€€€€€­•åA•½Á±”è‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ˆØÀÄØÁI½½Ğ€¹¬ÄØµÍÑ…™˜…ÉÑ¥±”ˆ¤¹±•¹Ñ °(€€€€€‘•Í­Ñ½Á9…Ù%Ñ•µÌè‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ˆØÀÄØÁI½½Ğ€¹¬ÄØµ‰½ÑÑ½´µ‘•Í­Ñ½À‰ÕÑÑ½¸ˆ¤¹±•¹Ñ °(€€€€€µ½‰¥±•9…Ù%Ñ•µÌè‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ˆØÀÄØÁI½½Ğ€¹¬ÄØµ‰½ÑÑ½´µµ½‰¥±”‰ÕÑÑ½¸ˆ¤¹±•¹Ñ °(€€€€€µ½‰¥±•É…İ•É%Ñ•µÌè‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½É±° ˆØÀÄØÁI½½Ğ€¹¬ÄØµµ½É”µ‘É…İ•Èm‘…Ñ„µ¬ÄØµ¹…Ùtˆ¤¹±•¹Ñ °(€€€€€ÅÕ•ÍÑ½Õ¹Ğè…Ñ¥Ù•EÕ•ÍÑÌ¡Ñ…É•Ğ¤¹±•¹Ñ °(€€€€€±…å½ÕÑA½±¥Í èÑÉÕ”°(€€€€€É•ÍÁ½¹Í¥Ù”èÑÉÕ”(€€€ôì(€ô((€™Õ¹Ñ¥½¸¥¹ÍÑ…±° ¤ì(€€€¥˜€¡¥¹ÍÑ…±±•ñğÑåÁ•½˜‘½Õµ•¹Ğ€ôôô€‰Õ¹‘•™¥¹•ˆ¤É•ÑÕÉ¸¥¹ÍÑ…±±•ì(€€€¥¹ÍÑ…±±•€ôÑÉÕ”ì(€€€l‰É•¹‘•É±°ˆ°€‰Í¡½İ5…Àˆ°€‰Í¡½İ1½…Ñ¥½¸ˆ°€‰Í¡½İÙ•¹Ğˆ°€‰¹•İ…µ”ˆ°€‰±½…ˆ°€‰™¥¹¥Í¡•‰…Ñ”ˆ°€‰Í¡½İ½…±¥Ñ¥½¹MÉ••¸‰t¹™½É… ¡İÉ…À¤ì(€€€‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°ÅÕ•Õ•I•™É•Í ¤ì(€€€‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰¡…¹”ˆ°ÅÕ•Õ•I•™É•Í ¤ì(€€€ÅÕ•Õ•I•™É•Í  ¤ì(€€€É•ÑÕÉ¸ÑÉÕ”ì(€ô((€½¹ÍĞ…Á¤€ôì(€€€YIM%=8°(€€€	U%1}YIM%=8°(€€€MY}YIM%=8°(€€€MY}M!5°(€€€A=M%Q%=9L°(€€€5=	%1}A=M%Q%=9L°(€€€1	1L°(€€€M!=IQ}1	1L°(€€€1=Q%=9}%=9L°(€€€…Ñ¥Ù•EÕ•ÍÑÌ°(€€€É•™É•Í °(€€€ÅÕ•Õ•I•™É•Í °(€€€Ù¥ÍÕ…±Õ‘¥Ğ°(€€€¥¹ÍÑ…±°(€ôì((€±½‰…±Q¡¥Ì¹-½ÉåÑ½U$ÄØÀ€ô…Á¤ì(€±½‰…±Q¡¥Ì¹-½ÉåÑ½Q•ÍĞÄØÀ€ô…Á¤ì(€¥¹ÍÑ…±° ¤ì)ô¤ ¤
+        <div class="k16-strategy"><span aria-hidden="true">${esc(definition.icon || "ğŸ¤")}</span><div><b>${esc(operation.revealed ? (definition.name || operation.id || "SoupeÅ™Å¯v tah") : "LidovÃ½ kontakt")}</b><p>${esc(operation.id ? (operation.revealed ? (definition.stages?.[Math.max(0, finite(operation.stage, 1) - 1)] || "SoupeÅ™ pÅ™ipravuje dalÅ¡Ã­ krok.") : "SoupeÅ™ koordinuje nÄ›kolik tahÅ¯ a hledÃ¡ slabinu.") : "VÄ›ÄnÃ½ sbÃ­rÃ¡ vzorec vaÅ¡ich rozhodnutÃ­ a posiluje vlastnÃ­ sÃ­Å¥.")}</p></div></div>
+        <div class="k16-desktop-only">
+          ${title("MAPA VLIVU")}
+          <div class="k16-factions">
+            ${factionRow("ObÄanÃ©", target.factions?.citizens)}
+            ${factionRow("MÃ©dia", target.factions?.press, "press")}
+            ${factionRow("JZD", target.factions?.jzd, "jzd")}
+            ${factionRow("StarÃ© struktury", target.factions?.oldguard, "oldguard")}
+          </div>
+        </div>
+        ${title("KLÃÄŒOVÃ LIDÃ‰")}
+        <div class="k16-staff">${keyPeople(target)}</div>
+        <button class="k16-action secondary k16-desktop-only" type="button" data-k16-nav="influence">ZOBRAZIT MAPU VLIVU</button>
+      </section>
+    </aside>`;
+  }
+
+  function desktopNav() {
+    return `<nav class="k16-bottom k16-bottom-desktop" aria-label="HlavnÃ­ navigace">${DESKTOP_NAV.map(([id, icon, label]) => `<button type="button" class="${id === "map" ? "active" : ""}" data-k16-nav="${id}" ${id === "map" ? 'aria-current="page"' : ""}><span aria-hidden="true">${icon}</span><b>${label}</b></button>`).join("")}</nav>`;
+  }
+
+  function mobileNav() {
+    return `<nav class="k16-bottom k16-bottom-mobile" aria-label="MobilnÃ­ navigace">${MOBILE_NAV.map(([id, icon, label]) => `<button type="button" class="${id === "map" ? "active" : ""}" ${id === "more" ? "data-k16-more" : `data-k16-nav="${id}"`} ${id === "map" ? 'aria-current="page"' : ""}><span aria-hidden="true">${icon}</span><b>${label}</b></button>`).join("")}</nav>`;
+  }
+
+  function mobileDrawer() {
+    return `<section class="k16-more-drawer" data-k16-drawer hidden aria-label="DalÅ¡Ã­ hernÃ­ sekce"><header><b>DALÅ Ã SEKCE</b><button type="button" data-k16-close aria-label="ZavÅ™Ã­t nabÃ­dku">Ã—</button></header><div>${MORE_NAV.map(([id, icon, label]) => `<button type="button" data-k16-nav="${id}"><span aria-hidden="true">${icon}</span><b>${label}</b></button>`).join("")}</div></section>`;
+  }
+
+  function ensureRoot() {
+    let root = document.getElementById("v0160Root");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "v0160Root";
+      document.body.appendChild(root);
+    }
+    return root;
+  }
+
+  function render(target) {
+    const root = ensureRoot();
+    const quests = activeQuests(target);
+    const trust = clamp(target.stats?.trust);
+    const influence = clamp(target.stats?.influence);
+    const funds = Math.max(0, finite(target.stats?.funds));
+    const weekdays = ["PondÄ›lÃ­", "ÃšterÃ½", "StÅ™eda", "ÄŒtvrtek", "PÃ¡tek", "Sobota", "NedÄ›le"];
+    const day = Math.max(1, finite(target.day, 1));
+
+    root.innerHTML = `<div class="k16-shell">
+      <header class="k16-topbar">
+        <section class="k16-day"><span class="k16-weather" aria-hidden="true">â˜€ï¸</span><div><b>Den ${day}</b><span>${weekdays[(day - 1) % 7]}</span><small>KvÄ›ten, rok 2 Â· ${Math.max(0, finite(target.actions))} akce</small></div><div class="k16-place">â—† DolnÃ­ Vejprnice</div></section>
+        <section class="k16-logo"><strong>KORYTO</strong><span>POLITICKÃ RPG STRATEGIE</span></section>
+        <section class="k16-resources">${resource("ğŸ¤", "DÅ®VÄšRA", `${Math.round(trust)}`, trust)}${resource("â™›", "VLIV", `${Math.round(influence)}`, influence, "influence")}${resource("ğŸª™", "PENÃZE", money(funds), Math.min(100, funds * 5), "money")}</section>
+        <button type="button" class="k16-settings" data-k16-settings aria-label="NastavenÃ­">âš™</button>
+      </header>
+      <div class="k16-layout">${leftPanel(target, quests)}${mapPanel(target, quests)}${rightPanel(target)}</div>
+      ${desktopNav()}
+      ${mobileNav()}
+      ${mobileDrawer()}
+    </div>`;
+    bind(root);
+  }
+
+  function navigate(name) {
+    if (name === "map") {
+      globalThis.showMap?.();
+      return;
+    }
+    if (name === "coalition") {
+      const target = stateOf();
+      if (target?.coalition?.active && typeof globalThis.showCoalitionScreen === "function") globalThis.showCoalitionScreen();
+      else globalThis.KorytoVisual148?.openDesk?.("elections");
+      return;
+    }
+    globalThis.KorytoVisual148?.openDesk?.(name);
+  }
+
+  function bind(root) {
+    root.querySelectorAll("[data-k16-location]").forEach(button => button.addEventListener("click", () => globalThis.showLocation?.(button.dataset.k16Location)));
+    root.querySelectorAll("[data-k16-nav]").forEach(button => button.addEventListener("click", () => {
+      const drawer = root.querySelector("[data-k16-drawer]");
+      if (drawer) drawer.hidden = true;
+      navigate(button.dataset.k16Nav);
+    }));
+    root.querySelector("[data-k16-end]")?.addEventListener("click", () => document.getElementById("endDayBtn")?.click());
+    root.querySelector("[data-k16-settings]")?.addEventListener("click", () => document.getElementById("pixelToggle")?.click());
+    root.querySelector("[data-k16-more]")?.addEventListener("click", () => {
+      const drawer = root.querySelector("[data-k16-drawer]");
+      if (!drawer) return;
+      drawer.hidden = !drawer.hidden;
+    });
+    root.querySelector("[data-k16-close]")?.addEventListener("click", () => {
+      const drawer = root.querySelector("[data-k16-drawer]");
+      if (drawer) drawer.hidden = true;
+    });
+  }
+
+  function canonicalLabels() {
+    const pageTitle = `Koryto ${VERSION} â€“ Clean UI Layout Polish`;
+    document.title = pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", `Koryto ${VERSION}: responzivnÃ­ komponentovÃ½ rebuild hlavnÃ­ mapy pro desktop, tablet a mobil.`);
+  }
+
+  function refresh() {
+    if (typeof document === "undefined") return false;
+    const target = stateOf();
+    const active = isMapActive(target);
+    document.documentElement.classList.toggle("k16-active", active);
+    const root = ensureRoot();
+    root.hidden = !active;
+    if (active) render(target);
+    canonicalLabels();
+    return active;
+  }
+
+  function queueRefresh() {
+    if (queued) return;
+    queued = true;
+    setTimeout(() => {
+      queued = false;
+      refresh();
+    }, 0);
+  }
+
+  function wrap(name) {
+    const original = globalThis[name];
+    if (typeof original !== "function" || original.__v0160Wrapped) return;
+    const wrapped = function (...args) {
+      const result = original.apply(this, args);
+      queueRefresh();
+      return result;
+    };
+    wrapped.__v0160Wrapped = true;
+    globalThis[name] = wrapped;
+  }
+
+  function visualAudit(target = stateOf()) {
+    return {
+      version: VERSION,
+      buildVersion: BUILD_VERSION,
+      saveVersion: SAVE_VERSION,
+      saveSchema: SAVE_SCHEMA,
+      active: isMapActive(target),
+      root: Boolean(document.getElementById("v0160Root")),
+      hotspots: document.querySelectorAll("#v0160Root .k16-hotspot").length,
+      legacyAppHidden: document.documentElement.classList.contains("k16-active"),
+      keyPeople: document.querySelectorAll("#v0160Root .k16-staff article").length,
+      desktopNavItems: document.querySelectorAll("#v0160Root .k16-bottom-desktop button").length,
+      mobileNavItems: document.querySelectorAll("#v0160Root .k16-bottom-mobile button").length,
+      mobileDrawerItems: document.querySelectorAll("#v0160Root .k16-more-drawer [data-k16-nav]").length,
+      questCount: activeQuests(target).length,
+      layoutPolish: true,
+      responsive: true
+    };
+  }
+
+  function install() {
+    if (installed || typeof document === "undefined") return installed;
+    installed = true;
+    ["renderAll", "showMap", "showLocation", "showEvent", "newGame", "load", "finishDebate", "showCoalitionScreen"].forEach(wrap);
+    document.addEventListener("click", queueRefresh);
+    document.addEventListener("change", queueRefresh);
+    queueRefresh();
+    return true;
+  }
+
+  const api = {
+    VERSION,
+    BUILD_VERSION,
+    SAVE_VERSION,
+    SAVE_SCHEMA,
+    POSITIONS,
+    MOBILE_POSITIONS,
+    LABELS,
+    SHORT_LABELS,
+    LOCATION_ICONS,
+    activeQuests,
+    refresh,
+    queueRefresh,
+    visualAudit,
+    install
+  };
+
+  globalThis.KorytoUI160 = api;
+  globalThis.KorytoTest160 = api;
+  install();
+})();
