@@ -6,27 +6,36 @@ Satirické české politické RPG o třináctidenní komunální kampani v Doln�
 
 **v0.16.1 TEST.1 — Clean UI Layout Polish**
 
-Tato větev mění způsob grafické implementace, nikoli herní mechaniky. Hlavní mapová obrazovka se vykresluje v izolovaném komponentovém kořenu bez řetězení vizuálních skinů v0.14.8–v0.15.2.
+Tato větev mění způsob grafické implementace, nikoli herní mechaniky. Hlavní mapová obrazovka se vykresluje v jednom izolovaném komponentovém kořenu bez řetězení historických vizuálních skinů.
 
 ### TEST.1 obsahuje
 
-- nový společný horní HUD,
+- kompaktní horní HUD,
 - levý panel aktivních kauz,
 - čistou SVG mapu Dolních Vejprnic,
 - osm živých a přístupných hotspotů,
-- pravý panel rivala, frakcí a klíčových lidí,
-- kompaktní spodní navigaci,
+- pravý panel rivala, strategie, frakcí a klíčových lidí,
+- desktopovou navigaci s osmi položkami,
+- mobilní navigaci s pěti velkými dotykovými položkami a nabídkou Další,
+- responzivní pořadí mapa → kauza → rival → lidé,
+- podporu safe-area na telefonech s výřezem,
 - původní questy, lokace, handlery a save systém.
 
-### Změny v0.16.1
+### Cílová rozlišení
 
-- legacy aplikace je při aktivní nové mapě úplně skrytá, takže se nezobrazuje původní horní lišta ani patička,
-- horní HUD a logo jsou nižší a nechávají více prostoru obci,
-- levý a pravý panel jsou užší a mají jemnější vnitřní rámečky,
-- cedule lokalit jsou menší, používají krátké názvy a vlastní ikony,
-- klíčoví lidé zobrazují skutečné členy štábu nebo bezpečné náborové náhledy z herních dat,
-- spodní navigace je přibližně o čtvrtinu nižší,
-- mapa zůstává jediným novým master screenem; ostatní obrazovky stále používají stabilní legacy UI.
+- desktop: 1920 × 1080, 1680 × 945, 1440 × 900,
+- tablet: 1366 × 1024, 1024 × 768, 834 × 1194,
+- mobil: 430 × 932, 390 × 844, 375 × 812,
+- minimální cílová šířka: 360 px.
+
+### Architektura
+
+- `src/v0160-ui.js` je jediný čistý renderer a datový adaptér,
+- `styles/v0160.css` obsahuje základní výtvarný systém,
+- `styles/v0160-responsive.css` obsahuje pouze responzivní rozložení stejného UI,
+- `assets/v0160/dolni-vejprnice-map.svg` neobsahuje zapečené texty, panely ani ovládání.
+
+Ostatní obrazovky zatím používají stabilní legacy UI. Po schválení mapy budou stejné komponenty použity pro události, štáb, debatu a koalici.
 
 ## Spuštění
 
@@ -34,11 +43,11 @@ Rozbalte release ZIP a otevřete `index.html`.
 
 ## Kompatibilita
 
-- build: `0.16.1-test.1`
-- save verze: `0.14.3-test.2`
-- save schema: `1`
+- build: `0.16.1-test.1`,
+- save verze: `0.14.3-test.2`,
+- save schema: `1`.
 
-Technický základ je v `docs/v0.16/v0160-clean-ui.md`. Layout polish je popsán v `docs/v0.16/v0161-layout-polish.md`.
+Technický základ je v `docs/v0.16/v0160-clean-ui.md`. Responzivní layout a cílová rozlišení jsou popsány v `docs/v0.16/v0161-layout-polish.md`.
 
 ## Stav projektu
 
