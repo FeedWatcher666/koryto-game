@@ -6,6 +6,7 @@ const html = read('index.html');
 const css = read('styles/v0160.css');
 const responsive = read('styles/v0160-responsive.css');
 const runtime = read('src/v0160-ui.js');
+const guard = read('src/v0161-interaction-guard.js');
 const svg = read('assets/v0160/dolni-vejprnice-map.svg');
 
 assert.equal(read('VERSION').trim(), '0.16.1-test.1');
@@ -14,16 +15,18 @@ assert.match(html, /viewport-fit=cover/);
 assert.match(html, /styles\/v0160\.css/);
 assert.match(html, /styles\/v0160-responsive\.css/);
 assert.match(html, /src\/v0160-ui\.js/);
+assert.match(html, /src\/v0161-interaction-guard\.js/);
 assert.ok(html.indexOf('styles/v0160.css') > html.indexOf('styles/v0149.css'));
 assert.ok(html.indexOf('styles/v0160-responsive.css') > html.indexOf('styles/v0160.css'));
 assert.ok(html.indexOf('src/v0160-ui.js') > html.indexOf('src/v0149-pixel-assets.js'));
+assert.ok(html.indexOf('src/v0161-interaction-guard.js') > html.indexOf('src/v0160-ui.js'));
 
 assert.match(runtime, /VERSION = "0\.16\.1 TEST\.1"/);
 assert.match(runtime, /BUILD_VERSION = "0\.16\.1-test\.1"/);
 assert.match(runtime, /SAVE_VERSION = "0\.14\.3-test\.2"/);
 assert.match(runtime, /SAVE_SCHEMA = 1/);
-assert.doesNotMatch(runtime, /MutationObserver|setInterval\s*\(/);
-assert.doesNotMatch(runtime + css + responsive, /https?:\/\//);
+assert.doesNotMatch(runtime + guard, /MutationObserver|setInterval\s*\(/);
+assert.doesNotMatch(runtime + guard + css + responsive, /https?:\/\//);
 assert.doesNotMatch(svg.replace('http://www.w3.org/2000/svg', ''), /https?:\/\//);
 
 assert.match(runtime, /showLocation\?\.\(button\.dataset\.k16Location\)/);
@@ -41,6 +44,8 @@ assert.match(runtime, /responsive: true/);
 assert.match(runtime, /desktopNavItems/);
 assert.match(runtime, /mobileNavItems/);
 assert.match(runtime, /mobileDrawerItems/);
+assert.match(guard, /stopPropagation/);
+assert.match(guard, /v0161InteractionGuard/);
 
 assert.match(css, /html\.k16-active #app\s*\{[^}]*display:\s*none/s);
 assert.match(css, /#v0160Root/);
