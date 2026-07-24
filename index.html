@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Koryto 0.16.0 TEST.1: čistý komponentový rebuild hlavní mapy bez historických vizuálních vrstev.">
-<title>Koryto 0.16.0 TEST.1 – Clean UI Rebuild</title>
+<meta name="description" content="Koryto 0.16.1 TEST.1: čistý komponentový rebuild hlavní mapy s kompaktním HUDem, panely a navigací.">
+<title>Koryto 0.16.1 TEST.1 – Clean UI Layout Polish</title>
 <link rel="stylesheet" href="styles/base.css">
 <link rel="stylesheet" href="styles/v0145.css">
 <link rel="stylesheet" href="styles/v0146.css">
@@ -16,7 +16,7 @@
 </head>
 <body>
 <div id="app" class="app">
-<header class="topbar"><div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.16.0 TEST.1</span></h1></div><div class="actions"><button id="mapBtn" class="btn small hidden">Mapa</button><button id="saveBtn" class="btn small hidden">Uložit</button><button id="loadBtn" class="btn small hidden">Načíst</button><button id="exportBtn" class="btn small hidden">Kronika</button><button id="restartBtn" class="btn small danger hidden">Nová hra</button></div></header>
+<header class="topbar"><div class="brand"><small>SATIRICKÉ POLITICKÉ RPG</small><h1>KORYTO <span>Dolní Vejprnice 0.16.1 TEST.1</span></h1></div><div class="actions"><button id="mapBtn" class="btn small hidden">Mapa</button><button id="saveBtn" class="btn small hidden">Uložit</button><button id="loadBtn" class="btn small hidden">Načíst</button><button id="exportBtn" class="btn small hidden">Kronika</button><button id="restartBtn" class="btn small danger hidden">Nová hra</button></div></header>
 <main>
 <section id="startScreen" class="screen start active"><div class="hero"><div class="crest">🐷🎲</div><p class="eyebrow">OTEVŘENÁ KAPITOLA</p><h2>Krysy v JZD</h2><p>Máte třináct dní, dvě akce denně a obec plnou lidí, kteří si pamatují každou lavičku i každou protislužbu. Vyřešte kauzy, sestavte štáb a porazte Vladimíra Věčného ve volbách.</p><div class="v0145-start-flow"><span><b>1</b> Vytvořte kandidáta</span><span><b>2</b> Řešte kauzy na mapě</span><span><b>3</b> Přežijte debatu a volby</span></div><blockquote>„Vesnice potřebuje hrdinu. Nebo alespoň někoho s autem a tiskárnou.“</blockquote><button id="startBtn" class="btn primary">Začít třináctidenní kampaň</button></div></section>
 <section id="creationScreen" class="screen"><div class="creation"><div class="panel"><p class="eyebrow">POSTAVA</p><h2>Kdo jde zachránit obec?</h2><div class="field"><label for="heroName">Jméno kandidáta</label><input id="heroName" value="Bohuslav Korytář" maxlength="28"></div><p>Vyberte styl kampaně. Volbu později nezměníte, politické názory ano.</p><div class="field"><label>Výchozí motivace</label><select id="origin" class="btn" style="width:100%"><option value="idealist">Chci skutečně něco napravit</option><option value="ambitious">Někdo tu funkci dělat musí</option><option value="revenge">Starosta mi zamítl pergolu</option></select></div></div><div class="panel"><p class="eyebrow">POLITICKÉ POVOLÁNÍ</p><div id="classGrid" class="class-grid"></div><button id="confirmBtn" class="btn primary" style="margin-top:15px;width:100%">Vstoupit do Dolních Vejprnic</button></div></div></section>
