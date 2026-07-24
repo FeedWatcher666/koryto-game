@@ -15,14 +15,15 @@ function run(cwd,args,label){const result=spawnSync(process.execPath,args,{cwd,s
 for(const file of syntax)run(root,['--check',file],`syntax ${file}`);
 const workspace=fs.mkdtempSync(path.join(os.tmpdir(),'koryto-v0149-regression-'));
 try{
-  for(const directory of ['src','styles','assets','docs','tests'])fs.symlinkSync(path.join(root,directory),path.join(workspace,directory),'dir');
+  for(const directory of ['src','styles','assets','docs'])fs.symlinkSync(path.join(root,directory),path.join(workspace,directory),'dir');
+  fs.cpSync(path.join(root,'tests'),path.join(workspace,'tests'),{recursive:true});
   fs.mkdirSync(path.join(workspace,'.github/workflows'),{recursive:true});
   const currentIndex=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const legacyIndex=currentIndex.replaceAll('0.16.0 TEST.1','0.14.9 TEST.10').replaceAll('0.16.0-test.1','0.14.9-test.10').replace('\n<link rel="stylesheet" href="styles/v0160.css">','').replace('<script src="src/v0160-ui.js"></script>','');
   fs.writeFileSync(path.join(workspace,'index.html'),legacyIndex);
   fs.writeFileSync(path.join(workspace,'VERSION'),'0.14.9-test.10\n');
-  fs.writeFileSync(path.join(workspace,'.github/workflows/v0142-stability.yml'),'name: Koryto v0.14.9 TEST.10\n\non:\n  push:\n    branches: [fix/pr19-v0149-wiring]\n\njobs:\n  package:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo koryto-v0.14.9-test.10\n');
-  for(const file of historical)run(workspace,[path.join(root,file)],file);
+  fs.writeFileSync(path.join(workspace,'.github/workflows/v0142-stability.yml'),'name: Koryto v0.14.9 TEST.10\n\non:\n  push:\n    branches: [test/v0.14.9-test10, fix/pr19-v0149-wiring]\n\njobs:\n  package:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo koryto-v0.14.9-test.10\n');
+  for(const file of historical)run(workspace,[file],file);
 }finally{fs.rmSync(workspace,{recursive:true,force:true});}
 run(root,['tests/v0160-clean-ui.mjs'],'tests/v0160-clean-ui.mjs');
 console.log(`Koryto v0.16.0 suite passed: ${syntax.length} syntax checks, ${historical.length+1} tests`);
