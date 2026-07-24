@@ -23,8 +23,9 @@ try{
     .replaceAll('0.16.1 TEST.1','0.14.9 TEST.10')
     .replaceAll('0.16.1-test.1','0.14.9-test.10')
     .replaceAll('Clean UI Layout Polish','komunální politické RPG')
-    .replaceAll('čistý komponentový rebuild hlavní mapy s kompaktním HUDem, panely a navigací','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní')
+    .replaceAll('responzivní komponentový rebuild hlavní mapy pro desktop, tablet a mobil','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní')
     .replace('\n<link rel="stylesheet" href="styles/v0160.css">','')
+    .replace('\n<link rel="stylesheet" href="styles/v0160-responsive.css">','')
     .replace('<script src="src/v0160-ui.js"></script>','');
   fs.writeFileSync(path.join(workspace,'index.html'),legacyIndex);
   fs.writeFileSync(path.join(workspace,'VERSION'),'0.14.9-test.10\n');
