@@ -16,6 +16,17 @@
     hq: [69, 79]
   });
 
+  const MOBILE_POSITIONS = Object.freeze({
+    pub: [22, 29],
+    townhall: [45, 38],
+    school: [74, 28],
+    paper: [79, 55],
+    pitch: [45, 78],
+    jzd: [21, 75],
+    meadow: [56, 49],
+    hq: [70, 79]
+  });
+
   const LABELS = Object.freeze({
     pub: "Hospoda U Tří lip",
     townhall: "Radnice",
@@ -49,16 +60,31 @@
     hq: "🏢"
   });
 
-  const NAV = [
+  const DESKTOP_NAV = Object.freeze([
     ["map", "🗺️", "Mapa"],
     ["quests", "📜", "Kauzy"],
     ["staff", "👥", "Štáb"],
-    ["influence", "♟️", "Vliv"],
+    ["influence", "♛", "Vliv"],
     ["debate", "🎙️", "Debata"],
     ["elections", "🗳️", "Volby"],
     ["coalition", "🤝", "Koalice"],
     ["archive", "🗄️", "Archiv"]
-  ];
+  ]);
+
+  const MOBILE_NAV = Object.freeze([
+    ["map", "🗺️", "Mapa"],
+    ["quests", "📁", "Kauzy"],
+    ["staff", "👥", "Štáb"],
+    ["influence", "♛", "Vliv"],
+    ["more", "☰", "Další"]
+  ]);
+
+  const MORE_NAV = Object.freeze([
+    ["debate", "🎙️", "Debata"],
+    ["elections", "🗳️", "Volby"],
+    ["coalition", "🤝", "Koalice"],
+    ["archive", "🗄️", "Archiv"]
+  ]);
 
   let installed = false;
   let queued = false;
@@ -116,8 +142,8 @@
     );
   }
 
-  function resource(label, value, width, kind = "") {
-    return `<article class="k16-resource ${kind}"><span>${esc(label)}</span><b>${esc(value)}</b><i><u style="width:${clamp(width)}%"></u></i></article>`;
+  function resource(icon, label, value, width, kind = "") {
+    return `<article class="k16-resource ${kind}"><span class="k16-resource-icon" aria-hidden="true">${icon}</span><span class="k16-resource-label">${esc(label)}</span><b>${esc(value)}</b><i><u style="width:${clamp(width)}%"></u></i></article>`;
   }
 
   function title(label, variant = "") {
@@ -128,20 +154,25 @@
     const primary = quests[0];
     const progress = primary ? Math.max(1, Math.min(5, primary.stage + 1)) : 0;
     return `<aside class="k16-left">
-      <section class="k16-panel">
+      <section class="k16-panel k16-case-panel">
         ${title(primary ? "AKTIVNÍ KAUZA" : "PŘEHLED KAMPANĚ", "danger")}
         <div class="k16-case-primary">
-          <h2>${esc(primary?.title || "Obec čeká na další tah")}</h2>
-          <p>${esc(primary?.desc || "Vyberte na mapě místo, kde chcete pokračovat v kampani.")}</p>
-          ${primary ? `<div class="k16-case-meta"><span>⌛ Termín</span><b>${primary.left <= 0 ? "DNES" : `${primary.left} dnů`}</b></div>
-            <div class="k16-progress"><span>POSTUP KAUZOU</span><b>${progress} / 5</b><i><u style="width:${progress * 20}%"></u></i></div>
-            <button class="k16-action" type="button" data-k16-location="${esc(primary.location)}">PŘEJÍT NA MÍSTO</button>` : ""}
+          <div class="k16-case-hero" aria-hidden="true">📋</div>
+          <div class="k16-case-copy">
+            <h2>${esc(primary?.title || "Obec čeká na další tah")}</h2>
+            <p>${esc(primary?.desc || "Vyberte na mapě místo, kde chcete pokračovat v kampani.")}</p>
+            ${primary ? `<div class="k16-case-meta"><span>◷ TERMÍN</span><b>${primary.left <= 0 ? "DNES" : `${primary.left} dnů`}</b></div>` : ""}
+          </div>
+          ${primary ? `<div class="k16-progress"><span>POSTUP KAUZOU</span><b>${progress} / 5</b><i><u style="width:${progress * 20}%"></u></i></div>
+            <button class="k16-action" type="button" data-k16-location="${esc(primary.location)}">📍 PŘEJÍT NA MÍSTO</button>` : ""}
         </div>
-        ${title("DALŠÍ KAUZY")}
-        <div class="k16-list">
-          ${quests.slice(primary ? 1 : 0, 5).map(item => `<button type="button" data-k16-location="${esc(item.location)}"><span class="mark">${item.left <= 2 ? "!" : "•"}</span><span><b>${esc(item.title)}</b><small>${item.left <= 0 ? "po termínu" : `${item.left} dnů`}</small></span><strong>›</strong></button>`).join("") || '<p class="k16-empty">Žádná další aktivní kauza.</p>'}
+        <div class="k16-desktop-only">
+          ${title("DALŠÍ KAUZY")}
+          <div class="k16-list">
+            ${quests.slice(primary ? 1 : 0, 5).map(item => `<button type="button" data-k16-location="${esc(item.location)}"><span class="mark">${item.left <= 2 ? "!" : "•"}</span><span><b>${esc(item.title)}</b><small>${item.left <= 0 ? "po termínu" : `${item.left} dnů`}</small></span><strong>›</strong></button>`).join("") || '<p class="k16-empty">Žádná další aktivní kauza.</p>'}
+          </div>
+          <button class="k16-action secondary" type="button" data-k16-nav="quests">ZOBRAZIT VŠECHNY KAUZY</button>
         </div>
-        <button class="k16-action secondary" type="button" data-k16-nav="quests">ZOBRAZIT VŠECHNY KAUZY</button>
       </section>
     </aside>`;
   }
@@ -156,19 +187,21 @@
 
     return `<main class="k16-center">
       <section class="k16-map-card" aria-label="Mapa Dolních Vejprnic">
-        <div class="k16-map-banner">DOLNÍ VEJPRNICE</div>
+        <div class="k16-map-banner"><span aria-hidden="true">🛡️</span>DOLNÍ VEJPRNICE</div>
         ${order.map(id => {
           const [x, y] = POSITIONS[id];
+          const [mx, my] = MOBILE_POSITIONS[id];
           const count = counts[id] || 0;
           const long = SHORT_LABELS[id].length > 10 ? "long" : "";
-          return `<button type="button" class="k16-hotspot ${count ? "hot" : ""} ${long}" data-k16-location="${id}" style="--x:${x}%;--y:${y}%" aria-label="${esc(LABELS[id])}" title="${esc(locations[id]?.name || LABELS[id])}"><span aria-hidden="true">${LOCATION_ICONS[id]}</span><b>${esc(SHORT_LABELS[id])}</b>${count ? `<em>${count}</em>` : ""}</button>`;
+          return `<button type="button" class="k16-hotspot ${count ? "hot" : ""} ${long}" data-k16-location="${id}" style="--x:${x}%;--y:${y}%;--mx:${mx}%;--my:${my}%" aria-label="${esc(LABELS[id])}" title="${esc(locations[id]?.name || LABELS[id])}"><span aria-hidden="true">${LOCATION_ICONS[id]}</span><b>${esc(SHORT_LABELS[id])}</b>${count ? `<em>${count}</em>` : ""}</button>`;
         }).join("")}
+        <div class="k16-map-vignette" aria-hidden="true"></div>
       </section>
       <section class="k16-map-actions" aria-label="Akce na mapě">
-        <button type="button" data-k16-nav="archive">📰 ZPRÁVY</button>
-        <button type="button" class="primary" data-k16-end>🏁 UKONČIT DEN</button>
-        <button type="button" data-k16-nav="archive">📅 PŘEHLED DNE</button>
-        <button type="button" data-k16-nav="influence">♟️ MAPA VLIVU</button>
+        <button type="button" data-k16-nav="archive">📰 <span>ZPRÁVY</span></button>
+        <button type="button" class="primary" data-k16-end>🏁 <span>UKONČIT DEN</span></button>
+        <button type="button" data-k16-nav="archive">📅 <span>PŘEHLED DNE</span></button>
+        <button type="button" data-k16-nav="influence">♛ <span>MAPA VLIVU</span></button>
       </section>
     </main>`;
   }
@@ -182,20 +215,24 @@
     const companions = companionsOf();
     const stories = companionStoriesOf();
     const party = Object.entries(target.party || {}).slice(0, 4);
-    const entries = party.length
-      ? party.map(([id, member]) => ({ id, member, known: true }))
-      : Object.keys(companions).slice(0, 3).map(id => ({ id, member: null, known: false }));
+    const used = new Set(party.map(([id]) => id));
+    const preview = Object.keys(companions)
+      .filter(id => !used.has(id))
+      .slice(0, Math.max(0, 4 - party.length))
+      .map(id => [id, null]);
+    const entries = [...party, ...preview].slice(0, 4);
 
-    return entries.map(({ id, member, known }) => {
+    return entries.map(([id, member]) => {
       const companion = companions[id] || {};
       const story = stories[id] || {};
+      const known = Boolean(member);
       const location = LABELS[story.location] || "v obci";
-      const icon = known ? (companion.icon || member?.icon || "👤") : "?";
+      const icon = companion.icon || member?.icon || "👤";
       const subtitle = known
         ? (member?.role || companion.role || "Člen štábu")
-        : `Lze potkat: ${location}`;
-      const value = known ? Math.round(finite(member?.loyalty, 50)) : "—";
-      return `<article class="${known ? "known" : "locked"}"><span class="avatar">${esc(icon)}</span><span><b>${esc(member?.name || companion.name || id)}</b><small>${esc(subtitle)}</small></span><strong>${value}</strong></article>`;
+        : `Potkáte: ${location}`;
+      const value = known ? `${Math.round(finite(member?.loyalty, 50))}%` : "?";
+      return `<article class="${known ? "known" : "locked"}"><span class="avatar" aria-hidden="true">${esc(icon)}</span><span class="k16-person-copy"><b>${esc(member?.name || companion.name || id)}</b><small>${esc(subtitle)}</small></span><strong>${value}</strong></article>`;
     }).join("");
   }
 
@@ -205,30 +242,40 @@
     const momentum = clamp(target.opponent?.momentum || 0);
 
     return `<aside class="k16-right">
-      <section class="k16-panel">
+      <section class="k16-panel k16-rival-panel">
         ${title("TLAK RIVALA", "danger")}
         <div class="k16-rival">
-          <div class="k16-rival-head"><span class="k16-rival-face">🕴️</span><span><b>Vladimír Věčný</b><small>politická setrvačnost</small></span><strong>${Math.round(momentum)} %</strong></div>
+          <div class="k16-rival-head"><span class="k16-rival-face" aria-hidden="true">🕴️</span><span><b>Vladimír Věčný</b><small>starosta a rival</small></span><strong>${Math.round(momentum)} %</strong></div>
           <i class="k16-track"><u style="width:${momentum}%"></u></i>
         </div>
         ${title("AKTUÁLNÍ STRATEGIE")}
-        <div class="k16-strategy"><span>${esc(definition.icon || "🎭")}</span><div><b>${esc(operation.revealed ? (definition.name || operation.id || "Soupeřův tah") : "Lidem naslouchat")}</b><p>${esc(operation.id ? (operation.revealed ? (definition.stages?.[Math.max(0, finite(operation.stage, 1) - 1)] || "Soupeř připravuje další krok.") : "Soupeř koordinuje několik tahů a hledá slabinu.") : "Věčný sbírá vzorec vašich rozhodnutí a posiluje vlastní síť.")}</p></div></div>
-        ${title("MAPA VLIVU")}
-        <div class="k16-factions">
-          ${factionRow("Občané", target.factions?.citizens)}
-          ${factionRow("Média", target.factions?.press, "press")}
-          ${factionRow("JZD", target.factions?.jzd, "jzd")}
-          ${factionRow("Staré struktury", target.factions?.oldguard, "oldguard")}
+        <div class="k16-strategy"><span aria-hidden="true">${esc(definition.icon || "🤝")}</span><div><b>${esc(operation.revealed ? (definition.name || operation.id || "Soupeřův tah") : "Lidový kontakt")}</b><p>${esc(operation.id ? (operation.revealed ? (definition.stages?.[Math.max(0, finite(operation.stage, 1) - 1)] || "Soupeř připravuje další krok.") : "Soupeř koordinuje několik tahů a hledá slabinu.") : "Věčný sbírá vzorec vašich rozhodnutí a posiluje vlastní síť.")}</p></div></div>
+        <div class="k16-desktop-only">
+          ${title("MAPA VLIVU")}
+          <div class="k16-factions">
+            ${factionRow("Občané", target.factions?.citizens)}
+            ${factionRow("Média", target.factions?.press, "press")}
+            ${factionRow("JZD", target.factions?.jzd, "jzd")}
+            ${factionRow("Staré struktury", target.factions?.oldguard, "oldguard")}
+          </div>
         </div>
         ${title("KLÍČOVÍ LIDÉ")}
         <div class="k16-staff">${keyPeople(target)}</div>
-        <button class="k16-action secondary" type="button" data-k16-nav="influence">ZOBRAZIT MAPU VLIVU</button>
+        <button class="k16-action secondary k16-desktop-only" type="button" data-k16-nav="influence">ZOBRAZIT MAPU VLIVU</button>
       </section>
     </aside>`;
   }
 
-  function bottomNav() {
-    return `<nav class="k16-bottom" aria-label="Hlavní navigace">${NAV.map(([id, icon, label]) => `<button type="button" class="${id === "map" ? "active" : ""}" data-k16-nav="${id}" ${id === "map" ? 'aria-current="page"' : ""}><span>${icon}</span><b>${label}</b></button>`).join("")}</nav>`;
+  function desktopNav() {
+    return `<nav class="k16-bottom k16-bottom-desktop" aria-label="Hlavní navigace">${DESKTOP_NAV.map(([id, icon, label]) => `<button type="button" class="${id === "map" ? "active" : ""}" data-k16-nav="${id}" ${id === "map" ? 'aria-current="page"' : ""}><span aria-hidden="true">${icon}</span><b>${label}</b></button>`).join("")}</nav>`;
+  }
+
+  function mobileNav() {
+    return `<nav class="k16-bottom k16-bottom-mobile" aria-label="Mobilní navigace">${MOBILE_NAV.map(([id, icon, label]) => `<button type="button" class="${id === "map" ? "active" : ""}" ${id === "more" ? "data-k16-more" : `data-k16-nav="${id}"`} ${id === "map" ? 'aria-current="page"' : ""}><span aria-hidden="true">${icon}</span><b>${label}</b></button>`).join("")}</nav>`;
+  }
+
+  function mobileDrawer() {
+    return `<section class="k16-more-drawer" data-k16-drawer hidden aria-label="Další herní sekce"><header><b>DALŠÍ SEKCE</b><button type="button" data-k16-close aria-label="Zavřít nabídku">×</button></header><div>${MORE_NAV.map(([id, icon, label]) => `<button type="button" data-k16-nav="${id}"><span aria-hidden="true">${icon}</span><b>${label}</b></button>`).join("")}</div></section>`;
   }
 
   function ensureRoot() {
@@ -252,13 +299,15 @@
 
     root.innerHTML = `<div class="k16-shell">
       <header class="k16-topbar">
-        <section class="k16-day"><span class="k16-weather">☀️</span><div><b>Den ${day}</b><span>${weekdays[(day - 1) % 7]}</span><small>Květen, rok 2 · ${Math.max(0, finite(target.actions))} akce</small></div><div class="k16-place">◆ Dolní Vejprnice</div></section>
+        <section class="k16-day"><span class="k16-weather" aria-hidden="true">☀️</span><div><b>Den ${day}</b><span>${weekdays[(day - 1) % 7]}</span><small>Květen, rok 2 · ${Math.max(0, finite(target.actions))} akce</small></div><div class="k16-place">◆ Dolní Vejprnice</div></section>
         <section class="k16-logo"><strong>KORYTO</strong><span>POLITICKÁ RPG STRATEGIE</span></section>
-        <section class="k16-resources">${resource("DŮVĚRA", `${Math.round(trust)} / 100`, trust)}${resource("VLIV", `${Math.round(influence)} / 100`, influence, "influence")}${resource("PENÍZE", money(funds), Math.min(100, funds * 5), "money")}</section>
+        <section class="k16-resources">${resource("🤝", "DŮVĚRA", `${Math.round(trust)}`, trust)}${resource("♛", "VLIV", `${Math.round(influence)}`, influence, "influence")}${resource("🪙", "PENÍZE", money(funds), Math.min(100, funds * 5), "money")}</section>
         <button type="button" class="k16-settings" data-k16-settings aria-label="Nastavení">⚙</button>
       </header>
       <div class="k16-layout">${leftPanel(target, quests)}${mapPanel(target, quests)}${rightPanel(target)}</div>
-      ${bottomNav()}
+      ${desktopNav()}
+      ${mobileNav()}
+      ${mobileDrawer()}
     </div>`;
     bind(root);
   }
@@ -279,15 +328,28 @@
 
   function bind(root) {
     root.querySelectorAll("[data-k16-location]").forEach(button => button.addEventListener("click", () => globalThis.showLocation?.(button.dataset.k16Location)));
-    root.querySelectorAll("[data-k16-nav]").forEach(button => button.addEventListener("click", () => navigate(button.dataset.k16Nav)));
+    root.querySelectorAll("[data-k16-nav]").forEach(button => button.addEventListener("click", () => {
+      const drawer = root.querySelector("[data-k16-drawer]");
+      if (drawer) drawer.hidden = true;
+      navigate(button.dataset.k16Nav);
+    }));
     root.querySelector("[data-k16-end]")?.addEventListener("click", () => document.getElementById("endDayBtn")?.click());
     root.querySelector("[data-k16-settings]")?.addEventListener("click", () => document.getElementById("pixelToggle")?.click());
+    root.querySelector("[data-k16-more]")?.addEventListener("click", () => {
+      const drawer = root.querySelector("[data-k16-drawer]");
+      if (!drawer) return;
+      drawer.hidden = !drawer.hidden;
+    });
+    root.querySelector("[data-k16-close]")?.addEventListener("click", () => {
+      const drawer = root.querySelector("[data-k16-drawer]");
+      if (drawer) drawer.hidden = true;
+    });
   }
 
   function canonicalLabels() {
     const pageTitle = `Koryto ${VERSION} – Clean UI Layout Polish`;
     document.title = pageTitle;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", `Koryto ${VERSION}: čistý komponentový rebuild hlavní mapy s kompaktním HUDem a živými herními daty.`);
+    document.querySelector('meta[name="description"]')?.setAttribute("content", `Koryto ${VERSION}: responzivní komponentový rebuild hlavní mapy pro desktop, tablet a mobil.`);
   }
 
   function refresh() {
@@ -334,8 +396,12 @@
       hotspots: document.querySelectorAll("#v0160Root .k16-hotspot").length,
       legacyAppHidden: document.documentElement.classList.contains("k16-active"),
       keyPeople: document.querySelectorAll("#v0160Root .k16-staff article").length,
+      desktopNavItems: document.querySelectorAll("#v0160Root .k16-bottom-desktop button").length,
+      mobileNavItems: document.querySelectorAll("#v0160Root .k16-bottom-mobile button").length,
+      mobileDrawerItems: document.querySelectorAll("#v0160Root .k16-more-drawer [data-k16-nav]").length,
       questCount: activeQuests(target).length,
-      layoutPolish: true
+      layoutPolish: true,
+      responsive: true
     };
   }
 
@@ -355,6 +421,7 @@
     SAVE_VERSION,
     SAVE_SCHEMA,
     POSITIONS,
+    MOBILE_POSITIONS,
     LABELS,
     SHORT_LABELS,
     LOCATION_ICONS,
