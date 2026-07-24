@@ -51,6 +51,7 @@ jobs:
           test -f "$target/styles/v0160.css"
           test -f "$target/styles/v0160-responsive.css"
           test -f "$target/src/v0160-ui.js"
+          test -f "$target/src/v0161-interaction-guard.js"
           test -f "$target/assets/v0160/dolni-vejprnice-map.svg"
           test -f "$target/docs/v0.16/v0161-layout-polish.md"
           grep -q '0.16.1 TEST.1' "$target/index.html"
@@ -58,7 +59,9 @@ jobs:
           grep -q 'styles/v0160.css' "$target/index.html"
           grep -q 'styles/v0160-responsive.css' "$target/index.html"
           grep -q 'src/v0160-ui.js' "$target/index.html"
+          grep -q 'src/v0161-interaction-guard.js' "$target/index.html"
           grep -q 'k16-bottom-mobile' "$target/src/v0160-ui.js"
+          grep -q 'stopPropagation' "$target/src/v0161-interaction-guard.js"
           grep -q 'max-width: 390px' "$target/styles/v0160-responsive.css"
           if grep -R -E 'https?://(fonts|cdn|unpkg|jsdelivr)' "$target/index.html" "$target/styles" "$target/src"; then
             echo "Release contains a forbidden network dependency" >&2
