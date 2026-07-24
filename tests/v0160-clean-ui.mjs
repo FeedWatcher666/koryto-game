@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const read = path => fs.readFileSync(path, 'utf8');
+const html = read('index.html');
+const css = read('styles/v0160.css');
+const runtime = read('src/v0160-ui.js');
+const svg = read('assets/v0160/dolni-vejprnice-map.svg');
+
+assert.equal(read('VERSION').trim(), '0.16.0-test.1');
+assert.match(html, /styles\/v0160\.css/);
+assert.match(html, /src\/v0160-ui\.js/);
+assert.ok(html.indexOf('styles/v0160.css') > html.indexOf('styles/v0149.css'));
+assert.ok(html.indexOf('src/v0160-ui.js') > html.indexOf('src/v0149-pixel-assets.js'));
+assert.match(runtime, /SAVE_VERSION = "0\.14\.3-test\.2"/);
+assert.match(runtime, /SAVE_SCHEMA = 1/);
+assert.doesNotMatch(runtime, /MutationObserver|setInterval\s*\(/);
+assert.doesNotMatch(runtime + css, /https?:\/\//);
+assert.doesNotMatch(svg.replace('http://www.w3.org/2000/svg',''), /https?:\/\//);
+assert.match(runtime, /showLocation\?\.\(button\.dataset\.k16Location\)/);
+assert.match(runtime, /endDayBtn/);
+assert.match(runtime, /KorytoApp\?\.getState/);
+assert.match(css, /#v0160Root/);
+assert.match(css, /\.k16-hotspot/);
+assert.match(css, /\.k16-topbar/);
+assert.match(css, /\.k16-bottom/);
+assert.match(svg, /viewBox="0 0 1600 1000"/);
+assert.doesNotMatch(svg, /<text\b/);
+for (const id of ['pub','townhall','school','paper','pitch','jzd','meadow','hq']) assert.match(runtime, new RegExp(`${id}:\\[\\d+,\\d+\\]`));
+console.log('v0.16.0 clean UI contract passed');
