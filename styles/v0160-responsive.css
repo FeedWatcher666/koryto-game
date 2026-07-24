@@ -1,0 +1,713 @@
+/* Koryto v0.16.1 TEST.1 — responsive layout companion for the clean UI renderer. */
+
+html.k16-active #app {
+  display: none !important;
+}
+
+.k16-shell {
+  padding-bottom: 72px;
+}
+
+.k16-topbar {
+  grid-template-columns: 245px minmax(330px, 1fr) 455px 50px;
+  min-height: 92px;
+}
+
+.k16-resource {
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto auto 9px;
+  gap: 2px 6px;
+}
+
+.k16-resource-icon {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+}
+
+.k16-resource-label {
+  color: #f2dab0;
+  font: 900 9px/1 Arial, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.k16-resource i {
+  grid-column: 1 / -1;
+}
+
+.k16-case-primary {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 8px;
+}
+
+.k16-case-hero {
+  display: grid;
+  place-items: center;
+  min-height: 78px;
+  border: 3px solid #170905;
+  background: linear-gradient(#ddc08d, #9c7445);
+  color: #2a160c;
+  font-size: 38px;
+  box-shadow: inset 0 0 0 2px #f6e1b5;
+}
+
+.k16-case-copy {
+  min-width: 0;
+}
+
+.k16-progress,
+.k16-case-primary > .k16-action {
+  grid-column: 1 / -1;
+}
+
+.k16-map-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.k16-map-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: inset 0 0 60px #14080599;
+}
+
+.k16-hotspot {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 4px;
+  align-items: center;
+  min-width: 92px;
+  min-height: 38px;
+  padding: 5px 8px;
+  font-size: 11px;
+  text-align: left;
+}
+
+.k16-hotspot.long {
+  min-width: 118px;
+}
+
+.k16-hotspot > span {
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.k16-hotspot b {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.k16-map-actions button span {
+  display: inline;
+}
+
+.k16-staff {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.k16-staff article {
+  position: relative;
+  grid-template-columns: 42px 1fr;
+  min-height: 66px;
+  padding: 5px;
+  border: 2px solid #170905;
+  background: linear-gradient(#4b2d1d, #24130c);
+  box-shadow: inset 0 0 0 1px #785033;
+}
+
+.k16-staff article.locked {
+  filter: saturate(0.55);
+}
+
+.k16-staff .avatar {
+  width: 40px;
+  height: 52px;
+  background: linear-gradient(#caa072, #7b5636);
+  font-size: 24px;
+}
+
+.k16-person-copy {
+  min-width: 0;
+}
+
+.k16-staff b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.k16-staff strong {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font-size: 9px;
+}
+
+.k16-bottom-desktop {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.k16-bottom-mobile {
+  display: none;
+}
+
+.k16-more-drawer {
+  position: fixed;
+  z-index: 650;
+  right: 8px;
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  width: min(330px, calc(100vw - 16px));
+  border: 4px solid #170905;
+  background: linear-gradient(#3f2518, #160b07);
+  box-shadow: inset 0 0 0 2px #754727, 0 14px 35px #000c;
+}
+
+.k16-more-drawer header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+  border-bottom: 3px solid #170905;
+  background: linear-gradient(#815126, #4b2b17);
+  color: #f8e5ba;
+}
+
+.k16-more-drawer header button {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #170905;
+  background: #2b160f;
+  color: #f7e7c6;
+  font-size: 24px;
+}
+
+.k16-more-drawer > div {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 8px;
+}
+
+.k16-more-drawer > div button {
+  min-height: 70px;
+  border: 3px solid #170905;
+  background: linear-gradient(#6d4328, #321a10);
+  color: #f7e7c6;
+  font-weight: 900;
+}
+
+.k16-more-drawer > div span,
+.k16-more-drawer > div b {
+  display: block;
+}
+
+.k16-more-drawer > div span {
+  font-size: 25px;
+}
+
+@media (max-width: 1380px) {
+  .k16-topbar {
+    grid-template-columns: 220px minmax(300px, 1fr) 400px 46px;
+  }
+
+  .k16-layout {
+    grid-template-columns: 245px minmax(560px, 1fr) 245px;
+  }
+
+  .k16-hotspot {
+    min-width: 82px;
+    font-size: 10px;
+  }
+
+  .k16-hotspot.long {
+    min-width: 104px;
+  }
+}
+
+@media (max-width: 1120px) {
+  .k16-topbar {
+    grid-template-columns: 190px minmax(260px, 1fr) 360px 44px;
+  }
+
+  .k16-logo strong {
+    font-size: 49px;
+  }
+
+  .k16-resource {
+    grid-template-columns: 22px 1fr;
+  }
+
+  .k16-resource-icon {
+    font-size: 19px;
+  }
+
+  .k16-resource b {
+    font-size: 15px;
+  }
+
+  .k16-layout {
+    grid-template-columns: 220px minmax(500px, 1fr) 220px;
+  }
+
+  .k16-map-actions button span {
+    display: none;
+  }
+
+  .k16-map-actions button {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .k16-shell {
+    padding: 0 5px calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .k16-topbar {
+    position: relative;
+    grid-template-columns: 1fr 1.25fr;
+    min-height: auto;
+    margin: 0 -5px 5px;
+  }
+
+  .k16-day {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 78px;
+  }
+
+  .k16-logo {
+    grid-column: 2;
+    grid-row: 1;
+    border-right: 0;
+  }
+
+  .k16-logo strong {
+    font-size: clamp(46px, 10vw, 68px);
+  }
+
+  .k16-resources {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    border-top: 4px solid #170905;
+  }
+
+  .k16-settings {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 42px;
+    height: 42px;
+    border: 2px solid #170905;
+    background: #2b160f;
+  }
+
+  .k16-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 760px;
+  }
+
+  .k16-center {
+    order: 1;
+    width: 100%;
+  }
+
+  .k16-left {
+    order: 2;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .k16-right {
+    order: 3;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .k16-map-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    background-size: cover;
+  }
+
+  .k16-map-banner {
+    min-width: 270px;
+    font-size: 15px;
+  }
+
+  .k16-hotspot {
+    left: var(--mx);
+    top: var(--my);
+    min-width: 78px;
+    min-height: 36px;
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .k16-hotspot.long {
+    min-width: 96px;
+  }
+
+  .k16-map-actions {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .k16-case-primary {
+    grid-template-columns: 86px 1fr 0.8fr;
+    align-items: center;
+  }
+
+  .k16-case-hero {
+    grid-row: 1 / 3;
+    min-height: 104px;
+  }
+
+  .k16-progress {
+    grid-column: 3;
+  }
+
+  .k16-case-primary > .k16-action {
+    grid-column: 3;
+  }
+
+  .k16-rival-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .k16-rival-panel > .k16-panel-title:nth-of-type(1),
+  .k16-rival-panel > .k16-rival {
+    grid-column: 1;
+  }
+
+  .k16-rival-panel > .k16-panel-title:nth-of-type(2),
+  .k16-rival-panel > .k16-strategy {
+    grid-column: 2;
+  }
+
+  .k16-rival-panel > .k16-panel-title:nth-of-type(3),
+  .k16-rival-panel > .k16-staff {
+    grid-column: 1 / -1;
+  }
+
+  .k16-staff {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .k16-staff article {
+    display: block;
+    min-height: 120px;
+    text-align: center;
+  }
+
+  .k16-staff .avatar {
+    width: 100%;
+    height: 68px;
+    margin-bottom: 5px;
+    font-size: 34px;
+  }
+
+  .k16-staff strong {
+    position: static;
+    display: block;
+    margin-top: 3px;
+  }
+
+  .k16-bottom-desktop {
+    display: none;
+  }
+
+  .k16-bottom-mobile {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .k16-bottom button {
+    min-height: 66px;
+  }
+}
+
+@media (max-width: 620px) {
+  .k16-topbar {
+    grid-template-columns: minmax(0, 1fr) minmax(170px, 1.35fr);
+  }
+
+  .k16-day {
+    grid-template-columns: 42px 1fr;
+    min-height: 68px;
+    padding: 6px 9px 4px;
+  }
+
+  .k16-weather {
+    width: 38px;
+    height: 38px;
+    font-size: 25px;
+  }
+
+  .k16-day b {
+    font-size: 19px;
+  }
+
+  .k16-day span {
+    font-size: 11px;
+  }
+
+  .k16-day small {
+    font-size: 8px;
+  }
+
+  .k16-place {
+    margin: 3px -9px -4px;
+    padding: 3px 9px;
+    font-size: 9px;
+  }
+
+  .k16-logo strong {
+    font-size: clamp(39px, 12vw, 54px);
+    -webkit-text-stroke-width: 2px;
+  }
+
+  .k16-logo span {
+    padding: 3px 12px;
+    font-size: 7px;
+  }
+
+  .k16-settings {
+    top: 5px;
+    right: 5px;
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  .k16-resources {
+    gap: 3px;
+    padding: 5px;
+  }
+
+  .k16-resource {
+    grid-template-columns: 20px 1fr;
+    min-height: 58px;
+    padding: 5px;
+  }
+
+  .k16-resource-icon {
+    font-size: 18px;
+  }
+
+  .k16-resource-label {
+    font-size: 7px;
+  }
+
+  .k16-resource b {
+    font-size: clamp(12px, 3.8vw, 16px);
+  }
+
+  .k16-map-card {
+    aspect-ratio: 1 / 1;
+    border-width: 5px;
+  }
+
+  .k16-map-banner {
+    top: 7px;
+    min-width: 220px;
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .k16-hotspot {
+    min-width: 68px;
+    min-height: 32px;
+    grid-template-columns: 16px 1fr;
+    gap: 2px;
+    padding: 3px 5px;
+    border-width: 2px;
+    font-size: 8px;
+  }
+
+  .k16-hotspot.long {
+    min-width: 84px;
+  }
+
+  .k16-hotspot > span {
+    font-size: 13px;
+  }
+
+  .k16-hotspot em {
+    right: -8px;
+    top: -9px;
+    min-width: 20px;
+    height: 20px;
+    font-size: 9px;
+  }
+
+  .k16-map-actions {
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .k16-map-actions button {
+    min-height: 44px;
+    padding: 3px;
+    font-size: 17px;
+  }
+
+  .k16-case-primary {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .k16-case-hero {
+    grid-row: auto;
+    min-height: 92px;
+  }
+
+  .k16-case-primary h2 {
+    font-size: 17px;
+  }
+
+  .k16-case-primary p {
+    font-size: 11px;
+  }
+
+  .k16-progress,
+  .k16-case-primary > .k16-action {
+    grid-column: 1 / -1;
+  }
+
+  .k16-desktop-only {
+    display: none !important;
+  }
+
+  .k16-rival-panel {
+    display: block;
+  }
+
+  .k16-rival-head {
+    grid-template-columns: 58px 1fr auto;
+  }
+
+  .k16-rival-face {
+    width: 56px;
+    height: 64px;
+    font-size: 30px;
+  }
+
+  .k16-strategy {
+    grid-template-columns: 62px 1fr;
+  }
+
+  .k16-strategy > span {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+  }
+
+  .k16-staff {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .k16-staff article {
+    min-height: 128px;
+    padding: 4px;
+  }
+
+  .k16-staff .avatar {
+    height: 72px;
+    font-size: 34px;
+  }
+
+  .k16-staff b {
+    font-size: 9px;
+  }
+
+  .k16-staff small {
+    font-size: 7px;
+  }
+
+  .k16-bottom {
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+  }
+
+  .k16-bottom button {
+    min-height: 64px;
+  }
+
+  .k16-bottom button span {
+    font-size: 22px;
+  }
+
+  .k16-bottom button b {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 390px) {
+  .k16-logo strong {
+    font-size: 37px;
+  }
+
+  .k16-logo span {
+    letter-spacing: 0.08em;
+  }
+
+  .k16-resource-icon {
+    display: none;
+  }
+
+  .k16-resource {
+    grid-template-columns: 1fr;
+  }
+
+  .k16-resource-label,
+  .k16-resource b {
+    grid-column: 1;
+  }
+
+  .k16-map-banner {
+    min-width: 190px;
+    font-size: 11px;
+  }
+
+  .k16-hotspot {
+    min-width: 62px;
+    font-size: 7px;
+  }
+
+  .k16-hotspot.long {
+    min-width: 76px;
+  }
+
+  .k16-staff .avatar {
+    height: 62px;
+    font-size: 29px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #v0160Root *,
+  #v0160Root *::before,
+  #v0160Root *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
