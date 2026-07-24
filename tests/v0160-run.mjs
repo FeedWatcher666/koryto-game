@@ -20,10 +20,10 @@ try{
   fs.mkdirSync(path.join(workspace,'.github/workflows'),{recursive:true});
   const currentIndex=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const legacyIndex=currentIndex
-    .replaceAll('0.16.0 TEST.1','0.14.9 TEST.10')
-    .replaceAll('0.16.0-test.1','0.14.9-test.10')
-    .replaceAll('Clean UI Rebuild','komunální politické RPG')
-    .replaceAll('čistý komponentový rebuild hlavní mapy bez historických vizuálních vrstev','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní')
+    .replaceAll('0.16.1 TEST.1','0.14.9 TEST.10')
+    .replaceAll('0.16.1-test.1','0.14.9-test.10')
+    .replaceAll('Clean UI Layout Polish','komunální politické RPG')
+    .replaceAll('čistý komponentový rebuild hlavní mapy s kompaktním HUDem, panely a navigací','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní')
     .replace('\n<link rel="stylesheet" href="styles/v0160.css">','')
     .replace('<script src="src/v0160-ui.js"></script>','');
   fs.writeFileSync(path.join(workspace,'index.html'),legacyIndex);
@@ -32,4 +32,4 @@ try{
   for(const file of historical)run(workspace,[file],file);
 }finally{fs.rmSync(workspace,{recursive:true,force:true});}
 run(root,['tests/v0160-clean-ui.mjs'],'tests/v0160-clean-ui.mjs');
-console.log(`Koryto v0.16.0 suite passed: ${syntax.length} syntax checks, ${historical.length+1} tests`);
+console.log(`Koryto v0.16.1 suite passed: ${syntax.length} syntax checks, ${historical.length+1} tests`);
