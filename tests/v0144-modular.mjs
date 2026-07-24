@@ -14,7 +14,7 @@ assert.equal(context.KorytoPlaytestLab.BUILD_VERSION,'0.14.6-test.10');
 assert.equal(context.KorytoPlaytestLab.SAVE_VERSION,'0.14.3-test.2');
 const app=readText('src/app.js');
 assert.ok(app.split('\n').length<1000,'app.js must stay below 1000 lines after AI playtest work');
-for(const pattern of [/const events=\{/,/const questDefs=\{/,/const companions=\{/,/const factionPlanDefs=\{/,/const debateCardDefs=\{/)assert.doesNotMatch(app,pattern);
+for(const pattern of [/const events=\{/,/const questDefs=\{/,/const companions=\{/,/const factionPlanDefs=\{/,/const debateCardDefs=\{/])assert.doesNotMatch(app,pattern);
 for(const name of ['KorytoCoreData','KorytoEventData','KorytoQuestData','KorytoCompanionData','KorytoFactionData','KorytoDebateData','KorytoQuestRuntime','KorytoEventSystem','KorytoFactionSystem','KorytoCompanionSystem','KorytoDebateSystem','KorytoElectionSystem','KorytoGameEngine','KorytoBalanceSystem','KorytoApp','KorytoCampaignExperience','KorytoPlaytestLab'])assert.ok(context[name],`${name} missing`);
 assert.equal(Object.keys(context.KorytoQuestData.definitions).length,11);
 assert.equal(context.KorytoEventSystem.validate().length,0);
