@@ -9,12 +9,12 @@ const syntaxFiles = [
   "src/v0147-consequences.js", "src/v0148-visual-system.js",
   "src/v0149-assets/atlas-1.js", "src/v0149-assets/atlas-2.js", "src/v0149-assets/atlas-3.js",
   "src/v0149-assets/village-1.js", "src/v0149-assets/village-2.js", "src/v0149-pixel-assets.js",
-  "src/v0150-visual-core.js", "src/v0150-visual-shell.js", "src/v0150-visual-content.js",
-  "src/v0150-visual-foundation.js", "src/v0151-graphics.js", "src/v0152-reference-match.js",
-  "src/v0142.js", "src/v0142c.js", "src/v0142d.js", "src/v0142-stability.js",
-  "src/v0142-countercampaign.js", "src/v0142-ui-balance.js", "src/v0142-clarity.js",
-  "src/v0142-rc3.js", "src/state.js", "src/save-system.js", "src/v0143.js",
-  "src/quest-system.js", "src/v0143-test3.js", "src/v0143-test10.js"
+  "src/v0149-png-hardening.js", "src/v0150-visual-core.js", "src/v0150-visual-shell.js",
+  "src/v0150-visual-content.js", "src/v0150-visual-foundation.js", "src/v0151-graphics.js",
+  "src/v0152-reference-match.js", "src/v0142.js", "src/v0142c.js", "src/v0142d.js",
+  "src/v0142-stability.js", "src/v0142-countercampaign.js", "src/v0142-ui-balance.js",
+  "src/v0142-clarity.js", "src/v0142-rc3.js", "src/state.js", "src/save-system.js",
+  "src/v0143.js", "src/quest-system.js", "src/v0143-test3.js", "src/v0143-test10.js"
 ];
 
 const tests = [
@@ -24,7 +24,7 @@ const tests = [
   "tests/v0143-modules.mjs", "tests/v0143-quest-system.mjs", "tests/v0143-test10.mjs",
   "tests/v0144-modular.mjs", "tests/v0144-simulation.mjs", "tests/v0145-playability.mjs",
   "tests/v0146-playtest.mjs", "tests/v0147-consequences.mjs", "tests/v0148-visual.mjs",
-  "tests/v0149-assets-review.mjs", "tests/layered-regressions.mjs",
+  "tests/v0149-hardening-review.mjs", "tests/layered-regressions.mjs",
   "tests/v0152-reference-match.mjs"
 ];
 
