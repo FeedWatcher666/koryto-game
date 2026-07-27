@@ -1,14 +1,20 @@
 "use strict";
 (() => {
-  const VERSION = "0.16.9 TEST.1";
-  const BUILD_VERSION = "0.16.9-test.1";
-  const SAVE_VERSION = "0.14.3-test.2";
-  const SAVE_SCHEMA = 1;
+  const INFO = globalThis.KorytoBuildInfo || Object.freeze({
+    displayVersion: "0.16.9 TEST.2",
+    buildVersion: "0.16.9-test.2",
+    saveVersion: "0.14.3-test.2",
+    saveSchema: 1,
+    applyLabels: () => false
+  });
+  const VERSION = INFO.displayVersion;
+  const BUILD_VERSION = INFO.buildVersion;
+  const SAVE_VERSION = INFO.saveVersion;
+  const SAVE_SCHEMA = INFO.saveSchema;
   const STORAGE_KEY = "koryto_ui_0169";
 
   let installed = false;
   let panelOpen = false;
-
   const defaults = {
     largeText: false,
     highContrast: false,
@@ -16,11 +22,8 @@
   };
 
   function readPrefs() {
-    try {
-      return {...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")};
-    } catch (_) {
-      return {...defaults};
-    }
+    try { return {...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")}; }
+    catch (_) { return {...defaults}; }
   }
 
   let prefs = readPrefs();
@@ -49,7 +52,6 @@
     if (!target) return;
     if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
     target.focus({preventScroll: true});
-    target.scrollIntoView({block: "start"});
   }
 
   function actionAllowed(id, target) {
@@ -88,10 +90,11 @@
 
   function phaseLabel(target) {
     const phase = target?.phase || "start";
-    return ({map: "Mapa", event: "Událost", debate: "Debata", finale: "Finále"})[phase] || phase;
+    return ({map: "Mapa", location: "Lokace", event: "Událost", debate: "Debata", finale: "Finále"})[phase] || phase;
   }
 
   function syncStatus() {
+    INFO.applyLabels?.();
     const target = stateOf();
     const status = document.getElementById("k169Status");
     if (status) {
@@ -111,7 +114,7 @@
       <section id="k169Utility" class="k169-utility" aria-label="Rychlé ovládání a přístupnost">
         <button type="button" class="k169-launcher" data-k169-open aria-expanded="false" aria-controls="k169Panel">☰ <span>Ovládání</span></button>
         <aside id="k169Panel" class="k169-panel" hidden>
-          <header><div><p>RELEASE POLISH</p><h2>Rychlé ovládání</h2><small id="k169Phase"></small></div><button type="button" data-k169-close aria-label="Zavřít panel">×</button></header>
+          <header><div><p>RELEASE INTEGRITY</p><h2>Rychlé ovládání</h2><small id="k169Phase"></small></div><button type="button" data-k169-close aria-label="Zavřít panel">×</button></header>
           <div id="k169Status" class="k169-status"></div>
           <section><h3>Hra</h3><div class="k169-grid">
             <button type="button" data-k169-action="save"><b>Uložit</b><small>Alt + S</small></button>
@@ -120,7 +123,7 @@
             <button type="button" data-k169-action="export"><b>Kronika</b><small>Alt + K</small></button>
           </div></section>
           <section><h3>Čitelnost</h3><div class="k169-grid">
-            <button type="button" data-k169-pref="largeText" aria-pressed="false"><b>Větší text</b><small>bez změny layoutu</small></button>
+            <button type="button" data-k169-pref="largeText" aria-pressed="false"><b>Větší text</b><small>bez změny pravidel</small></button>
             <button type="button" data-k169-pref="highContrast" aria-pressed="false"><b>Vyšší kontrast</b><small>ostřejší panely</small></button>
             <button type="button" data-k169-pref="reducedMotion" aria-pressed="false"><b>Méně pohybu</b><small>omezení animací</small></button>
             <button type="button" data-k169-focus><b>Aktivní obsah</b><small>přesun fokusu</small></button>
@@ -151,9 +154,7 @@
     if (panelOpen) {
       syncStatus();
       panel.querySelector("button")?.focus();
-    } else {
-      launcher.focus();
-    }
+    } else launcher.focus();
   }
 
   function togglePref(key) {
@@ -166,11 +167,8 @@
 
   function handleAction(action) {
     const map = {
-      save: ["saveBtn", "Uložit"],
-      load: ["loadBtn", "Načíst"],
-      map: ["mapBtn", "Mapa"],
-      export: ["exportBtn", "Kronika"],
-      restart: ["restartBtn", "Nová hra"]
+      save: ["saveBtn", "Uložit"], load: ["loadBtn", "Načíst"], map: ["mapBtn", "Mapa"],
+      export: ["exportBtn", "Kronika"], restart: ["restartBtn", "Nová hra"]
     };
     const command = map[action];
     if (command) triggerOriginal(command[0], command[1]);
@@ -194,9 +192,7 @@
       return setPanel(false);
     }
     if (editable(event.target) || !event.altKey || event.ctrlKey || event.metaKey) return;
-    const key = event.key.toLowerCase();
-    const actions = {s: "save", l: "load", m: "map", k: "export", u: "panel"};
-    const action = actions[key];
+    const action = ({s: "save", l: "load", m: "map", k: "export", u: "panel"})[event.key.toLowerCase()];
     if (!action) return;
     event.preventDefault();
     if (action === "panel") setPanel(!panelOpen);
@@ -209,6 +205,8 @@
       buildVersion: BUILD_VERSION,
       saveVersion: SAVE_VERSION,
       saveSchema: SAVE_SCHEMA,
+      title: document.title,
+      dataBuild: document.documentElement.dataset.korytoBuild || null,
       utility: Boolean(document.getElementById("k169Utility")),
       panelOpen,
       largeText: document.documentElement.classList.contains("k169-large-text"),
@@ -221,6 +219,7 @@
   function install() {
     if (installed || typeof document === "undefined") return installed;
     installed = true;
+    INFO.applyLabels?.();
     ensureUtility();
     applyPrefs();
     syncStatus();
