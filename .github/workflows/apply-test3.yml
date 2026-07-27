@@ -1,0 +1,43 @@
+name: Apply Koryto TEST.3 patch
+
+on:
+  push:
+    branches:
+      - agent/v0160-clean-ui
+    paths:
+      - '.test3-patch.b64'
+      - '.github/workflows/apply-test3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging commit
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v0160-clean-ui
+          fetch-depth: 0
+
+      - name: Apply verified TEST.3 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .test3-patch.b64 > /tmp/koryto-test3-patch.tar.gz
+          echo 'bddc561c9b6121fc536875ddcfe94b054bb7c31b08d296cc7a99cc98f918f67f  /tmp/koryto-test3-patch.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/koryto-test3-patch.tar.gz -C .
+          rm -f .test3-patch.b64 .github/workflows/apply-test3.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'v0.16.9 TEST.3: close release integrity blockers'
+          git push origin HEAD:agent/v0160-clean-ui
+
+      - name: Dispatch final TEST.3 CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run v0142-stability.yml --ref agent/v0160-clean-ui
