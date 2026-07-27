@@ -1,0 +1,217 @@
+:root {
+  --k167-ink: #f4ead5;
+  --k167-muted: #cbb991;
+  --k167-night: #100906;
+  --k167-panel: #2b1810;
+  --k167-panel-2: #3b2318;
+  --k167-brass: #c99b43;
+  --k167-green: #63864d;
+  --k167-red: #913f36;
+  --k167-blue: #426b7e;
+}
+
+html.k167-coalition-active body,
+html.k167-ending-active body { background: var(--k167-night); }
+html.k167-coalition-active #app > .topbar,
+html.k167-coalition-active #app > .footer-note,
+html.k167-ending-active #app > .topbar,
+html.k167-ending-active #app > .footer-note { display: none !important; }
+
+html.k167-coalition-active #coalitionScreen.active,
+html.k167-ending-active #endingScreen.active {
+  display: block;
+  min-height: 100vh;
+  padding: 18px 18px calc(40px + env(safe-area-inset-bottom));
+  color: var(--k167-ink);
+  background:
+    radial-gradient(circle at 50% 0, rgba(201,155,67,.13), transparent 34%),
+    linear-gradient(180deg, #1d100b, #0e0705 78%);
+}
+
+.k167-election-header,
+.k167-ending-header {
+  width: min(1480px, 100%);
+  margin: 0 auto 16px;
+  padding: 20px;
+  color: var(--k167-ink);
+  background: linear-gradient(125deg, rgba(61,36,24,.98), rgba(29,16,11,.99));
+  border: 1px solid rgba(201,155,67,.55);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.34);
+}
+.k167-election-header > div:first-child,
+.k167-ending-header > div:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.k167-election-header p,
+.k167-ending-header p { margin: 0; color: var(--k167-brass); font-weight: 900; letter-spacing: .12em; }
+.k167-election-header h1,
+.k167-ending-header h1 { margin: 4px 0; font-size: clamp(1.65rem, 3.5vw, 2.8rem); }
+.k167-election-header small,
+.k167-ending-header small { color: var(--k167-muted); }
+
+.k167-election-metrics,
+.k167-ending-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.k167-election-metrics article,
+.k167-ending-metrics article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  align-items: center;
+  min-height: 68px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(201,155,67,.24);
+  border-radius: 12px;
+}
+.k167-ending-metrics article.danger { border-color: rgba(145,63,54,.8); }
+.k167-election-metrics article > span,
+.k167-ending-metrics article > span { grid-row: 1 / 3; font-size: 1.4rem; }
+.k167-election-metrics small,
+.k167-ending-metrics small { color: var(--k167-muted); text-transform: uppercase; letter-spacing: .06em; }
+.k167-election-metrics b,
+.k167-ending-metrics b { font-size: 1.15rem; }
+
+.k167-seat-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 5px;
+  margin-top: 16px;
+  padding: 8px;
+  background: rgba(0,0,0,.22);
+  border-radius: 12px;
+}
+.k167-seat-strip i { display: block; height: 22px; border-radius: 5px; background: rgba(255,255,255,.13); }
+.k167-seat-strip i.player { background: linear-gradient(#7fa167,#52743f); }
+.k167-seat-strip i.ally { background: linear-gradient(#d5aa55,#a7772f); }
+.k167-seat-strip i.other { background: linear-gradient(#66332e,#3b201d); }
+.k167-seat-strip > span {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: calc((var(--majority) - .5) * (100% / 15));
+  width: 2px;
+  background: #fff5d7;
+  box-shadow: 0 0 8px rgba(255,245,215,.75);
+}
+
+html.k167-coalition-active .k167-coalition-shell,
+html.k167-ending-active .k167-ending-shell { width: min(1480px, 100%); margin: 0 auto; }
+html.k167-coalition-active .coalition-shell > .panel,
+html.k167-ending-active .ending > .panel,
+html.k167-ending-active .ending-grid > .panel {
+  color: var(--k167-ink);
+  background: linear-gradient(180deg, rgba(55,32,22,.98), rgba(31,18,12,.99));
+  border: 1px solid rgba(201,155,67,.36);
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(0,0,0,.24);
+}
+html.k167-coalition-active .coalition-shell { display: grid; gap: 14px; }
+html.k167-coalition-active .k167-negotiation-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px; }
+html.k167-coalition-active .k167-negotiation-header .eyebrow { color: var(--k167-brass); }
+html.k167-coalition-active .coalition-score { font-size: clamp(1.8rem, 4vw, 3.2rem); color: var(--k167-brass); font-weight: 1000; }
+
+html.k167-coalition-active #coalitionResources {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+html.k167-coalition-active .k167-resource-card {
+  min-height: 94px;
+  padding: 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(201,155,67,.28);
+  border-radius: 12px;
+}
+html.k167-coalition-active .k167-resource-card strong { display: block; margin-top: 5px; color: var(--k167-brass); font-size: 1.45rem; }
+
+html.k167-coalition-active #coalitionPartners {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+}
+html.k167-coalition-active .k167-partner-card {
+  position: relative;
+  min-width: 0;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(72,43,29,.94), rgba(40,23,16,.98));
+  border: 1px solid rgba(201,155,67,.35);
+  border-radius: 14px;
+}
+html.k167-coalition-active .k167-partner-card.available { box-shadow: inset 0 3px 0 rgba(99,134,77,.8); }
+html.k167-coalition-active .k167-partner-card.joined { border-color: #7fa167; background: linear-gradient(180deg, rgba(66,88,49,.92), rgba(35,49,27,.98)); }
+html.k167-coalition-active .k167-partner-card.locked { opacity: .58; filter: grayscale(.35); }
+html.k167-coalition-active .k167-partner-card .seats { position: absolute; top: 12px; right: 12px; color: var(--k167-brass); font-size: 1.65rem; font-weight: 1000; }
+html.k167-coalition-active .k167-partner-card h3 { padding-right: 38px; }
+html.k167-coalition-active .k167-partner-card button,
+html.k167-coalition-active .k167-offer,
+html.k167-coalition-active .k167-pass,
+html.k167-ending-active .k167-again {
+  min-height: 44px;
+  border: 1px solid rgba(201,155,67,.55);
+  border-radius: 10px;
+  color: var(--k167-ink);
+  background: linear-gradient(#6b8e52,#496d3a);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+html.k167-coalition-active .k167-offer-panel:not(.hidden) { display: block; padding: 18px; border-color: var(--k167-brass); }
+html.k167-coalition-active .k167-offer-panel .offer-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+html.k167-coalition-active .k167-offer {
+  min-height: 150px;
+  padding: 16px;
+  text-align: left;
+  background: linear-gradient(180deg, rgba(77,47,31,.98), rgba(40,24,16,.98));
+}
+html.k167-coalition-active .k167-offer strong { display: block; margin-bottom: 8px; font-size: 1.08rem; }
+html.k167-coalition-active .k167-offer small,
+html.k167-coalition-active .k167-offer .check { display: block; margin-top: 7px; color: var(--k167-muted); }
+html.k167-coalition-active .k167-offer:disabled { opacity: .45; cursor: not-allowed; }
+html.k167-coalition-active .k167-log-entry { padding: 10px 12px; border-left: 3px solid rgba(201,155,67,.35); }
+html.k167-coalition-active .k167-log-entry.coalition-contract { border-left-color: #7fa167; background: rgba(99,134,77,.1); }
+
+.k167-contract-summary { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 12px; }
+.k167-contract-summary span { padding: 7px 10px; border-radius: 999px; color: var(--k167-muted); background: rgba(255,255,255,.05); border: 1px solid rgba(201,155,67,.2); }
+.k167-contract-summary b { color: var(--k167-ink); }
+html.k167-ending-active .ending-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; margin-top: 14px !important; }
+html.k167-ending-active .k167-ending-emoji { font-size: clamp(3.5rem, 9vw, 6.5rem) !important; }
+html.k167-ending-active .k167-ending-title { font-size: clamp(1.75rem, 4vw, 3rem); }
+html.k167-ending-active .k167-ending-lead { color: var(--k167-muted); }
+html.k167-ending-active .k167-ending-story { line-height: 1.65; }
+html.k167-ending-active .k167-final-stats .metric { border-color: rgba(201,155,67,.24); }
+html.k167-ending-active .k167-again { display: block; width: min(360px,100%); margin: 18px auto 0 !important; }
+
+@media (max-width: 980px) {
+  .k167-election-metrics,
+  .k167-ending-metrics { grid-template-columns: repeat(2, 1fr); }
+  html.k167-coalition-active #coalitionPartners { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  html.k167-ending-active .ending-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  html.k167-coalition-active #coalitionScreen.active,
+  html.k167-ending-active #endingScreen.active { padding: 8px 8px calc(24px + env(safe-area-inset-bottom)); }
+  .k167-election-header,
+  .k167-ending-header { padding: 14px; border-radius: 12px; }
+  .k167-election-metrics,
+  .k167-ending-metrics { grid-template-columns: 1fr 1fr; }
+  .k167-election-metrics article,
+  .k167-ending-metrics article { min-height: 62px; }
+  .k167-seat-strip { gap: 2px; padding: 6px; }
+  .k167-seat-strip i { height: 18px; }
+  html.k167-coalition-active .k167-negotiation-header { align-items: flex-start; flex-direction: column; }
+  html.k167-coalition-active #coalitionResources,
+  html.k167-coalition-active #coalitionPartners,
+  html.k167-coalition-active .k167-offer-panel .offer-grid { grid-template-columns: 1fr; }
+  html.k167-coalition-active .k167-offer { min-height: 132px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.k167-coalition-active *,
+  html.k167-ending-active * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
