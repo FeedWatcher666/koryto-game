@@ -7,8 +7,8 @@ const runtime = read('src/v0166-day-debate-ui.js');
 const css = read('styles/v0166-day-debate-ui.css');
 const browserPolish = read('styles/v0166-browser-polish.css');
 
-assert.equal(read('VERSION').trim(), '0.16.6-test.1');
-assert.match(html, /0\.16\.6 TEST\.1/);
+assert.equal(read('VERSION').trim(), '0.16.7-test.1');
+assert.match(html, /0\.16\.7 TEST\.1/);
 assert.match(html, /styles\/v0166-day-debate-ui\.css/);
 assert.match(html, /styles\/v0166-browser-polish\.css/);
 assert.match(html, /src\/v0166-day-debate-ui\.js/);
@@ -36,6 +36,6 @@ assert.match(css, /#debateCards \.k166-debate-card/);
 assert.match(css, /min-height:\s*44px/);
 assert.match(css, /@media \(max-width: 760px\)/);
 assert.match(css, /safe-area-inset-bottom/);
-assert.match(browserPolish, /Dolní Vejprnice 0\.16\.6 TEST\.1/);
+assert.match(browserPolish, /Dolní Vejprnice 0\.16\.7 TEST\.1/);
 
-console.log('v0.16.6 day summary, debate and browser-smoke polish contract passed');
+console.log('v0.16.6 day summary, debate and browser-smoke polish contract passed inside v0.16.7');
