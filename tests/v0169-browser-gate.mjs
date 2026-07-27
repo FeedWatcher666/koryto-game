@@ -135,6 +135,12 @@ try {
       assert.equal(await page.locator('#v0160Root .k16-hotspot').count(), 8, `${target.name}: hotspots`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot[title]').count(), 0, `${target.name}: native tooltips`);
 
+      const coach = page.locator('#v0145CoachOverlay:not(.hidden)');
+      if (await coach.isVisible().catch(() => false)) {
+        await page.click('#v0145CoachClose');
+        await page.waitForSelector('#v0145CoachOverlay', {state: 'hidden'});
+      }
+
       await page.locator('#v0160Root .k16-hotspot').first().click();
       await page.waitForFunction(() => globalThis.KorytoUI165?.visualAudit?.().activeView === 'location');
       await page.waitForSelector('#v0165Root [data-k165-map]', {state: 'visible'});
