@@ -7,8 +7,8 @@ const runtime = read('src/v0167-election-coalition-ui.js');
 const css = read('styles/v0167-election-coalition-ui.css');
 const app = read('src/app.js');
 
-assert.equal(read('VERSION').trim(), '0.16.9-test.1');
-assert.match(html, /0\.16\.7 TEST\.1/);
+assert.equal(read('VERSION').trim(), '0.16.9-test.2');
+assert.match(html, /0\.16\.9 TEST\.2/);
 assert.match(html, /styles\/v0167-election-coalition-ui\.css/);
 assert.match(html, /src\/v0167-election-coalition-ui\.js/);
 assert.ok(html.indexOf('styles/v0167-election-coalition-ui.css') > html.indexOf('styles/v0166-browser-polish.css'));
@@ -42,4 +42,4 @@ assert.match(css, /min-height:\s*44px/);
 assert.match(css, /@media \(max-width: 760px\)/);
 assert.match(css, /safe-area-inset-bottom/);
 
-console.log('v0.16.7 election night and coalition visual contract passed inside v0.16.9');
+console.log('v0.16.7 election night and coalition contract passed inside v0.16.9 TEST.2');
