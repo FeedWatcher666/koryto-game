@@ -17,17 +17,23 @@ const targets = [
   {name: '390x844', width: 390, height: 844}
 ];
 
-const snapshot = state => ({
-  seed: state?.seed || null,
-  day: state?.day || null,
-  actions: state?.actions ?? null,
-  phase: state?.phase || null,
-  heroName: state?.hero?.name || null,
-  heroClass: state?.hero?.classId || null,
-  support: state?.stats?.support ?? null,
-  trust: state?.stats?.trust ?? null,
-  registerStatus: state?.quests?.register?.status || null
-});
+const snapshot = state => {
+  const copy = JSON.parse(JSON.stringify(state ?? null));
+  if (!copy || typeof copy !== 'object' || Array.isArray(copy)) return copy;
+
+  // loadGame() intentionally clears transient, in-progress interaction state.
+  copy.currentLocation = null;
+  copy.currentEvent = null;
+  copy.partyAssignment = null;
+  copy.partyUsedDay = 0;
+  return copy;
+};
+
+const assertSaveContract = (state, label) => {
+  assert.equal(state?.version, '0.14.3-test.2', `${label}: save version`);
+  assert.equal(state?.saveFormat, 'koryto', `${label}: save format`);
+  assert.equal(state?.saveSchema, 1, `${label}: save schema`);
+};
 
 const browser = await chromium.launch({headless: true});
 try {
@@ -162,6 +168,7 @@ try {
         return make(state);
       }, snapshot.toString());
       assert.equal(savedSnapshot.phase, 'map', `${target.name}: persisted phase`);
+      assertSaveContract(savedSnapshot, `${target.name}: persisted state`);
 
       await page.reload({waitUntil: 'load'});
       await page.waitForSelector('#startBtn', {state: 'visible'});
@@ -174,7 +181,8 @@ try {
         const make = new Function('state', `return (${snapshotSource})(state)`);
         return make(globalThis.KorytoApp.getState());
       }, snapshot.toString());
-      assert.deepEqual(loadedSnapshot, savedSnapshot, `${target.name}: save/load roundtrip state`);
+      assertSaveContract(loadedSnapshot, `${target.name}: loaded state`);
+      assert.deepEqual(loadedSnapshot, savedSnapshot, `${target.name}: complete save/load roundtrip state`);
       await page.evaluate(() => globalThis.KorytoUI169?.syncStatus?.());
       await auditSurface('roundtrip-map');
       await page.screenshot({path: `browser-artifacts/${target.name}-map.png`, fullPage: false});
@@ -219,4 +227,4 @@ try {
   await browser.close();
 }
 
-console.log('v0.16.9 TEST.3 packaged Chromium navigation and save/load gate passed');
+console.log('v0.16.9 TEST.3 packaged Chromium navigation and complete save/load gate passed');
