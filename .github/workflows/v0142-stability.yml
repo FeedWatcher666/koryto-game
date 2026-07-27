@@ -1,4 +1,4 @@
-name: Koryto v0.16.6 TEST.1
+name: Koryto v0.16.7 TEST.1
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.16.6-test.1-diagnostics
+          name: koryto-v0.16.7-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
       - name: Build offline package
@@ -38,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           build_version="$(cat VERSION)"
-          test "$build_version" = "0.16.6-test.1"
+          test "$build_version" = "0.16.7-test.1"
           target="dist/koryto-v${build_version}"
           mkdir -p "$target"
           cp index.html VERSION README.md "$target/"
@@ -53,6 +53,7 @@ jobs:
           cp docs/v0.16/v0165-audit.md "$target/docs/v0.16/"
           cp docs/v0.16/v0166-day-debate.md "$target/docs/v0.16/"
           cp docs/v0.16/v0166-browser-smoke.md "$target/docs/v0.16/"
+          cp docs/v0.16/v0167-election-coalition.md "$target/docs/v0.16/"
           rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
           test -f "$target/styles/v0160.css"
           test -f "$target/styles/v0160-responsive.css"
@@ -61,30 +62,36 @@ jobs:
           test -f "$target/styles/v0165-campaign-ui.css"
           test -f "$target/styles/v0166-day-debate-ui.css"
           test -f "$target/styles/v0166-browser-polish.css"
+          test -f "$target/styles/v0167-election-coalition-ui.css"
           test -f "$target/src/v0160-ui.js"
           test -f "$target/src/v0161-interaction-guard.js"
           test -f "$target/src/v0163-staff.js"
           test -f "$target/src/v0165-campaign-ui.js"
           test -f "$target/src/v0166-day-debate-ui.js"
+          test -f "$target/src/v0167-election-coalition-ui.js"
           test -f "$target/assets/v0160/dolni-vejprnice-map.svg"
           test -f "$target/assets/v0165/manifest.json"
           test -f "$target/docs/v0.16/v0165-audit.md"
           test -f "$target/docs/v0.16/v0166-day-debate.md"
           test -f "$target/docs/v0.16/v0166-browser-smoke.md"
-          grep -q '0.16.6 TEST.1' "$target/index.html"
+          test -f "$target/docs/v0.16/v0167-election-coalition.md"
+          grep -q '0.16.7 TEST.1' "$target/index.html"
           grep -q 'viewport-fit=cover' "$target/index.html"
           grep -q 'styles/v0160.css' "$target/index.html"
           grep -q 'styles/v0165-campaign-ui.css' "$target/index.html"
           grep -q 'styles/v0166-day-debate-ui.css' "$target/index.html"
           grep -q 'styles/v0166-browser-polish.css' "$target/index.html"
+          grep -q 'styles/v0167-election-coalition-ui.css' "$target/index.html"
           grep -q 'src/v0160-ui.js' "$target/index.html"
           grep -q 'src/v0165-campaign-ui.js' "$target/index.html"
           grep -q 'src/v0166-day-debate-ui.js' "$target/index.html"
+          grep -q 'src/v0167-election-coalition-ui.js' "$target/index.html"
           grep -q 'k16-bottom-mobile' "$target/src/v0160-ui.js"
           grep -q 'stopPropagation' "$target/src/v0161-interaction-guard.js"
           grep -q 'max-width: 390px' "$target/styles/v0160-responsive.css"
           grep -q 'data-k166-confirm-day' "$target/src/v0166-day-debate-ui.js"
-          grep -q 'Dolní Vejprnice 0.16.6 TEST.1' "$target/styles/v0166-browser-polish.css"
+          grep -q 'KorytoUI167' "$target/src/v0167-election-coalition-ui.js"
+          grep -q 'Dolní Vejprnice 0.16.7 TEST.1' "$target/styles/v0166-browser-polish.css"
           if grep -R -E 'https?://(fonts|cdn|unpkg|jsdelivr)' "$target/index.html" "$target/styles" "$target/src"; then
             echo "Release contains a forbidden network dependency" >&2
             exit 1
@@ -92,6 +99,6 @@ jobs:
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.16.6-test.1
-          path: dist/koryto-v0.16.6-test.1
+          name: koryto-v0.16.7-test.1
+          path: dist/koryto-v0.16.7-test.1
           if-no-files-found: error
