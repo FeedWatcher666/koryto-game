@@ -54,22 +54,24 @@ try {
       await page.locator('#classGrid [data-class]').first().click();
       await page.locator('#confirmBtn').scrollIntoViewIfNeeded();
       await page.click('#confirmBtn');
-      await page.waitForSelector('#gameScreen.active');
-      await page.waitForSelector('#eventView:not(.hidden)');
+      await page.waitForFunction(() => globalThis.KorytoApp?.getState?.().phase === 'event');
+      await page.waitForSelector('#v0165Root:not([hidden])', {state: 'visible'});
+      await page.waitForSelector('#v0165Root [data-k165-choice]:not([disabled])', {state: 'visible'});
       note(`${target.name} event`);
       await page.evaluate(() => globalThis.KorytoUI169?.syncStatus?.());
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), true, `${target.name}: save disabled in event`);
 
-      await page.locator('#choiceBox .choice:not([disabled])').first().click();
+      await page.locator('#v0165Root [data-k165-choice]:not([disabled])').first().click();
       await page.waitForSelector('#diceClose:not(.hidden)', {timeout: 5000});
       await page.click('#diceClose');
-      await page.waitForSelector('#continueAfter', {state: 'visible'});
-      await page.click('#continueAfter');
+      await page.waitForSelector('#v0165Root [data-k165-continue]', {state: 'visible'});
+      await page.click('#v0165Root [data-k165-continue]');
       await page.waitForFunction(() => globalThis.KorytoApp?.getState?.().phase === 'map');
       await page.waitForFunction(() => document.documentElement.classList.contains('k169-map-stable'));
       await page.evaluate(() => {
         globalThis.KorytoMapStability169?.forceCanonicalMap?.();
         globalThis.KorytoUI169?.syncStatus?.();
+        globalThis.KorytoBuildInfo?.applyLabels?.();
       });
       note(`${target.name} map`);
 
@@ -116,6 +118,7 @@ try {
           active: document.querySelector('.screen.active')?.id,
           phase: globalThis.KorytoApp?.getState?.().phase,
           htmlClasses: document.documentElement.className,
+          visibleSurface: !document.getElementById('v0165Root')?.hidden ? 'v0165Root' : !document.getElementById('v0160Root')?.hidden ? 'v0160Root' : 'legacy',
           errors: []
         }));
         fs.writeFileSync(`browser-artifacts/${target.name}-failure-state.json`, JSON.stringify({state, failed, errors}, null, 2));
