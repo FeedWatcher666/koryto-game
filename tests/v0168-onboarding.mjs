@@ -8,12 +8,12 @@ const css = read('styles/v0168-onboarding-ui.css');
 const core = read('src/core-data.js');
 const guard = read('src/v0161-interaction-guard.js');
 
-assert.equal(read('VERSION').trim(), '0.16.8-test.1');
+assert.equal(read('VERSION').trim(), '0.16.9-test.1');
 assert.match(html, /0\.16\.7 TEST\.1/);
 assert.match(guard, /styles\/v0168-onboarding-ui\.css/);
 assert.match(guard, /src\/v0168-onboarding-ui\.js/);
-assert.match(guard, /Candidate Onboarding UI/);
-assert.match(guard, /0\.16\.8 TEST\.1/);
+assert.match(guard, /Release Polish/);
+assert.match(guard, /0\.16\.9 TEST\.1/);
 
 assert.match(runtime, /VERSION = "0\.16\.8 TEST\.1"/);
 assert.match(runtime, /BUILD_VERSION = "0\.16\.8-test\.1"/);
@@ -44,4 +44,4 @@ assert.match(css, /min-height:\s*44px/);
 assert.match(css, /@media \(max-width: 820px\)/);
 assert.match(css, /safe-area-inset-bottom/);
 
-console.log('v0.16.8 onboarding and candidate creation visual contract passed');
+console.log('v0.16.8 onboarding and candidate creation visual contract passed inside v0.16.9');
