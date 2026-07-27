@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 jobs:
   apply-test3:
@@ -21,28 +20,27 @@ jobs:
           ref: agent/v0160-clean-ui
           fetch-depth: 0
 
-      - name: Assemble TEST.3 patch
-        run: cat .test3-patch-part-* | base64 -d > /tmp/koryto-test3-patch.tar.gz
-
-      - name: Verify TEST.3 patch digest
-        run: echo 'bddc561c9b6121fc536875ddcfe94b054bb7c31b08d296cc7a99cc98f918f67f  /tmp/koryto-test3-patch.tar.gz' | sha256sum -c -
-
-      - name: Extract TEST.3 patch
+      - name: Assemble and verify TEST.3 patch
+        shell: bash
         run: |
+          set -euo pipefail
+          cat .test3-patch-part-* | base64 -d > /tmp/koryto-test3-patch.tar.gz
+          echo 'bddc561c9b6121fc536875ddcfe94b054bb7c31b08d296cc7a99cc98f918f67f  /tmp/koryto-test3-patch.tar.gz' | sha256sum -c -
+
+      - name: Extract non-workflow TEST.3 changes
+        shell: bash
+        run: |
+          set -euo pipefail
           tar -xzf /tmp/koryto-test3-patch.tar.gz -C .
-          rm -f .test3-patch-part-* .test3-patch.b64 .github/workflows/apply-test3.yml
+          git checkout HEAD -- .github/workflows/v0142-stability.yml
+          rm -f .test3-patch-part-* .test3-patch.b64
 
-      - name: Commit TEST.3 patch
+      - name: Commit and push non-workflow TEST.3 changes
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m 'v0.16.9 TEST.3: close release integrity blockers'
-
-      - name: Push TEST.3 patch
-        run: git push origin HEAD:agent/v0160-clean-ui
-
-      - name: Dispatch final TEST.3 CI
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run v0142-stability.yml --ref agent/v0160-clean-ui
+          git push origin HEAD:agent/v0160-clean-ui
