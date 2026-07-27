@@ -16,7 +16,7 @@ assert.match(runtime, /SAVE_VERSION = "0\.14\.3-test\.2"/);
 assert.match(runtime, /SAVE_SCHEMA = 1/);
 assert.match(runtime, /k169-viewport-lock/);
 assert.match(runtime, /k169-pregame/);
-assert.match(runtime, /data\.k169ActiveScreen/);
+assert.match(runtime, /dataset\.k169ActiveScreen/);
 assert.match(runtime, /KorytoViewportLock169/);
 assert.doesNotMatch(runtime, /MutationObserver|setInterval\s*\(/);
 assert.doesNotMatch(runtime + css, /https?:\/\//);
