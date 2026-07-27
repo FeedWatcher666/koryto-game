@@ -30,6 +30,7 @@ try{
     .replace('\n<link rel="stylesheet" href="styles/v0164-map-cards.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0165-campaign-ui.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0166-day-debate-ui.css">','')
+    .replace('\n<link rel="stylesheet" href="styles/v0166-browser-polish.css">','')
     .replace('<script src="src/v0160-ui.js"></script>','')
     .replace('<script src="src/v0161-interaction-guard.js"></script>','')
     .replace('<script src="src/v0163-staff.js"></script>','')
