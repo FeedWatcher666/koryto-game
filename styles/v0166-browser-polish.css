@@ -1,4 +1,4 @@
 /* Browser-smoke polish for visible legacy labels that are still supplied by v0.14.9 pseudo-elements. */
 .v0149-assets-fallback .brand h1 span::after {
-  content: "Dolní Vejprnice 0.16.7 TEST.1";
+  content: "Dolní Vejprnice 0.16.8 TEST.1";
 }
