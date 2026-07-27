@@ -1,26 +1,32 @@
 "use strict";
 (() => {
-  const VERSION = "0.16.9 MAP STABILITY";
-  const SAVE_VERSION = "0.14.3-test.2";
-  const SAVE_SCHEMA = 1;
+  const INFO = globalThis.KorytoBuildInfo || {displayVersion:"0.16.9 TEST.2",buildVersion:"0.16.9-test.2",saveVersion:"0.14.3-test.2",saveSchema:1};
+  const VERSION = `${INFO.displayVersion} MAP STABILITY`;
+  const SAVE_VERSION = INFO.saveVersion;
+  const SAVE_SCHEMA = INFO.saveSchema;
 
   let installed = false;
   let queued = false;
-
   const stateOf = () => globalThis.KorytoApp?.getState?.() || globalThis.state || null;
 
   function mapIsActive(target = stateOf()) {
-    return Boolean(
-      target &&
-      !target.ended &&
-      target.phase === "map" &&
-      document.getElementById("gameScreen")?.classList.contains("active")
-    );
+    return Boolean(target && !target.ended && target.phase === "map" && document.getElementById("gameScreen")?.classList.contains("active"));
   }
 
   function openUtility() {
-    const launcher = document.querySelector("[data-k169-open]");
-    if (launcher) launcher.click();
+    document.querySelector("[data-k169-open]")?.click();
+  }
+
+  function syncLegacyNavigation(active) {
+    const legacy = document.querySelectorAll("#v0148Nav,.v0148-nav,.k165-bottom");
+    legacy.forEach(nav => {
+      nav.hidden = Boolean(active);
+      nav.inert = Boolean(active);
+      nav.setAttribute("aria-hidden", String(Boolean(active)));
+      if (active) nav.setAttribute("data-k169-disabled-nav", "true");
+      else nav.removeAttribute("data-k169-disabled-nav");
+    });
+    return legacy.length;
   }
 
   function forceCanonicalMap() {
@@ -29,6 +35,7 @@
     const active = mapIsActive(target);
     const html = document.documentElement;
     html.classList.toggle("k169-map-stable", active);
+    syncLegacyNavigation(active);
     if (!active) return false;
 
     target.ui = target.ui || {};
@@ -46,6 +53,7 @@
     const legacyToggle = document.getElementById("pixelToggle");
     if (legacyToggle) {
       legacyToggle.hidden = true;
+      legacyToggle.inert = true;
       legacyToggle.setAttribute("aria-hidden", "true");
       legacyToggle.tabIndex = -1;
     }
@@ -54,7 +62,6 @@
       button.removeAttribute("title");
       button.dataset.k169StableHitbox = "true";
     });
-
     return true;
   }
 
@@ -92,8 +99,13 @@
 
   function visualAudit(target = stateOf()) {
     const hotspots = [...document.querySelectorAll("#v0160Root .k16-hotspot")];
+    const visibleNavigation = [...document.querySelectorAll("nav,.k16-bottom")].filter(nav => {
+      const style = getComputedStyle(nav);
+      return !nav.hidden && !nav.inert && style.display !== "none" && style.visibility !== "hidden";
+    });
     return {
       version: VERSION,
+      buildVersion: INFO.buildVersion,
       saveVersion: SAVE_VERSION,
       saveSchema: SAVE_SCHEMA,
       active: mapIsActive(target),
@@ -101,7 +113,9 @@
       stableRoot: document.getElementById("v0160Root")?.dataset.k169MapStable || null,
       hotspotCount: hotspots.length,
       nativeTooltips: hotspots.filter(button => button.hasAttribute("title")).length,
-      legacyPixelToggleHidden: Boolean(document.getElementById("pixelToggle")?.hidden)
+      legacyPixelToggleHidden: Boolean(document.getElementById("pixelToggle")?.hidden),
+      visibleNavigationCount: visibleNavigation.length,
+      disabledLegacyNavigationCount: document.querySelectorAll("[data-k169-disabled-nav='true']").length
     };
   }
 
@@ -113,16 +127,7 @@
     document.addEventListener("change", queueStabilize);
     globalThis.addEventListener("resize", queueStabilize, {passive: true});
     queueStabilize();
-    globalThis.KorytoMapStability169 = {
-      VERSION,
-      SAVE_VERSION,
-      SAVE_SCHEMA,
-      mapIsActive,
-      forceCanonicalMap,
-      queueStabilize,
-      visualAudit,
-      install
-    };
+    globalThis.KorytoMapStability169 = {VERSION, SAVE_VERSION, SAVE_SCHEMA, mapIsActive, forceCanonicalMap, syncLegacyNavigation, queueStabilize, visualAudit, install};
     return true;
   }
 
