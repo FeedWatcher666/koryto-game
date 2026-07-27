@@ -1,21 +1,30 @@
 "use strict";
 (() => {
   let installed = false;
-  let loading = false;
-  let onboardingLoading = false;
-  let polishLoading = false;
-  let mapStabilityLoading = false;
-  let viewportLoading = false;
-  let creationFlowLoading = false;
+  let playtestLoading = false;
+
+  function buildInfo() {
+    return globalThis.KorytoBuildInfo || {
+      displayVersion: "0.16.9 TEST.2",
+      buildVersion: "0.16.9-test.2",
+      saveVersion: "0.14.3-test.2",
+      saveSchema: 1,
+      applyLabels: () => false
+    };
+  }
 
   function canonicalLabels() {
-    document.title = "Koryto 0.16.9 TEST.1 – Release Polish";
-    document.querySelector('meta[name="description"]')?.setAttribute("content", "Koryto 0.16.9 TEST.1: závěrečný UX, přístupnostní a release-polish pass pro celý offline build.");
+    return buildInfo().applyLabels?.() || false;
+  }
+
+  function playtestRequested() {
+    if (typeof location === "undefined") return false;
+    return new URLSearchParams(location.search).get("playtest") === "1";
   }
 
   function loadPlaytestLayer() {
-    if (loading || typeof document === "undefined") return;
-    loading = true;
+    if (playtestLoading || typeof document === "undefined" || !playtestRequested()) return false;
+    playtestLoading = true;
     if (!document.querySelector('link[data-k162-style]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -29,91 +38,7 @@
       script.dataset.k162Runtime = "1";
       document.body.appendChild(script);
     }
-  }
-
-  function loadOnboardingLayer() {
-    if (onboardingLoading || typeof document === "undefined") return;
-    onboardingLoading = true;
-    if (!document.querySelector('link[data-k168-style]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "styles/v0168-onboarding-ui.css";
-      link.dataset.k168Style = "1";
-      document.head.appendChild(link);
-    }
-    if (!document.querySelector('script[data-k168-runtime]')) {
-      const script = document.createElement("script");
-      script.src = "src/v0168-onboarding-ui.js";
-      script.dataset.k168Runtime = "1";
-      document.body.appendChild(script);
-    }
-  }
-
-  function loadReleasePolishLayer() {
-    if (polishLoading || typeof document === "undefined") return;
-    polishLoading = true;
-    canonicalLabels();
-    if (!document.querySelector('link[data-k169-style]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "styles/v0169-release-polish.css";
-      link.dataset.k169Style = "1";
-      document.head.appendChild(link);
-    }
-    if (!document.querySelector('script[data-k169-runtime]')) {
-      const script = document.createElement("script");
-      script.src = "src/v0169-release-polish.js";
-      script.dataset.k169Runtime = "1";
-      document.body.appendChild(script);
-    }
-  }
-
-  function loadMapStabilityLayer() {
-    if (mapStabilityLoading || typeof document === "undefined") return;
-    mapStabilityLoading = true;
-    if (!document.querySelector('link[data-k169-map-style]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "styles/v0169-map-stability.css";
-      link.dataset.k169MapStyle = "1";
-      document.head.appendChild(link);
-    }
-    if (!document.querySelector('script[data-k169-map-runtime]')) {
-      const script = document.createElement("script");
-      script.src = "src/v0169-map-stability.js";
-      script.dataset.k169MapRuntime = "1";
-      document.body.appendChild(script);
-    }
-  }
-
-  function loadViewportLayer() {
-    if (viewportLoading || typeof document === "undefined") return;
-    viewportLoading = true;
-    if (!document.querySelector('link[data-k169-viewport-style]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "styles/v0169-viewport-lock.css";
-      link.dataset.k169ViewportStyle = "1";
-      document.head.appendChild(link);
-    }
-    if (!document.querySelector('script[data-k169-viewport-runtime]')) {
-      const script = document.createElement("script");
-      script.src = "src/v0169-viewport-lock.js";
-      script.dataset.k169ViewportRuntime = "1";
-      document.body.appendChild(script);
-    }
-  }
-
-  function loadCreationFlowFix() {
-    if (creationFlowLoading || typeof document === "undefined") return;
-    creationFlowLoading = true;
-    if (!document.querySelector('link[data-k169-creation-style]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "styles/v0169-creation-flow-fix.css";
-      link.dataset.k169CreationStyle = "1";
-      document.head.appendChild(link);
-    }
+    return true;
   }
 
   function install() {
@@ -122,27 +47,20 @@
     if (!root) return false;
     root.addEventListener("click", event => event.stopPropagation());
     root.dataset.v0161InteractionGuard = "ready";
+    canonicalLabels();
     loadPlaytestLayer();
-    loadOnboardingLayer();
-    loadReleasePolishLayer();
-    loadMapStabilityLayer();
-    loadViewportLayer();
-    loadCreationFlowFix();
     installed = true;
     return true;
   }
 
-  document.addEventListener("DOMContentLoaded", install, { once: true });
+  document.addEventListener("DOMContentLoaded", install, {once: true});
   setTimeout(install, 0);
 
   globalThis.KorytoInteractionGuard161 = {
     install,
-    loadPlaytestLayer,
-    loadOnboardingLayer,
-    loadReleasePolishLayer,
-    loadMapStabilityLayer,
-    loadViewportLayer,
-    loadCreationFlowFix,
-    canonicalLabels
+    buildInfo,
+    canonicalLabels,
+    playtestRequested,
+    loadPlaytestLayer
   };
 })();
