@@ -1,4 +1,4 @@
-name: Koryto v0.16.1 TEST.1
+name: Koryto v0.16.5 TEST.1
 
 on:
   push:
@@ -30,14 +30,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.16.1-test.1-diagnostics
+          name: koryto-v0.16.5-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
       - name: Build offline package
         shell: bash
         run: |
           set -euo pipefail
-          target=dist/koryto-v0.16.1-test.1
+          build_version="$(cat VERSION)"
+          test "$build_version" = "0.16.5-test.1"
+          target="dist/koryto-v${build_version}"
           mkdir -p "$target"
           cp index.html VERSION README.md "$target/"
           cp -R src styles assets "$target/"
@@ -46,20 +48,28 @@ jobs:
           cp docs/v0.14/v0147-consequence-report.md "$target/docs/v0.14/"
           cp docs/v0.16/v0160-clean-ui.md "$target/docs/v0.16/"
           cp docs/v0.16/v0161-layout-polish.md "$target/docs/v0.16/"
+          cp docs/v0.16/v0162-playtest.md "$target/docs/v0.16/"
+          cp docs/v0.16/v0163-staff-polish.md "$target/docs/v0.16/"
+          cp docs/v0.16/v0165-audit.md "$target/docs/v0.16/"
           rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
-          test "$(cat "$target/VERSION")" = "0.16.1-test.1"
           test -f "$target/styles/v0160.css"
           test -f "$target/styles/v0160-responsive.css"
+          test -f "$target/styles/v0163-staff.css"
+          test -f "$target/styles/v0164-map-cards.css"
+          test -f "$target/styles/v0165-campaign-ui.css"
           test -f "$target/src/v0160-ui.js"
           test -f "$target/src/v0161-interaction-guard.js"
+          test -f "$target/src/v0163-staff.js"
+          test -f "$target/src/v0165-campaign-ui.js"
           test -f "$target/assets/v0160/dolni-vejprnice-map.svg"
-          test -f "$target/docs/v0.16/v0161-layout-polish.md"
-          grep -q '0.16.1 TEST.1' "$target/index.html"
+          test -f "$target/assets/v0165/manifest.json"
+          test -f "$target/docs/v0.16/v0165-audit.md"
+          grep -q '0.16.5 TEST.1' "$target/index.html"
           grep -q 'viewport-fit=cover' "$target/index.html"
           grep -q 'styles/v0160.css' "$target/index.html"
-          grep -q 'styles/v0160-responsive.css' "$target/index.html"
+          grep -q 'styles/v0165-campaign-ui.css' "$target/index.html"
           grep -q 'src/v0160-ui.js' "$target/index.html"
-          grep -q 'src/v0161-interaction-guard.js' "$target/index.html"
+          grep -q 'src/v0165-campaign-ui.js' "$target/index.html"
           grep -q 'k16-bottom-mobile' "$target/src/v0160-ui.js"
           grep -q 'stopPropagation' "$target/src/v0161-interaction-guard.js"
           grep -q 'max-width: 390px' "$target/styles/v0160-responsive.css"
@@ -70,6 +80,6 @@ jobs:
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.16.1-test.1
-          path: dist/koryto-v0.16.1-test.1
+          name: koryto-v0.16.5-test.1
+          path: dist/koryto-v0.16.5-test.1
           if-no-files-found: error
