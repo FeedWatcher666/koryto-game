@@ -1,12 +1,21 @@
-# Koryto v0.16.9 TEST.3
+# Koryto v0.17.0 TEST.1
 
-Hratelný offline test sjednoceného kampanového UI.
+Hratelný offline test nové vizuální základny kampaně.
 
 ## Spuštění
 
 Rozbalte ZIP a otevřete `index.html`.
 
-## Dokončené části řady v0.16
+## Co přidává v0.17.0
+
+- jednotný dřevěný, kovový a pergamenový vizuální systém podle schváleného směru,
+- čitelnější hierarchii hlavní mapy, aktivní kauzy, rivala a klíčových lidí,
+- přepracované lokality, události, volby a výsledkové karty bez změny mechanik,
+- kompaktní mobilní rozložení se stejnými herními informacemi jako desktop,
+- komponentové CSS a lehkou dekorační vrstvu bez vzdálených závislostí,
+- plný save/load roundtrip se zachovaným formátem `0.14.3-test.2 / schema 1`.
+
+## Zachované hratelné části řady v0.16
 
 - úvodní briefing třináctidenní kampaně,
 - tvorba kandidáta s živým náhledem,
@@ -41,4 +50,4 @@ Rozbalte ZIP a otevřete `index.html`.
 5. Dokončit volby a koaliční vyjednávání.
 6. Ověřit celý tok na desktopu a při šířce 390 px.
 
-Podrobný popis iterace je v `docs/v0.16/v0169-release-polish.md`.
+Podrobný popis iterace je v `docs/v0.17/v0170-visual-foundation.md`.

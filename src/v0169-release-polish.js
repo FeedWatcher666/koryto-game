@@ -1,8 +1,8 @@
 "use strict";
 (() => {
   const INFO = globalThis.KorytoBuildInfo || Object.freeze({
-    displayVersion: "0.16.9 TEST.3",
-    buildVersion: "0.16.9-test.3",
+    displayVersion: "0.17.0 TEST.1",
+    buildVersion: "0.17.0-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
     applyLabels: () => false

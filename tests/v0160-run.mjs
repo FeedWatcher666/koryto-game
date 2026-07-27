@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const syntax = [
-  'src/build-info.js','src/app.js','src/core-data.js','src/companion-data.js','src/faction-data.js','src/debate-data.js','src/event-data.js','src/quest-data.js','src/quest-runtime.js','src/debate-system.js','src/election-system.js','src/game-engine.js','src/event-system.js','src/faction-system.js','src/companion-system.js','src/balance-system.js','src/ux-system.js','src/v0144-test10.js','src/v0145-campaign.js','src/v0146-playtest.js','src/v0147-consequences.js','src/v0148-visual-system.js','src/v0149-assets/atlas-1.js','src/v0149-assets/atlas-2.js','src/v0149-assets/atlas-3.js','src/v0149-assets/village-1.js','src/v0149-assets/village-2.js','src/v0149-pixel-assets.js','src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js','src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js','src/v0142-rc3.js','src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js','src/v0143-test10.js','src/v0160-ui.js','src/v0161-interaction-guard.js','src/v0163-staff.js','src/v0165-campaign-ui.js','src/v0166-day-debate-ui.js','src/v0167-election-coalition-ui.js','src/v0168-onboarding-ui.js','src/v0169-release-polish.js','src/v0169-map-stability.js','src/v0169-viewport-lock.js'
+  'src/build-info.js','src/app.js','src/core-data.js','src/companion-data.js','src/faction-data.js','src/debate-data.js','src/event-data.js','src/quest-data.js','src/quest-runtime.js','src/debate-system.js','src/election-system.js','src/game-engine.js','src/event-system.js','src/faction-system.js','src/companion-system.js','src/balance-system.js','src/ux-system.js','src/v0144-test10.js','src/v0145-campaign.js','src/v0146-playtest.js','src/v0147-consequences.js','src/v0148-visual-system.js','src/v0149-assets/atlas-1.js','src/v0149-assets/atlas-2.js','src/v0149-assets/atlas-3.js','src/v0149-assets/village-1.js','src/v0149-assets/village-2.js','src/v0149-pixel-assets.js','src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js','src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js','src/v0142-rc3.js','src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js','src/v0143-test10.js','src/v0160-ui.js','src/v0161-interaction-guard.js','src/v0163-staff.js','src/v0165-campaign-ui.js','src/v0166-day-debate-ui.js','src/v0167-election-coalition-ui.js','src/v0168-onboarding-ui.js','src/v0169-release-polish.js','src/v0169-map-stability.js','src/v0169-viewport-lock.js','src/v0170-visual-foundation.js'
 ];
 const historical = [
   'tests/content-integrity.mjs','tests/save-migration.mjs','tests/smoke.mjs','tests/simulation.mjs','tests/v0142-stability.mjs','tests/v0142-countercampaign.mjs','tests/v0142-ui-balance.mjs','tests/v0142-clarity.mjs','tests/v0142-rc3.mjs','tests/v0143-modules.mjs','tests/v0143-quest-system.mjs','tests/v0143-test10.mjs','tests/v0144-modular.mjs','tests/v0144-simulation.mjs','tests/v0145-playability.mjs','tests/v0146-playtest.mjs','tests/v0147-consequences.mjs','tests/v0148-visual.mjs','tests/v0149-assets.mjs','tests/v0149-assets-review.mjs'
@@ -21,10 +21,10 @@ try{
   fs.mkdirSync(path.join(workspace,'.github/workflows'),{recursive:true});
   const currentIndex=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const legacyIndex=currentIndex
-    .replaceAll('0.16.9 TEST.3','0.14.9 TEST.10')
-    .replaceAll('0.16.9-test.3','0.14.9-test.10')
-    .replaceAll('Release Integrity Fixes','komunální politické RPG')
-    .replaceAll('stabilizovaný interní release candidate s jedinou navigací, idempotentní identitou a ověřeným save/load roundtripem.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
+    .replaceAll('0.17.0 TEST.1','0.14.9 TEST.10')
+    .replaceAll('0.17.0-test.1','0.14.9-test.10')
+    .replaceAll('Visual Foundation','komunální politické RPG')
+    .replaceAll('první hratelný vizuální základ mapy, událostí a responzivního politického RPG rozhraní.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
     .replace('\n<link rel="stylesheet" href="styles/v0160.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0160-responsive.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0163-staff.css">','')
@@ -38,6 +38,7 @@ try{
     .replace('\n<link rel="stylesheet" href="styles/v0169-map-stability.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0169-viewport-lock.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0169-creation-flow-fix.css">','')
+    .replace('\n<link rel="stylesheet" href="styles/v0170-visual-foundation.css">','')
     .replace('<script src="src/build-info.js"></script>','')
     .replace('<script src="src/v0160-ui.js"></script>','')
     .replace('<script src="src/v0161-interaction-guard.js"></script>','')
@@ -48,7 +49,8 @@ try{
     .replace('<script src="src/v0168-onboarding-ui.js"></script>','')
     .replace('<script src="src/v0169-release-polish.js"></script>','')
     .replace('<script src="src/v0169-map-stability.js"></script>','')
-    .replace('<script src="src/v0169-viewport-lock.js"></script>','');
+    .replace('<script src="src/v0169-viewport-lock.js"></script>','')
+    .replace('<script src="src/v0170-visual-foundation.js"></script>','');
   fs.writeFileSync(path.join(workspace,'index.html'),legacyIndex);
   fs.writeFileSync(path.join(workspace,'VERSION'),'0.14.9-test.10\n');
   fs.writeFileSync(path.join(workspace,'.github/workflows/v0142-stability.yml'),'name: Koryto v0.14.9 TEST.10\n\non:\n  push:\n    branches: [test/v0.14.9-test10, fix/pr19-v0149-wiring]\n\njobs:\n  package:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo koryto-v0.14.9-test.10\n');
@@ -67,7 +69,8 @@ try{
 const current = [
   'tests/v0160-clean-ui.mjs','tests/v0166-day-debate.mjs','tests/v0167-election-coalition.mjs',
   'tests/v0168-onboarding.mjs','tests/v0169-release-polish.mjs','tests/v0169-map-stability.mjs',
-  'tests/v0169-viewport-lock.mjs','tests/v0169-release-integrity.mjs'
+  'tests/v0169-viewport-lock.mjs','tests/v0169-release-integrity.mjs','tests/v0170-visual-foundation.mjs'
 ];
 for(const file of current)run(root,[file],file);
-console.log(`Koryto v0.16.9 TEST.3 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);
+console.log(`Koryto v0.17.0 TEST.1 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);
+

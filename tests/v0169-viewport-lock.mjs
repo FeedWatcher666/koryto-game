@@ -7,7 +7,7 @@ const runtime = read('src/v0169-viewport-lock.js');
 const css = read('styles/v0169-viewport-lock.css');
 const creationFix = read('styles/v0169-creation-flow-fix.css');
 
-assert.equal(read('VERSION').trim(), '0.16.9-test.3');
+assert.equal(read('VERSION').trim(), '0.17.0-test.1');
 assert.match(html, /styles\/v0169-viewport-lock\.css/);
 assert.match(html, /src\/v0169-viewport-lock\.js/);
 assert.match(html, /styles\/v0169-creation-flow-fix\.css/);
@@ -43,4 +43,5 @@ assert.match(creationFix, /#confirmBtn\.k168-confirm-button/);
 assert.match(creationFix, /display:\s*block\s*!important/);
 assert.match(creationFix, /position:\s*sticky/);
 
-console.log('v0.16.9 TEST.3 fixed-screen viewport and candidate progression contract passed');
+console.log('v0.17.0 TEST.1 fixed-screen viewport and candidate progression contract passed');
+

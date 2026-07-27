@@ -9,7 +9,7 @@ const creationCss = read('styles/v0169-creation-flow-fix.css');
 const campaignRuntime = read('src/v0165-campaign-ui.js');
 const campaignCss = read('styles/v0165-campaign-ui.css');
 
-assert.equal(read('VERSION').trim(), '0.16.9-test.3');
+assert.equal(read('VERSION').trim(), '0.17.0-test.1');
 assert.match(html, /styles\/v0169-map-stability\.css/);
 assert.match(html, /src\/v0169-map-stability\.js/);
 assert.match(runtime, /globalThis\.KorytoBuildInfo/);
@@ -43,4 +43,5 @@ for (const id of ['pub', 'townhall', 'school', 'paper', 'pitch', 'jzd', 'meadow'
   assert.match(css, new RegExp(`data-k16-location="${id}"`));
 }
 
-console.log('v0.16.9 TEST.3 canonical map and cross-surface navigation contract passed');
+console.log('v0.17.0 TEST.1 canonical map and cross-surface navigation contract passed');
+
