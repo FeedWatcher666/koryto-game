@@ -2,17 +2,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const read = path => fs.readFileSync(path, 'utf8');
-const guard = read('src/v0161-interaction-guard.js');
+const html = read('index.html');
 const runtime = read('src/v0169-viewport-lock.js');
 const css = read('styles/v0169-viewport-lock.css');
 const creationFix = read('styles/v0169-creation-flow-fix.css');
 
-assert.equal(read('VERSION').trim(), '0.16.9-test.1');
-assert.match(guard, /styles\/v0169-viewport-lock\.css/);
-assert.match(guard, /src\/v0169-viewport-lock\.js/);
-assert.match(guard, /loadViewportLayer/);
-assert.match(guard, /styles\/v0169-creation-flow-fix\.css/);
-assert.match(guard, /loadCreationFlowFix/);
+assert.equal(read('VERSION').trim(), '0.16.9-test.2');
+assert.match(html, /styles\/v0169-viewport-lock\.css/);
+assert.match(html, /src\/v0169-viewport-lock\.js/);
+assert.match(html, /styles\/v0169-creation-flow-fix\.css/);
 
 assert.match(runtime, /VERSION = "0\.16\.9 VIEWPORT LOCK"/);
 assert.match(runtime, /SAVE_VERSION = "0\.14\.3-test\.2"/);
@@ -45,4 +43,4 @@ assert.match(creationFix, /#confirmBtn\.k168-confirm-button/);
 assert.match(creationFix, /display:\s*block\s*!important/);
 assert.match(creationFix, /position:\s*sticky/);
 
-console.log('v0.16.9 fixed-screen viewport, compact mode and candidate progression contract passed');
+console.log('v0.16.9 TEST.2 fixed-screen viewport and candidate progression contract passed');
