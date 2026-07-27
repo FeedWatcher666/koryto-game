@@ -10,7 +10,7 @@ const guard = read('src/v0161-interaction-guard.js');
 const svg = read('assets/v0160/dolni-vejprnice-map.svg');
 
 assert.equal(read('VERSION').trim(), '0.16.5-test.1');
-assert.match(html, /0\.16\.1 TEST\.1/);
+assert.match(html, /0\.16\.5 TEST\.1/);
 assert.match(html, /viewport-fit=cover/);
 assert.match(html, /styles\/v0160\.css/);
 assert.match(html, /styles\/v0160-responsive\.css/);
@@ -21,8 +21,8 @@ assert.ok(html.indexOf('styles/v0160-responsive.css') > html.indexOf('styles/v01
 assert.ok(html.indexOf('src/v0160-ui.js') > html.indexOf('src/v0149-pixel-assets.js'));
 assert.ok(html.indexOf('src/v0161-interaction-guard.js') > html.indexOf('src/v0160-ui.js'));
 
-assert.match(runtime, /VERSION = "0\.16\.1 TEST\.1"/);
-assert.match(runtime, /BUILD_VERSION = "0\.16\.1-test\.1"/);
+assert.match(runtime, /VERSION = "0\.16\.5 TEST\.1"/);
+assert.match(runtime, /BUILD_VERSION = "0\.16\.5-test\.1"/);
 assert.match(runtime, /SAVE_VERSION = "0\.14\.3-test\.2"/);
 assert.match(runtime, /SAVE_SCHEMA = 1/);
 assert.doesNotMatch(runtime + guard, /MutationObserver|setInterval\s*\(/);
