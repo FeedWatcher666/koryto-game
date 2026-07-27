@@ -1,4 +1,4 @@
-# Koryto v0.16.6 TEST.1
+# Koryto v0.16.7 TEST.1
 
 Hratelný offline test sjednoceného kampanového UI.
 
@@ -16,6 +16,8 @@ Rozbalte ZIP a otevřete `index.html`.
 - výsledek rozhodnutí,
 - denní uzávěrka před ukončením dne,
 - veřejná debata a taktické karty,
+- volební noc a patnáctimandátový přehled,
+- koaliční salonek, nabídky a živý log vyjednávání,
 - responzivní desktopové a mobilní rozhraní.
 
 ## Doporučený test
@@ -26,6 +28,8 @@ Rozbalte ZIP a otevřete `index.html`.
 4. Otevřete událost, proveďte hod a pokračujte z nové výsledkové karty.
 5. Na mapě otevřete `Ukončit den`, zkontrolujte přehled a potvrďte další den.
 6. Spusťte veřejnou debatu a odehrajte několik taktických karet.
-7. Vyzkoušejte stejný tok při šířce mobilního telefonu.
+7. Dokončete volby, zkontrolujte mandáty a projděte koaličním vyjednáváním.
+8. Ověřte konečný volební účet a spusťte novou kampaň.
+9. Vyzkoušejte stejný tok při šířce mobilního telefonu.
 
-Podrobný popis iterace je v `docs/v0.16/v0166-day-debate.md`.
+Podrobný popis iterace je v `docs/v0.16/v0167-election-coalition.md`.
