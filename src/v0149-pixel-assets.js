@@ -175,39 +175,18 @@
     return validation.ok ? `${DATA_PREFIX}${base64}` : "";
   }
 
-  function lockCanonicalValue(target, property, value) {
-    if (!target) return false;
-    const marker = `__v0149Locked_${property}`;
-    if (target[marker]) return true;
-    try {
-      target[property] = value;
-      Object.defineProperty(target, property, {
-        configurable: true,
-        enumerable: true,
-        get: () => value,
-        set: () => {}
-      });
-      Object.defineProperty(target, marker, { configurable: true, value: true });
-      return true;
-    } catch (_) {
-      try { target[property] = value; } catch (_) {}
-      return false;
-    }
-  }
-
   function canonicalLabels() {
     if (typeof document === "undefined") return false;
-    const titleNode = document.querySelector?.("title");
-    if (titleNode) titleNode.textContent = DISPLAY_TITLE;
-    lockCanonicalValue(document, "title", DISPLAY_TITLE);
-    lockCanonicalValue(document.querySelector?.(".brand h1 span"), "textContent", `Dolní Vejprnice ${VERSION}`);
-    const description = document.querySelector?.('meta[name="description"]');
-    lockCanonicalValue(description, "content", DISPLAY_DESCRIPTION);
-    description?.setAttribute?.("content", DISPLAY_DESCRIPTION);
+    const newer = globalThis.KorytoBuildInfo;
+    if (newer?.applyLabels) return newer.applyLabels();
+    document.title = DISPLAY_TITLE;
+    document.querySelector?.('meta[name="description"]')?.setAttribute?.("content", DISPLAY_DESCRIPTION);
+    const brand = document.querySelector?.(".brand h1 span");
+    if (brand) brand.textContent = `Dolní Vejprnice ${VERSION}`;
     const footer = document.querySelector?.(".footer-note");
     if (footer) {
       const cleanFooter = String(footer.textContent || "").replace(/\s*·\s*0\.14(?:\.\d+)?\s+(?:TEST\.\d+|RC\d+)$/u, "");
-      lockCanonicalValue(footer, "textContent", `${cleanFooter} · ${VERSION}`);
+      footer.textContent = `${cleanFooter} · ${VERSION}`;
     }
     if (document.documentElement?.dataset) document.documentElement.dataset.korytoBuild = BUILD_VERSION;
     return true;
@@ -299,11 +278,7 @@
   function install() {
     canonicalLabels();
     if (typeof document === "undefined") return false;
-    if (!assetState.installed) {
-      document.addEventListener?.("click", canonicalLabels);
-      document.addEventListener?.("change", canonicalLabels);
-      assetState.installed = true;
-    }
+    assetState.installed = true;
     return preload();
   }
 
