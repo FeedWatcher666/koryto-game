@@ -6,6 +6,7 @@
   let polishLoading = false;
   let mapStabilityLoading = false;
   let viewportLoading = false;
+  let creationFlowLoading = false;
 
   function canonicalLabels() {
     document.title = "Koryto 0.16.9 TEST.1 – Release Polish";
@@ -103,6 +104,18 @@
     }
   }
 
+  function loadCreationFlowFix() {
+    if (creationFlowLoading || typeof document === "undefined") return;
+    creationFlowLoading = true;
+    if (!document.querySelector('link[data-k169-creation-style]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "styles/v0169-creation-flow-fix.css";
+      link.dataset.k169CreationStyle = "1";
+      document.head.appendChild(link);
+    }
+  }
+
   function install() {
     if (installed || typeof document === "undefined") return installed;
     const root = document.getElementById("v0160Root");
@@ -114,6 +127,7 @@
     loadReleasePolishLayer();
     loadMapStabilityLayer();
     loadViewportLayer();
+    loadCreationFlowFix();
     installed = true;
     return true;
   }
@@ -128,6 +142,7 @@
     loadReleasePolishLayer,
     loadMapStabilityLayer,
     loadViewportLayer,
+    loadCreationFlowFix,
     canonicalLabels
   };
 })();
