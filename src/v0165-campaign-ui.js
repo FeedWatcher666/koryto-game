@@ -129,7 +129,7 @@
     const old = document.getElementById("v0160Root");
     if (old) old.hidden = true;
     bindCommon(root);
-    document.title = `Koryto ${VERSION} – ${view === "location" ? "lokalita" : view === "event" ? "událost" : view === "result" ? "výsledek" : "kauzy"}`;
+    globalThis.KorytoBuildInfo?.applyLabels?.();
     return root;
   }
 
