@@ -1,22 +1,15 @@
-# Koryto v0.16.2 TEST.1 — Playable Map + Staff
+# Koryto v0.16.2 TEST.1 — archiv playtest prototypu
 
-## Účel
+## Stav ve v0.16.9 TEST.3
 
-První ručně testovatelný build nového komponentového UI. Nasazuje schválený mapový art a obrazovku štábu bez změny questů, eventů, volebních výpočtů nebo save kontraktu.
+Experimentální query režim `?playtest=1` byl z distribuovaného releasu odstraněn. Odkazoval na soubory, které nebyly součástí offline ZIPu, a proto vytvářel dvě chyby 404.
 
-## Funkční propojení
+Běžná hra, testovací workflow ani dokumentace už tento režim neprezentují jako podporovanou funkci. Testování štábu probíhá standardní herní cestou a přes automatické kontrakty obrazovky štábu.
 
-- hotspot mapy volá původní `showLocation(id)`,
-- aktivní podpora zapisuje `state.selectedSupport`,
-- mise zapisuje `state.partyAssignment`, `partyUsedDay` a únavu stejným kontraktem jako původní `dispatchCompanion`,
-- osobní agenda vede do skutečné lokace postavy,
-- otevřený konflikt volá původní konfliktový event,
-- výsledek mise zpracuje původní `resolvePartyAssignment` při ukončení dne.
+## Zachovaný historický kontext
 
-## Playtest režim
-
-`index.html?playtest=1` zobrazí bezpečné tlačítko pro doplnění všech pěti členů štábu. Funkce není automatická a nemění save schema.
+v0.16.2 ověřovala propojení nové mapy a štábu s původními funkcemi `showLocation`, `dispatchCompanion`, `resolvePartyAssignment` a se save kontraktem `0.14.3-test.2` / schema `1`.
 
 ## Rollback
 
-Odebrání `src/v0162-playtest.js`, `styles/v0162-playtest.css`, `assets/v0162/` a dynamického loaderu ve `src/v0161-interaction-guard.js` vrátí v0.16.1 mapový build.
+Žádný produkční loader v0.16.2 již neexistuje. Návrat k dřívějšímu UI se řeší verzovaným Git commitem, nikoli query parametrem.

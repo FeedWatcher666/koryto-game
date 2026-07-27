@@ -33,6 +33,8 @@
   let previousShowLocation = null;
   let previousShowEvent = null;
   let previousShowMap = null;
+  const legacyNavigationState = new Map();
+  const LEGACY_NAVIGATION_SELECTOR = "#v0148Nav,.v0148-nav,#v0160Root .k16-bottom";
 
   const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"})[char]);
   const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
@@ -88,6 +90,33 @@
       <section class="k165-more-drawer" data-k165-drawer hidden><header><b>DALŠÍ SEKCE</b><button type="button" data-k165-close>×</button></header><div>${more.map(([id,icon,label])=>`<button type="button" data-k165-nav="${id}"><span>${icon}</span><b>${label}</b></button>`).join("")}</div></section>`;
   }
 
+  function suppressLegacyNavigation(active) {
+    document.querySelectorAll(LEGACY_NAVIGATION_SELECTOR).forEach(nav => {
+      if (active) {
+        if (!legacyNavigationState.has(nav)) {
+          legacyNavigationState.set(nav, {
+            hidden: Boolean(nav.hidden),
+            inert: Boolean(nav.inert),
+            ariaHidden: nav.getAttribute("aria-hidden")
+          });
+        }
+        nav.hidden = true;
+        nav.inert = true;
+        nav.setAttribute("aria-hidden", "true");
+        nav.setAttribute("data-k165-disabled-nav", "true");
+        return;
+      }
+      const previous = legacyNavigationState.get(nav);
+      if (!previous) return;
+      nav.hidden = previous.hidden;
+      nav.inert = previous.inert;
+      if (previous.ariaHidden === null) nav.removeAttribute("aria-hidden");
+      else nav.setAttribute("aria-hidden", previous.ariaHidden);
+      nav.removeAttribute("data-k165-disabled-nav");
+      legacyNavigationState.delete(nav);
+    });
+  }
+
   function activate(html, view, id = null) {
     activeView = view;
     activeId = id;
@@ -96,6 +125,7 @@
     root.hidden = false;
     document.documentElement.classList.add("k165-active");
     document.documentElement.classList.remove("k16-active","k163-map-view","k163-staff-view");
+    suppressLegacyNavigation(true);
     const old = document.getElementById("v0160Root");
     if (old) old.hidden = true;
     bindCommon(root);
@@ -107,6 +137,7 @@
     activeView = null;
     activeId = null;
     document.documentElement.classList.remove("k165-active");
+    suppressLegacyNavigation(false);
     const root = ensureRoot();
     root.hidden = true;
   }
@@ -351,7 +382,8 @@
       choiceCards:document.querySelectorAll("#v0165Root .k165-choice").length,
       locationAssets:Object.keys(LOCATION_ASSETS).length,
       questAssets:Object.keys(QUEST_ASSETS).length,
-      tacticAssets:Object.keys(TACTIC_ASSETS).length
+      tacticAssets:Object.keys(TACTIC_ASSETS).length,
+      disabledLegacyNavigations:document.querySelectorAll("[data-k165-disabled-nav='true']").length
     };
   }
 
@@ -384,7 +416,7 @@
       if(event.target?.id === "diceClose") setTimeout(()=>renderResult(),80);
     },true);
 
-    globalThis.KorytoUI165 = {VERSION,BUILD_VERSION,SAVE_VERSION,SAVE_SCHEMA,LOCATION_ASSETS,QUEST_ASSETS,TACTIC_ASSETS,renderQuestList,renderQuestDetail,renderLocation,renderEvent,renderResult,navigate,visualAudit,install};
+    globalThis.KorytoUI165 = {VERSION,BUILD_VERSION,SAVE_VERSION,SAVE_SCHEMA,LOCATION_ASSETS,QUEST_ASSETS,TACTIC_ASSETS,suppressLegacyNavigation,renderQuestList,renderQuestDetail,renderLocation,renderEvent,renderResult,navigate,visualAudit,install};
     return true;
   }
 

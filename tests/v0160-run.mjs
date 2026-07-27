@@ -21,10 +21,10 @@ try{
   fs.mkdirSync(path.join(workspace,'.github/workflows'),{recursive:true});
   const currentIndex=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const legacyIndex=currentIndex
-    .replaceAll('0.16.9 TEST.2','0.14.9 TEST.10')
-    .replaceAll('0.16.9-test.2','0.14.9-test.10')
-    .replaceAll('Release Integrity','komunální politické RPG')
-    .replaceAll('stabilizovaný offline release candidate s jednotnou verzí, mapou a pevným herním viewportem.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
+    .replaceAll('0.16.9 TEST.3','0.14.9 TEST.10')
+    .replaceAll('0.16.9-test.3','0.14.9-test.10')
+    .replaceAll('Release Integrity Fixes','komunální politické RPG')
+    .replaceAll('stabilizovaný interní release candidate s jedinou navigací, idempotentní identitou a ověřeným save/load roundtripem.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
     .replace('\n<link rel="stylesheet" href="styles/v0160.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0160-responsive.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0163-staff.css">','')
@@ -70,4 +70,4 @@ const current = [
   'tests/v0169-viewport-lock.mjs','tests/v0169-release-integrity.mjs'
 ];
 for(const file of current)run(root,[file],file);
-console.log(`Koryto v0.16.9 TEST.2 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);
+console.log(`Koryto v0.16.9 TEST.3 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);

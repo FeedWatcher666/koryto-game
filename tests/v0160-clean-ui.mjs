@@ -9,8 +9,8 @@ const runtime = read('src/v0160-ui.js');
 const guard = read('src/v0161-interaction-guard.js');
 const svg = read('assets/v0160/dolni-vejprnice-map.svg');
 
-assert.equal(read('VERSION').trim(), '0.16.9-test.2');
-assert.match(html, /0\.16\.9 TEST\.2/);
+assert.equal(read('VERSION').trim(), '0.16.9-test.3');
+assert.match(html, /0\.16\.9 TEST\.3/);
 assert.match(html, /viewport-fit=cover/);
 assert.match(html, /styles\/v0160\.css/);
 assert.match(html, /styles\/v0160-responsive\.css/);
@@ -46,6 +46,7 @@ assert.match(runtime, /mobileNavItems/);
 assert.match(runtime, /mobileDrawerItems/);
 assert.match(guard, /stopPropagation/);
 assert.match(guard, /v0161InteractionGuard/);
+assert.doesNotMatch(guard, /v0162-playtest|playtestRequested|loadPlaytestLayer/);
 
 assert.match(css, /html\.k16-active #app\s*\{[^}]*display:\s*none/s);
 assert.match(css, /#v0160Root/);
@@ -70,4 +71,4 @@ for (const id of ['pub', 'townhall', 'school', 'paper', 'pitch', 'jzd', 'meadow'
   assert.match(runtime, new RegExp(`${id}: \\[\\d+, \\d+\\]`));
 }
 
-console.log('v0.16.5 responsive clean UI subsystem contract passed inside v0.16.9 TEST.2');
+console.log('v0.16.5 responsive clean UI subsystem contract passed inside v0.16.9 TEST.3');

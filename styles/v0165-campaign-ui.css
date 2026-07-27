@@ -38,3 +38,13 @@ html.k165-active #app { display:none !important; }
 @media(max-width:760px){.k165-bottom-desktop{display:none}.k165-bottom-mobile{display:grid;grid-template-columns:repeat(5,1fr)}.k165-bottom-mobile button:nth-child(n){display:block}}
 /* Quest illustrations came from art-direction sheets. Obscure baked-in corner badges so live deadlines remain the only source of truth. */
 .k165-quest-card .k165-card-art::before{content:"";position:absolute;z-index:1;inset:0 0 auto 0;height:52px;background:linear-gradient(180deg,#1a0907e8 0,#1a090788 56%,transparent 100%);pointer-events:none}.k165-quest-card .k165-card-art>span,.k165-quest-card .k165-card-art>em{z-index:2}.k165-quest-card .k165-card-art>em{min-width:92px;text-align:center}
+
+/* TEST.3: a k165 surface owns navigation exclusively. Legacy bars are not only covered; they are removed from layout and hit testing. */
+html.k165-active #v0148Nav,
+html.k165-active .v0148-nav,
+html.k165-active #v0160Root .k16-bottom,
+html.k165-active [data-k165-disabled-nav="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

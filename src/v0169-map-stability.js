@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  const INFO = globalThis.KorytoBuildInfo || {displayVersion:"0.16.9 TEST.2",buildVersion:"0.16.9-test.2",saveVersion:"0.14.3-test.2",saveSchema:1};
+  const INFO = globalThis.KorytoBuildInfo || {displayVersion:"0.16.9 TEST.3",buildVersion:"0.16.9-test.3",saveVersion:"0.14.3-test.2",saveSchema:1};
   const VERSION = `${INFO.displayVersion} MAP STABILITY`;
   const SAVE_VERSION = INFO.saveVersion;
   const SAVE_SCHEMA = INFO.saveSchema;
@@ -17,16 +17,21 @@
     document.querySelector("[data-k169-open]")?.click();
   }
 
+  function setNavigationDisabled(nav, disabled) {
+    nav.hidden = Boolean(disabled);
+    nav.inert = Boolean(disabled);
+    nav.setAttribute("aria-hidden", String(Boolean(disabled)));
+    if (disabled) nav.setAttribute("data-k169-disabled-nav", "true");
+    else nav.removeAttribute("data-k169-disabled-nav");
+  }
+
   function syncLegacyNavigation(active) {
-    const legacy = document.querySelectorAll("#v0148Nav,.v0148-nav,.k165-bottom");
-    legacy.forEach(nav => {
-      nav.hidden = Boolean(active);
-      nav.inert = Boolean(active);
-      nav.setAttribute("aria-hidden", String(Boolean(active)));
-      if (active) nav.setAttribute("data-k169-disabled-nav", "true");
-      else nav.removeAttribute("data-k169-disabled-nav");
-    });
-    return legacy.length;
+    const k165Active = document.documentElement.classList.contains("k165-active");
+    const legacy = [...document.querySelectorAll("#v0148Nav,.v0148-nav")];
+    const campaign = [...document.querySelectorAll(".k165-bottom")];
+    legacy.forEach(nav => setNavigationDisabled(nav, active || k165Active));
+    campaign.forEach(nav => setNavigationDisabled(nav, active));
+    return legacy.length + campaign.length;
   }
 
   function forceCanonicalMap() {

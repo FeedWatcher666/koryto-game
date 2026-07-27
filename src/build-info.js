@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.16.9 TEST.2",
-    buildVersion: "0.16.9-test.2",
+    displayVersion: "0.16.9 TEST.3",
+    buildVersion: "0.16.9-test.3",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.16.9 TEST.2 – Release Integrity",
-    description: "Koryto 0.16.9 TEST.2: stabilizovaný offline release candidate s jednotnou verzí, mapou a pevným herním viewportem."
+    title: "Koryto 0.16.9 TEST.3 – Release Integrity Fixes",
+    description: "Koryto 0.16.9 TEST.3: stabilizovaný interní release candidate s jedinou navigací, idempotentní identitou a ověřeným save/load roundtripem."
   });
 
   function applyLabels() {
@@ -18,7 +18,7 @@
     const footer = document.querySelector(".footer-note");
     if (footer) {
       const base = String(footer.textContent || "")
-        .replace(/\s*·\s*0\.\d+\.\d+\s+(?:TEST\.\d+|RC\d+)$/u, "")
+        .replace(/(?:\s*·\s*0\.\d+\.\d+\s+(?:TEST\.\d+|RC\d+))+$/u, "")
         .trim();
       footer.textContent = `${base} · ${info.displayVersion}`;
     }

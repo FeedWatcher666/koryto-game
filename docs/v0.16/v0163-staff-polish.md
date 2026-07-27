@@ -18,7 +18,7 @@ UI čte existující:
 - `KorytoCompanionData`,
 - `KorytoQuestData`.
 
-Nábor se neprovádí falešným UI tlačítkem. Zamčená karta pouze ukáže lokaci a příběhovou cestu. Výjimkou je explicitní `?playtest=1`, který slouží k rychlému testování celé obrazovky.
+Nábor se neprovádí falešným UI tlačítkem. Zamčená karta pouze ukáže lokaci a příběhovou cestu. Dřívější experimentální režim `?playtest=1` byl ve v0.16.9 TEST.3 odstraněn, protože nebyl součástí distribuovaného offline balíčku.
 
 ## Funkční záložky
 
