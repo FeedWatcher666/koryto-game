@@ -1,4 +1,4 @@
-name: Koryto v0.16.9 TEST.1
+name: Koryto v0.16.9 TEST.2
 
 on:
   push:
@@ -17,28 +17,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Run tests
         shell: bash
         run: |
           set -o pipefail
           npm test 2>&1 | tee test-output.txt
+
       - name: Upload test diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.16.9-test.1-diagnostics
+          name: koryto-v0.16.9-test.2-diagnostics
           path: test-output.txt
           if-no-files-found: warn
+
       - name: Build offline package
         shell: bash
         run: |
           set -euo pipefail
           build_version="$(cat VERSION)"
-          test "$build_version" = "0.16.9-test.1"
+          test "$build_version" = "0.16.9-test.2"
           target="dist/koryto-v${build_version}"
           mkdir -p "$target"
           cp index.html VERSION README.md "$target/"
@@ -57,40 +61,56 @@ jobs:
           cp docs/v0.16/v0168-onboarding.md "$target/docs/v0.16/"
           cp docs/v0.16/v0169-release-polish.md "$target/docs/v0.16/"
           rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
-          test -f "$target/styles/v0160.css"
-          test -f "$target/styles/v0160-responsive.css"
-          test -f "$target/styles/v0163-staff.css"
-          test -f "$target/styles/v0164-map-cards.css"
-          test -f "$target/styles/v0165-campaign-ui.css"
-          test -f "$target/styles/v0166-day-debate-ui.css"
-          test -f "$target/styles/v0166-browser-polish.css"
-          test -f "$target/styles/v0167-election-coalition-ui.css"
-          test -f "$target/styles/v0168-onboarding-ui.css"
-          test -f "$target/styles/v0169-release-polish.css"
-          test -f "$target/src/v0160-ui.js"
-          test -f "$target/src/v0161-interaction-guard.js"
-          test -f "$target/src/v0163-staff.js"
-          test -f "$target/src/v0165-campaign-ui.js"
-          test -f "$target/src/v0166-day-debate-ui.js"
-          test -f "$target/src/v0167-election-coalition-ui.js"
+
+          test -f "$target/src/build-info.js"
           test -f "$target/src/v0168-onboarding-ui.js"
           test -f "$target/src/v0169-release-polish.js"
-          test -f "$target/assets/v0160/dolni-vejprnice-map.svg"
+          test -f "$target/src/v0169-map-stability.js"
+          test -f "$target/src/v0169-viewport-lock.js"
+          test -f "$target/styles/v0168-onboarding-ui.css"
+          test -f "$target/styles/v0169-release-polish.css"
+          test -f "$target/styles/v0169-map-stability.css"
+          test -f "$target/styles/v0169-viewport-lock.css"
+          test -f "$target/styles/v0169-creation-flow-fix.css"
+          test -f "$target/assets/v0164/map-pixel-cartoon.webp"
           test -f "$target/assets/v0165/manifest.json"
-          test -f "$target/docs/v0.16/v0169-release-polish.md"
+
           grep -q 'viewport-fit=cover' "$target/index.html"
-          grep -q 'styles/v0169-release-polish.css' "$target/src/v0161-interaction-guard.js"
-          grep -q 'src/v0169-release-polish.js' "$target/src/v0161-interaction-guard.js"
-          grep -q '0.16.9 TEST.1' "$target/src/v0161-interaction-guard.js"
-          grep -q 'KorytoUI169' "$target/src/v0169-release-polish.js"
-          grep -q 'Dolní Vejprnice 0.16.9 TEST.1' "$target/styles/v0166-browser-polish.css"
+          grep -q 'Koryto 0.16.9 TEST.2' "$target/index.html"
+          grep -q 'src/build-info.js' "$target/index.html"
+          grep -q 'src/v0168-onboarding-ui.js' "$target/index.html"
+          grep -q 'src/v0169-release-polish.js' "$target/index.html"
+          grep -q 'src/v0169-map-stability.js' "$target/index.html"
+          grep -q 'src/v0169-viewport-lock.js' "$target/index.html"
+          grep -q 'styles/v0169-creation-flow-fix.css' "$target/index.html"
+          grep -q 'get("playtest") === "1"' "$target/src/v0161-interaction-guard.js"
           if grep -R -E 'https?://(fonts|cdn|unpkg|jsdelivr)' "$target/index.html" "$target/styles" "$target/src"; then
             echo "Release contains a forbidden network dependency" >&2
             exit 1
           fi
+
+      - name: Install Chromium gate dependency
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.54.2
+          npx playwright install --with-deps chromium
+
+      - name: Browser gate on packaged artifact
+        shell: bash
+        run: |
+          node tests/v0169-browser-gate.mjs dist/koryto-v0.16.9-test.2
+
+      - name: Upload browser gate screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.16.9-test.2-browser-gate
+          path: browser-artifacts
+          if-no-files-found: warn
+
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.16.9-test.1
-          path: dist/koryto-v0.16.9-test.1
+          name: koryto-v0.16.9-test.2
+          path: dist/koryto-v0.16.9-test.2
           if-no-files-found: error
