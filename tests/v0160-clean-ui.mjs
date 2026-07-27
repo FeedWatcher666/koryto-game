@@ -9,7 +9,7 @@ const runtime = read('src/v0160-ui.js');
 const guard = read('src/v0161-interaction-guard.js');
 const svg = read('assets/v0160/dolni-vejprnice-map.svg');
 
-assert.equal(read('VERSION').trim(), '0.16.7-test.1');
+assert.equal(read('VERSION').trim(), '0.16.8-test.1');
 assert.match(html, /0\.16\.7 TEST\.1/);
 assert.match(html, /viewport-fit=cover/);
 assert.match(html, /styles\/v0160\.css/);
@@ -70,4 +70,4 @@ for (const id of ['pub', 'townhall', 'school', 'paper', 'pitch', 'jzd', 'meadow'
   assert.match(runtime, new RegExp(`${id}: \\[\\d+, \\d+\\]`));
 }
 
-console.log('v0.16.5 responsive clean UI subsystem contract passed inside v0.16.7');
+console.log('v0.16.5 responsive clean UI subsystem contract passed inside v0.16.8');
