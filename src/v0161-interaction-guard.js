@@ -4,6 +4,7 @@
   let loading = false;
   let onboardingLoading = false;
   let polishLoading = false;
+  let mapStabilityLoading = false;
 
   function canonicalLabels() {
     document.title = "Koryto 0.16.9 TEST.1 – Release Polish";
@@ -65,6 +66,24 @@
     }
   }
 
+  function loadMapStabilityLayer() {
+    if (mapStabilityLoading || typeof document === "undefined") return;
+    mapStabilityLoading = true;
+    if (!document.querySelector('link[data-k169-map-style]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "styles/v0169-map-stability.css";
+      link.dataset.k169MapStyle = "1";
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[data-k169-map-runtime]')) {
+      const script = document.createElement("script");
+      script.src = "src/v0169-map-stability.js";
+      script.dataset.k169MapRuntime = "1";
+      document.body.appendChild(script);
+    }
+  }
+
   function install() {
     if (installed || typeof document === "undefined") return installed;
     const root = document.getElementById("v0160Root");
@@ -74,6 +93,7 @@
     loadPlaytestLayer();
     loadOnboardingLayer();
     loadReleasePolishLayer();
+    loadMapStabilityLayer();
     installed = true;
     return true;
   }
@@ -81,5 +101,12 @@
   document.addEventListener("DOMContentLoaded", install, { once: true });
   setTimeout(install, 0);
 
-  globalThis.KorytoInteractionGuard161 = { install, loadPlaytestLayer, loadOnboardingLayer, loadReleasePolishLayer, canonicalLabels };
+  globalThis.KorytoInteractionGuard161 = {
+    install,
+    loadPlaytestLayer,
+    loadOnboardingLayer,
+    loadReleasePolishLayer,
+    loadMapStabilityLayer,
+    canonicalLabels
+  };
 })();
