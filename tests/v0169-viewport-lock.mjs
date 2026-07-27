@@ -5,11 +5,14 @@ const read = path => fs.readFileSync(path, 'utf8');
 const guard = read('src/v0161-interaction-guard.js');
 const runtime = read('src/v0169-viewport-lock.js');
 const css = read('styles/v0169-viewport-lock.css');
+const creationFix = read('styles/v0169-creation-flow-fix.css');
 
 assert.equal(read('VERSION').trim(), '0.16.9-test.1');
 assert.match(guard, /styles\/v0169-viewport-lock\.css/);
 assert.match(guard, /src\/v0169-viewport-lock\.js/);
 assert.match(guard, /loadViewportLayer/);
+assert.match(guard, /styles\/v0169-creation-flow-fix\.css/);
+assert.match(guard, /loadCreationFlowFix/);
 
 assert.match(runtime, /VERSION = "0\.16\.9 VIEWPORT LOCK"/);
 assert.match(runtime, /SAVE_VERSION = "0\.14\.3-test\.2"/);
@@ -19,7 +22,7 @@ assert.match(runtime, /k169-pregame/);
 assert.match(runtime, /dataset\.k169ActiveScreen/);
 assert.match(runtime, /KorytoViewportLock169/);
 assert.doesNotMatch(runtime, /MutationObserver|setInterval\s*\(/);
-assert.doesNotMatch(runtime + css, /https?:\/\//);
+assert.doesNotMatch(runtime + css + creationFix, /https?:\/\//);
 
 assert.match(css, /max-height:\s*100dvh/);
 assert.match(css, /overflow:\s*hidden\s*!important/);
@@ -34,4 +37,12 @@ assert.match(css, /\.k166-debate-card/);
 assert.match(css, /@media \(max-width: 820px\)/);
 assert.match(css, /safe-area-inset-bottom/);
 
-console.log('v0.16.9 fixed-screen viewport and short-display compact mode contract passed');
+assert.match(creationFix, /\.k168-profession-panel/);
+assert.match(creationFix, /grid-template-rows:\s*auto minmax\(0, 1fr\) auto/);
+assert.match(creationFix, /\.k168-profession-panel \.k168-class-grid/);
+assert.match(creationFix, /overflow-y:\s*auto/);
+assert.match(creationFix, /#confirmBtn\.k168-confirm-button/);
+assert.match(creationFix, /display:\s*block\s*!important/);
+assert.match(creationFix, /position:\s*sticky/);
+
+console.log('v0.16.9 fixed-screen viewport, compact mode and candidate progression contract passed');
