@@ -1,4 +1,12 @@
-/* Koryto v0.16.9 — keep candidate creation playable inside the fixed viewport. */
+/* Koryto v0.16.9 TEST.2 — candidate creation and single-navigation release integrity. */
+
+html.k16-active #v0148Nav,
+html.k16-active .v0148-nav,
+html.k16-active .k165-bottom,
+html.k16-active [data-k169-disabled-nav="true"] {
+  display: none !important;
+  pointer-events: none !important;
+}
 
 @media (min-width: 821px) {
   html.k169-pregame #creationScreen.active {
