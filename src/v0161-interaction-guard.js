@@ -3,10 +3,11 @@
   let installed = false;
   let loading = false;
   let onboardingLoading = false;
+  let polishLoading = false;
 
   function canonicalLabels() {
-    document.title = "Koryto 0.16.8 TEST.1 – Candidate Onboarding UI";
-    document.querySelector('meta[name="description"]')?.setAttribute("content", "Koryto 0.16.8 TEST.1: nový úvod, tvorba kandidáta a výběr politického povolání pro desktop i mobil.");
+    document.title = "Koryto 0.16.9 TEST.1 – Release Polish";
+    document.querySelector('meta[name="description"]')?.setAttribute("content", "Koryto 0.16.9 TEST.1: závěrečný UX, přístupnostní a release-polish pass pro celý offline build.");
   }
 
   function loadPlaytestLayer() {
@@ -30,7 +31,6 @@
   function loadOnboardingLayer() {
     if (onboardingLoading || typeof document === "undefined") return;
     onboardingLoading = true;
-    canonicalLabels();
     if (!document.querySelector('link[data-k168-style]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -46,6 +46,25 @@
     }
   }
 
+  function loadReleasePolishLayer() {
+    if (polishLoading || typeof document === "undefined") return;
+    polishLoading = true;
+    canonicalLabels();
+    if (!document.querySelector('link[data-k169-style]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "styles/v0169-release-polish.css";
+      link.dataset.k169Style = "1";
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[data-k169-runtime]')) {
+      const script = document.createElement("script");
+      script.src = "src/v0169-release-polish.js";
+      script.dataset.k169Runtime = "1";
+      document.body.appendChild(script);
+    }
+  }
+
   function install() {
     if (installed || typeof document === "undefined") return installed;
     const root = document.getElementById("v0160Root");
@@ -54,6 +73,7 @@
     root.dataset.v0161InteractionGuard = "ready";
     loadPlaytestLayer();
     loadOnboardingLayer();
+    loadReleasePolishLayer();
     installed = true;
     return true;
   }
@@ -61,5 +81,5 @@
   document.addEventListener("DOMContentLoaded", install, { once: true });
   setTimeout(install, 0);
 
-  globalThis.KorytoInteractionGuard161 = { install, loadPlaytestLayer, loadOnboardingLayer, canonicalLabels };
+  globalThis.KorytoInteractionGuard161 = { install, loadPlaytestLayer, loadOnboardingLayer, loadReleasePolishLayer, canonicalLabels };
 })();
