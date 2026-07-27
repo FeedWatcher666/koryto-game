@@ -10,14 +10,14 @@ const classes={
  necro:{name:"Stranický nekromant",icon:"🧟",desc:"Oživí kariéru i člověka, kterého voliči už pohřbili. +2 k mocenským hodům proti starým strukturám.",attrs:{charisma:2,intellect:2,cunning:3,authority:4,resilience:1},ability:"revive"}
 };
 const locations={
- pub:{name:"Hospoda U Zvadlého klásku",icon:"🍺",desc:"Volební průzkum bez metodiky, zato s utopencem."},
- jzd:{name:"JZD Budoucnost",icon:"🚜",desc:"Nafta mizí, ale vliv zůstává."},
- townhall:{name:"Obecní úřad",icon:"🏛️",desc:"Dungeon razítek, příloh a lidí bez jmenovky."},
+ pub:{name:"Hospoda U Tří lip",icon:"🍺",desc:"Volební průzkum bez metodiky, zato s utopencem."},
+ jzd:{name:"JZD a sídliště",icon:"🚜",desc:"Nafta mizí, ale vliv zůstává."},
+ townhall:{name:"Radnice",icon:"🏛️",desc:"Dungeon razítek, příloh a lidí bez jmenovky."},
  school:{name:"Základní škola",icon:"🏫",desc:"Do třídy prší podle rozvrhu."},
- meadow:{name:"Poslední louka",icon:"🌳",desc:"Veřejný prostor, dokud developer nezmění slovník."},
- paper:{name:"Vejprnický hlas",icon:"📰",desc:"Nezávislé médium placené obcí."},
- pitch:{name:"Fotbalové hřiště",icon:"⚽",desc:"Sport, politika a párek v jednom rozpočtu."},
- hq:{name:"Kampaňová garáž",icon:"📣",desc:"Dobrovolníci, tiskárna a jedna zásuvka."}
+ meadow:{name:"Náměstí a louka",icon:"🌳",desc:"Veřejný prostor, dokud developer nezmění slovník."},
+ paper:{name:"Redakce Vejprnického hlasu",icon:"📰",desc:"Nezávislé médium placené obcí."},
+ pitch:{name:"Stadion",icon:"⚽",desc:"Sport, politika a párek v jednom rozpočtu."},
+ hq:{name:"Kulturní dům a štáb",icon:"📣",desc:"Dobrovolníci, tiskárna a jedna zásuvka."}
 };
 const voterDefs={
  parents:{name:"Rodiče školáků",icon:"🎒",population:170,turnout:.72,base:42},

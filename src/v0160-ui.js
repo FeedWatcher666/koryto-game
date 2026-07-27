@@ -1,30 +1,30 @@
 "use strict";
 (() => {
-  const VERSION = "0.16.1 TEST.1";
-  const BUILD_VERSION = "0.16.1-test.1";
+  const VERSION = "0.16.5 TEST.1";
+  const BUILD_VERSION = "0.16.5-test.1";
   const SAVE_VERSION = "0.14.3-test.2";
   const SAVE_SCHEMA = 1;
 
   const POSITIONS = Object.freeze({
-    pub: [27, 31],
-    townhall: [44, 40],
-    school: [71, 28],
-    paper: [82, 55],
-    pitch: [45, 78],
-    jzd: [23, 76],
-    meadow: [58, 49],
-    hq: [69, 79]
+    pub: [17, 23],
+    townhall: [48, 37],
+    school: [82, 22],
+    paper: [78, 67],
+    pitch: [49, 81],
+    jzd: [15, 82],
+    meadow: [52, 67],
+    hq: [87, 91]
   });
 
   const MOBILE_POSITIONS = Object.freeze({
-    pub: [22, 29],
-    townhall: [45, 38],
-    school: [74, 28],
-    paper: [79, 55],
-    pitch: [45, 78],
-    jzd: [21, 75],
-    meadow: [56, 49],
-    hq: [70, 79]
+    pub: [17, 23],
+    townhall: [48, 37],
+    school: [82, 22],
+    paper: [78, 67],
+    pitch: [49, 81],
+    jzd: [15, 82],
+    meadow: [52, 67],
+    hq: [87, 90]
   });
 
   const LABELS = Object.freeze({
@@ -58,6 +58,14 @@
     jzd: "🚜",
     meadow: "🌳",
     hq: "🏢"
+  });
+
+  const PORTRAIT_ASSETS = Object.freeze({
+    marie: "assets/v0163/marie.webp",
+    daniela: "assets/v0163/daniela.webp",
+    brazda: "assets/v0163/brazda.webp",
+    bohumil: "assets/v0163/bohumil.webp",
+    holub: "assets/v0163/holub.webp"
   });
 
   const DESKTOP_NAV = Object.freeze([
@@ -228,11 +236,14 @@
       const known = Boolean(member);
       const location = LABELS[story.location] || "v obci";
       const icon = companion.icon || member?.icon || "👤";
+      const portrait = PORTRAIT_ASSETS[id]
+        ? `<img src="${PORTRAIT_ASSETS[id]}" alt="" loading="eager">`
+        : esc(icon);
       const subtitle = known
         ? (member?.role || companion.role || "Člen štábu")
         : `Potkáte: ${location}`;
       const value = known ? `${Math.round(finite(member?.loyalty, 50))}%` : "?";
-      return `<article class="${known ? "known" : "locked"}"><span class="avatar" aria-hidden="true">${esc(icon)}</span><span class="k16-person-copy"><b>${esc(member?.name || companion.name || id)}</b><small>${esc(subtitle)}</small></span><strong>${value}</strong></article>`;
+      return `<article class="${known ? "known" : "locked"}"><span class="avatar" aria-hidden="true">${portrait}</span><span class="k16-person-copy"><b>${esc(member?.name || companion.name || id)}</b><small>${esc(subtitle)}</small></span><strong>${value}</strong></article>`;
     }).join("");
   }
 
@@ -245,7 +256,7 @@
       <section class="k16-panel k16-rival-panel">
         ${title("TLAK RIVALA", "danger")}
         <div class="k16-rival">
-          <div class="k16-rival-head"><span class="k16-rival-face" aria-hidden="true">🕴️</span><span><b>Vladimír Věčný</b><small>starosta a rival</small></span><strong>${Math.round(momentum)} %</strong></div>
+          <div class="k16-rival-head"><span class="k16-rival-face" aria-hidden="true"><img src="assets/v0164/rival.webp" alt=""></span><span><b>Vladimír Věčný</b><small>starosta a rival</small></span><strong>${Math.round(momentum)} %</strong></div>
           <i class="k16-track"><u style="width:${momentum}%"></u></i>
         </div>
         ${title("AKTUÁLNÍ STRATEGIE")}
@@ -302,7 +313,7 @@
         <section class="k16-day"><span class="k16-weather" aria-hidden="true">☀️</span><div><b>Den ${day}</b><span>${weekdays[(day - 1) % 7]}</span><small>Květen, rok 2 · ${Math.max(0, finite(target.actions))} akce</small></div><div class="k16-place">◆ Dolní Vejprnice</div></section>
         <section class="k16-logo"><strong>KORYTO</strong><span>POLITICKÁ RPG STRATEGIE</span></section>
         <section class="k16-resources">${resource("🤝", "DŮVĚRA", `${Math.round(trust)}`, trust)}${resource("♛", "VLIV", `${Math.round(influence)}`, influence, "influence")}${resource("🪙", "PENÍZE", money(funds), Math.min(100, funds * 5), "money")}</section>
-        <button type="button" class="k16-settings" data-k16-settings aria-label="Nastavení">⚙</button>
+        <button type="button" class="k16-settings" data-k16-settings aria-label="Přepnout vizuální režim">🎨</button>
       </header>
       <div class="k16-layout">${leftPanel(target, quests)}${mapPanel(target, quests)}${rightPanel(target)}</div>
       ${desktopNav()}
