@@ -1,4 +1,4 @@
-# Koryto v0.16.9 TEST.1
+# Koryto v0.16.9 TEST.3
 
 Hratelný offline test sjednoceného kampanového UI.
 
