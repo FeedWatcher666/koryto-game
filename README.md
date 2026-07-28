@@ -1,6 +1,7 @@
-# Koryto v0.17.0 TEST.1
+# Koryto v0.17.1 TEST.1
 
-Hratelný offline test nové vizuální základny kampaně.
+Hratelný offline test nové vizuální základny kampaně a prvního průchodu
+čitelností rozhodování.
 
 ## Spuštění
 
@@ -14,6 +15,15 @@ Rozbalte ZIP a otevřete `index.html`.
 - kompaktní mobilní rozložení se stejnými herními informacemi jako desktop,
 - komponentové CSS a lehkou dekorační vrstvu bez vzdálených závislostí,
 - plný save/load roundtrip se zachovaným formátem `0.14.3-test.2 / schema 1`.
+
+## Co dolaďuje v0.17.1
+
+- mapa dává větší prostor hernímu světu a jasně označuje hlavní cíl tahu,
+- události na desktopu ukazují rozhodovací karty ještě nad spodní navigací,
+- volby jsou očíslované, přístupně pojmenované a vizuálně rozlišují riziko,
+- mobil používá kompaktní horizontální volby místo dlouhých obrazových bloků,
+- výsledky mají výraznější oddělení dopadů od příběhového textu,
+- mechaniky a save formát zůstávají beze změny.
 
 ## Zachované hratelné části řady v0.16
 
@@ -50,4 +60,4 @@ Rozbalte ZIP a otevřete `index.html`.
 5. Dokončit volby a koaliční vyjednávání.
 6. Ověřit celý tok na desktopu a při šířce 390 px.
 
-Podrobný popis iterace je v `docs/v0.17/v0170-visual-foundation.md`.
+Podrobný popis iterace je v `docs/v0.17/v0171-decision-hud.md`.
