@@ -30,7 +30,7 @@ assert.match(styles, /grid-template-columns:\s*198px minmax\(0,\s*1fr\) 214px/, 
 assert.match(styles, /grid-template-rows:\s*36px minmax\(0,\s*1fr\) 172px/, "event context and decisions share the first viewport");
 assert.match(styles, /\.k165-day em[\s\S]*display:\s*none\s*!important/, "legacy place row cannot cover compact-header controls");
 assert.match(styles, /\.k165-activity-grid[\s\S]*grid-auto-rows:\s*104px[\s\S]*align-content:\s*start/, "location activities stay compact instead of filling empty space");
-assert.match(styles, /grid-template-rows:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/, "all six professions fit in a two-by-three grid");
+assert.match(styles, /grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)[\s\S]*grid-template-rows:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/, "all six professions fit in a three-by-two grid");
 assert.match(styles, /max-height:\s*650px/, "short notebook height has an explicit event layout");
 assert.match(styles, /overflow:\s*hidden\s*!important/, "desktop frame cannot drift into a long document");
 assert.match(styles, /aspect-ratio:\s*3\s*\/\s*4/, "mobile receives a portrait map rather than a squeezed desktop map");
