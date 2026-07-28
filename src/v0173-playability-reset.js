@@ -7,6 +7,7 @@
     saveSchema: 1
   };
   let queued = false;
+  let settleQueued = false;
   let lastSurface = null;
 
   const visible = element => {
@@ -135,7 +136,7 @@
     })[char]);
   }
 
-  function sync() {
+  function sync(settle = true) {
     installRoot();
     const nextSurface = surfaceKey();
     if (lastSurface && nextSurface !== lastSurface && innerWidth <= 820) {
@@ -147,7 +148,17 @@
     decorateMap();
     compactEventStory();
     markSurface();
+    if (settle) queueSettle();
     return true;
+  }
+
+  function queueSettle() {
+    if (settleQueued) return;
+    settleQueued = true;
+    setTimeout(() => {
+      settleQueued = false;
+      sync(false);
+    }, 0);
   }
 
   function queueSync() {
