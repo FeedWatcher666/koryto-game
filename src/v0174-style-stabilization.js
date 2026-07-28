@@ -98,6 +98,10 @@
     if (surface !== lastSurface) {
       document.documentElement.dataset.k174PreviousSurface = lastSurface;
       lastSurface = surface;
+      // Settle the legacy surface immediately. This consumes its mobile
+      // scroll reset before a player or accessibility test moves focus to
+      // the next interactive card, preventing a stale animation-frame jump.
+      globalThis.KorytoUI173?.sync?.(false);
     }
     decorateComponents();
     const utilityPanel = document.querySelector(".k169-panel");
