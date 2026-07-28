@@ -70,6 +70,14 @@
     });
   }
 
+  function restoreMapActionLabels(...buttons) {
+    buttons.filter(Boolean).forEach(button => {
+      [...button.children]
+        .filter(child => child.tagName === "SPAN")
+        .forEach(label => label.style.setProperty("display", "inline", "important"));
+    });
+  }
+
   function decorateMap() {
     const actions = document.querySelector("#v0160Root .k16-map-actions");
     const endDay = actions?.querySelector("[data-k16-end]");
@@ -88,6 +96,7 @@
     }
     const title = document.querySelector("#v0160Root .k16-case-primary h2")?.textContent?.trim() || "aktivní kauza";
     primary.innerHTML = `<span aria-hidden="true">▶</span><span>POKRAČOVAT: ${escapeHtml(title)}</span>`;
+    restoreMapActionLabels(primary, endDay);
     primary.setAttribute("aria-label", `Pokračovat v hlavní kauze: ${title}`);
     primary.onclick = () => {
       const liveCaseAction = document.querySelector("#v0160Root .k16-case-primary [data-k16-location]");
