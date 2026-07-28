@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
-const dist = path.resolve(process.argv[2] || 'dist/koryto-v0.17.2-test.1');
+const dist = path.resolve(process.argv[2] || 'dist/koryto-v0.17.3-test.1');
 const index = path.join(dist, 'index.html');
 assert.ok(fs.existsSync(index), `Missing packaged index: ${index}`);
 fs.mkdirSync('browser-artifacts', {recursive: true});
@@ -14,6 +14,7 @@ const note = line => fs.appendFileSync(progressPath, `${new Date().toISOString()
 const targets = [
   {name: '1366x768', width: 1366, height: 768},
   {name: '1280x720', width: 1280, height: 720},
+  {name: '1024x550', width: 1024, height: 550},
   {name: '390x844', width: 390, height: 844}
 ];
 
@@ -35,7 +36,12 @@ const assertSaveContract = (state, label) => {
   assert.equal(state?.saveSchema, 1, `${label}: save schema`);
 };
 
-const browser = await chromium.launch({headless: true});
+const browser = await chromium.launch({
+  headless: true,
+  ...(process.env.KORYTO_CHROMIUM_PATH
+    ? {executablePath: process.env.KORYTO_CHROMIUM_PATH}
+    : {})
+});
 try {
   for (const target of targets) {
     const context = await browser.newContext({viewport: {width: target.width, height: target.height}});
@@ -46,7 +52,57 @@ try {
     page.on('console', message => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
     page.on('requestfailed', request => failed.push(`${request.url()} :: ${request.failure()?.errorText || 'failed'}`));
 
-    const auditSurface = async label => {
+    const assertReachable = async (locator, label) => {
+      await locator.evaluate(element => element.scrollIntoView({block: 'center', inline: 'nearest'}));
+      await page.waitForTimeout(50);
+      const reachability = await locator.evaluate(element => {
+        const rect = element.getBoundingClientRect();
+        const root = document.documentElement;
+        const pregame = document.querySelector('#startScreen.active,#creationScreen.active');
+        const nav = pregame
+          ? null
+          : root.classList.contains('k165-active')
+            ? document.querySelector('#v0165Root .k165-bottom')
+            : root.classList.contains('k16-active')
+              ? document.querySelector('#v0160Root .k16-bottom')
+              : null;
+        const candidateNavRect = nav?.getBoundingClientRect();
+        const navRect = nav &&
+          getComputedStyle(nav).display !== 'none' &&
+          candidateNavRect.width > 0 &&
+          candidateNavRect.height > 0
+            ? candidateNavRect
+            : null;
+        const overlapWidth = navRect
+          ? Math.max(0, Math.min(rect.right, navRect.right) - Math.max(rect.left, navRect.left))
+          : 0;
+        const overlapHeight = navRect
+          ? Math.max(0, Math.min(rect.bottom, navRect.bottom) - Math.max(rect.top, navRect.top))
+          : 0;
+        return {
+          top: rect.top,
+          bottom: rect.bottom,
+          width: rect.width,
+          height: rect.height,
+          viewportHeight: innerHeight,
+          navigationTop: navRect?.top ?? innerHeight,
+          overlap: Math.round(overlapWidth * overlapHeight),
+          scrollY,
+          documentScrollHeight: document.documentElement.scrollHeight,
+          bodyScrollHeight: document.body.scrollHeight,
+          htmlOverflowY: getComputedStyle(document.documentElement).overflowY,
+          bodyOverflowY: getComputedStyle(document.body).overflowY,
+          activeOverflowY: getComputedStyle(document.querySelector('.screen.active')).overflowY
+        };
+      });
+      assert.ok(reachability.width > 0 && reachability.height > 0, `${target.name} ${label}: action has dimensions`);
+      assert.ok(reachability.top >= -1, `${target.name} ${label}: action top is reachable ${JSON.stringify(reachability)}`);
+      assert.ok(reachability.bottom <= reachability.navigationTop + 1, `${target.name} ${label}: action is above fixed navigation ${JSON.stringify(reachability)}`);
+      assert.equal(reachability.overlap, 0, `${target.name} ${label}: action is not covered by navigation`);
+      return reachability;
+    };
+
+    const auditSurface = async (label, {requireReachablePrimary = true} = {}) => {
       const audit = await page.evaluate(() => {
         const visible = element => {
           const style = getComputedStyle(element);
@@ -66,13 +122,14 @@ try {
           legacyNavigationCount: legacy.length,
           disabledLegacyNavigationCount: legacy.filter(nav => nav.hidden && nav.inert && nav.getAttribute('aria-hidden') === 'true').length,
           horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1 || document.body.scrollWidth > innerWidth + 1,
-          footerVersionCount: (footer.match(/0\.17\.2 TEST\.1/g) || []).length,
+          footerVersionCount: (footer.match(/0\.17\.3 TEST\.1/g) || []).length,
           title: document.title,
           meta: document.querySelector('meta[name="description"]')?.content || '',
           build: document.documentElement.dataset.korytoBuild || null,
           visual: document.documentElement.dataset.korytoVisual || null,
           foundationActive: document.documentElement.classList.contains('k170-foundation'),
-          markedSurfaces: document.querySelectorAll('[data-k170-surface]').length
+          markedSurfaces: document.querySelectorAll('[data-k170-surface]').length,
+          playability: globalThis.KorytoUI173?.audit?.() || null
         };
       });
       note(`${target.name} ${label} ${JSON.stringify(audit)}`);
@@ -81,12 +138,18 @@ try {
       assert.equal(audit.disabledLegacyNavigationCount, audit.legacyNavigationCount, `${target.name} ${label}: legacy navigation hidden, inert and aria-hidden`);
       assert.equal(audit.horizontalOverflow, false, `${target.name} ${label}: no horizontal overflow`);
       assert.equal(audit.footerVersionCount, 1, `${target.name} ${label}: footer version exactly once`);
-      assert.match(audit.title, /0\.17\.2 TEST\.1/, `${target.name} ${label}: title`);
-      assert.match(audit.meta, /0\.17\.2 TEST\.1/, `${target.name} ${label}: meta`);
-      assert.equal(audit.build, '0.17.2-test.1', `${target.name} ${label}: data build`);
-      assert.equal(audit.visual, '0.17.2-test.1', `${target.name} ${label}: visual marker`);
+      assert.match(audit.title, /0\.17\.3 TEST\.1/, `${target.name} ${label}: title`);
+      assert.match(audit.meta, /0\.17\.3 TEST\.1/, `${target.name} ${label}: meta`);
+      assert.equal(audit.build, '0.17.3-test.1', `${target.name} ${label}: data build`);
+      assert.equal(audit.visual, '0.17.3-test.1', `${target.name} ${label}: visual marker`);
       assert.equal(audit.foundationActive, true, `${target.name} ${label}: visual foundation active`);
       assert.ok(audit.markedSurfaces >= 2, `${target.name} ${label}: live surfaces are marked`);
+      assert.equal(audit.playability?.buildVersion, '0.17.3-test.1', `${target.name} ${label}: playability build`);
+      assert.equal(audit.playability?.active, true, `${target.name} ${label}: playability reset active`);
+      assert.deepEqual(audit.playability?.nestedScrollers, [], `${target.name} ${label}: no critical nested scroll traps`);
+      if (requireReachablePrimary) {
+        assert.equal(audit.playability?.coveredPrimaryActions, 0, `${target.name} ${label}: primary actions are not covered`);
+      }
       return audit;
     };
 
@@ -95,7 +158,7 @@ try {
       const url = `${pathToFileURL(index).href}?browsergate=1`;
       await page.goto(url, {waitUntil: 'load'});
       await page.waitForSelector('#startBtn', {state: 'visible'});
-      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.2-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active && globalThis.KorytoUI172?.audit?.().active);
+      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.3-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active && globalThis.KorytoUI172?.audit?.().active && globalThis.KorytoUI173?.audit?.().active);
 
       const identity = await page.evaluate(() => {
         const footer = document.querySelector('.footer-note')?.textContent || '';
@@ -104,24 +167,29 @@ try {
           meta: document.querySelector('meta[name="description"]')?.content || '',
           build: document.documentElement.dataset.korytoBuild,
           brand: document.querySelector('.brand h1 span')?.textContent || '',
-          footerVersionCount: (footer.match(/0\.17\.2 TEST\.1/g) || []).length,
+          footerVersionCount: (footer.match(/0\.17\.3 TEST\.1/g) || []).length,
           visual: document.documentElement.dataset.korytoVisual,
           visualAudit: globalThis.KorytoUI170?.visualAudit?.()
         };
       });
-      assert.match(identity.title, /0\.17\.2 TEST\.1/, `${target.name}: title`);
-      assert.match(identity.meta, /0\.17\.2 TEST\.1/, `${target.name}: meta`);
-      assert.equal(identity.build, '0.17.2-test.1', `${target.name}: data build`);
-      assert.equal(identity.visual, '0.17.2-test.1', `${target.name}: visual data build`);
-      assert.match(identity.brand, /0\.17\.2 TEST\.1/, `${target.name}: brand`);
+      assert.match(identity.title, /0\.17\.3 TEST\.1/, `${target.name}: title`);
+      assert.match(identity.meta, /0\.17\.3 TEST\.1/, `${target.name}: meta`);
+      assert.equal(identity.build, '0.17.3-test.1', `${target.name}: data build`);
+      assert.equal(identity.visual, '0.17.3-test.1', `${target.name}: visual data build`);
+      assert.match(identity.brand, /0\.17\.3 TEST\.1/, `${target.name}: brand`);
       assert.equal(identity.footerVersionCount, 1, `${target.name}: footer version once`);
       assert.equal(identity.visualAudit?.remoteAssets, 0, `${target.name}: offline visual assets`);
 
       await page.click('#startBtn');
       await page.waitForSelector('#creationScreen.active');
       await page.fill('#heroName', `Gate ${target.name}`);
-      await page.locator('#classGrid [data-class]').first().click();
-      await page.locator('#confirmBtn').scrollIntoViewIfNeeded();
+      const firstClass = page.locator('#classGrid [data-class]').first();
+      await assertReachable(firstClass, 'first candidate class');
+      await firstClass.click();
+      await assertReachable(page.locator('#confirmBtn'), 'candidate confirmation');
+      if (target.name === '1024x550') {
+        await page.screenshot({path: `browser-artifacts/${target.name}-creation.png`, fullPage: false});
+      }
       await page.click('#confirmBtn');
       await page.waitForFunction(() => globalThis.KorytoApp?.getState?.().phase === 'event');
       await page.waitForSelector('#v0165Root [data-k165-choice]:not([disabled])', {state: 'visible'});
@@ -132,16 +200,17 @@ try {
       });
       const decisionAudit = await page.evaluate(() => globalThis.KorytoUI171?.audit?.());
       const turnDecisionAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
-      assert.equal(decisionAudit?.buildVersion, '0.17.2-test.1', `${target.name}: decision HUD build`);
+      assert.equal(decisionAudit?.buildVersion, '0.17.3-test.1', `${target.name}: decision HUD build`);
       assert.ok(decisionAudit?.numberedChoices >= 2, `${target.name}: numbered decision cards`);
       assert.equal(decisionAudit?.accessibleChoices, decisionAudit?.numberedChoices, `${target.name}: accessible decision labels`);
-      assert.equal(turnDecisionAudit?.buildVersion, '0.17.2-test.1', `${target.name}: turn clarity build`);
+      assert.equal(turnDecisionAudit?.buildVersion, '0.17.3-test.1', `${target.name}: turn clarity build`);
       assert.ok(turnDecisionAudit?.availableChoices >= 2, `${target.name}: explicit available choices`);
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), true, `${target.name}: save disabled in event`);
-      await auditSurface('event');
+      await auditSurface('event', {requireReachablePrimary: false});
       await page.screenshot({path: `browser-artifacts/${target.name}-event.png`, fullPage: false});
-      if (target.width <= 760) {
-        await page.locator('#v0165Root [data-k165-choice]:not([disabled])').first().scrollIntoViewIfNeeded();
+      await assertReachable(page.locator('#v0165Root [data-k165-choice]:not([disabled])').first(), 'event choice');
+      await auditSurface('event-decision');
+      if (target.width <= 760 || target.name === '1024x550') {
         await page.screenshot({path: `browser-artifacts/${target.name}-decision.png`, fullPage: false});
       }
 
@@ -153,6 +222,7 @@ try {
       const resultAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
       assert.ok(resultAudit?.impactChips >= 1, `${target.name}: result impact chips`);
       assert.match(await page.locator('#v0165Root [data-k165-continue]').textContent(), /1 AKCI/, `${target.name}: result action cost`);
+      await assertReachable(page.locator('#v0165Root [data-k165-continue]'), 'result continuation');
       await auditSurface('result');
       await page.screenshot({path: `browser-artifacts/${target.name}-result.png`, fullPage: false});
 
@@ -165,6 +235,17 @@ try {
         globalThis.KorytoUI172?.decorate?.();
         globalThis.KorytoBuildInfo?.applyLabels?.();
       });
+      const coach = page.locator('#v0145CoachOverlay:not(.hidden)');
+      if (await coach.isVisible().catch(() => false)) {
+        await page.click('#v0145CoachClose');
+        await page.waitForSelector('#v0145CoachOverlay', {state: 'hidden'});
+      }
+      await page.evaluate(() => {
+        globalThis.KorytoUI172?.decorate?.();
+        globalThis.KorytoUI173?.sync?.();
+      });
+      await assertReachable(page.locator('#v0160Root [data-k16-end]'), 'end day');
+      await page.evaluate(() => globalThis.KorytoUI173?.sync?.());
       const mapAudit = await auditSurface('map');
       assert.equal(mapAudit.phase, 'map', `${target.name}: map phase`);
       const turnMapAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
@@ -173,13 +254,6 @@ try {
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), false, `${target.name}: save enabled on map`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot').count(), 8, `${target.name}: hotspots`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot[title]').count(), 0, `${target.name}: native tooltips`);
-
-      const coach = page.locator('#v0145CoachOverlay:not(.hidden)');
-      if (await coach.isVisible().catch(() => false)) {
-        await page.click('#v0145CoachClose');
-        await page.waitForSelector('#v0145CoachOverlay', {state: 'hidden'});
-      }
-
       const beforeEarlyEnd = await page.evaluate(() => {
         const state = globalThis.KorytoApp.getState();
         return {day: state.day, actions: state.actions, momentum: state.opponent.momentum};
@@ -209,6 +283,7 @@ try {
       await page.locator('#v0160Root .k16-hotspot').first().click();
       await page.waitForFunction(() => globalThis.KorytoUI165?.visualAudit?.().activeView === 'location');
       await page.waitForSelector('#v0165Root [data-k165-map]', {state: 'visible'});
+      await assertReachable(page.locator('#v0165Root [data-k165-map]'), 'return from location');
       const locationAudit = await auditSurface('location');
       assert.equal(locationAudit.activeView, 'location', `${target.name}: location view`);
       await page.screenshot({path: `browser-artifacts/${target.name}-location.png`, fullPage: false});
@@ -231,7 +306,7 @@ try {
 
       await page.reload({waitUntil: 'load'});
       await page.waitForSelector('#startBtn', {state: 'visible'});
-      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.2-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active && globalThis.KorytoUI172?.audit?.().active);
+      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.3-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active && globalThis.KorytoUI172?.audit?.().active && globalThis.KorytoUI173?.audit?.().active);
       await page.click('[data-k169-open]');
       await page.click('[data-k169-action="load"]');
       await page.waitForFunction(() => globalThis.KorytoApp?.getState?.().phase === 'map');
@@ -242,7 +317,12 @@ try {
       }, snapshot.toString());
       assertSaveContract(loadedSnapshot, `${target.name}: loaded state`);
       assert.deepEqual(loadedSnapshot, savedSnapshot, `${target.name}: complete save/load roundtrip state`);
-      await page.evaluate(() => globalThis.KorytoUI169?.syncStatus?.());
+      await page.evaluate(() => {
+        globalThis.KorytoUI169?.syncStatus?.();
+        globalThis.KorytoUI173?.sync?.();
+      });
+      await assertReachable(page.locator('#v0160Root [data-k16-end]'), 'roundtrip end day');
+      await page.evaluate(() => globalThis.KorytoUI173?.sync?.());
       await auditSurface('roundtrip-map');
       await page.screenshot({path: `browser-artifacts/${target.name}-map.png`, fullPage: false});
 
@@ -286,4 +366,4 @@ try {
   await browser.close();
 }
 
-console.log('v0.17.2 TEST.1 packaged Chromium turn clarity and complete save/load gate passed');
+console.log('v0.17.3 TEST.1 packaged Chromium playability and complete save/load gate passed');

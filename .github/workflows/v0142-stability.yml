@@ -1,11 +1,12 @@
-name: Koryto v0.17.2 TEST.1
+name: Koryto v0.17.3 TEST.1
 
 on:
   push:
     branches:
-      - agent/v0172-turn-clarity
+      - agent/v0173-playability-reset
   pull_request:
     branches:
+      - agent/v0172-turn-clarity
       - agent/v0171-decision-hud
       - agent/v0170-visual-foundation
       - agent/v0160-clean-ui
@@ -36,7 +37,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.17.2-test.1-diagnostics
+          name: koryto-v0.17.3-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
 
@@ -45,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           build_version="$(cat VERSION)"
-          test "$build_version" = "0.17.2-test.1"
+          test "$build_version" = "0.17.3-test.1"
           target="dist/koryto-v${build_version}"
           mkdir -p "$target"
           cp index.html VERSION README.md "$target/"
@@ -67,6 +68,7 @@ jobs:
           cp docs/v0.17/v0170-visual-foundation.md "$target/docs/v0.17/"
           cp docs/v0.17/v0171-decision-hud.md "$target/docs/v0.17/"
           cp docs/v0.17/v0172-turn-clarity.md "$target/docs/v0.17/"
+          cp docs/v0.17/v0173-playability-reset.md "$target/docs/v0.17/"
           rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
 
           test -f "$target/src/build-info.js"
@@ -77,6 +79,7 @@ jobs:
           test -f "$target/src/v0170-visual-foundation.js"
           test -f "$target/src/v0171-decision-hud.js"
           test -f "$target/src/v0172-turn-clarity.js"
+          test -f "$target/src/v0173-playability-reset.js"
           test -f "$target/styles/v0168-onboarding-ui.css"
           test -f "$target/styles/v0169-release-polish.css"
           test -f "$target/styles/v0169-map-stability.css"
@@ -85,11 +88,12 @@ jobs:
           test -f "$target/styles/v0170-visual-foundation.css"
           test -f "$target/styles/v0171-decision-hud.css"
           test -f "$target/styles/v0172-turn-clarity.css"
+          test -f "$target/styles/v0173-playability-reset.css"
           test -f "$target/assets/v0164/map-pixel-cartoon.webp"
           test -f "$target/assets/v0165/manifest.json"
 
           grep -q 'viewport-fit=cover' "$target/index.html"
-          grep -q 'Koryto 0.17.2 TEST.1' "$target/index.html"
+          grep -q 'Koryto 0.17.3 TEST.1' "$target/index.html"
           grep -q 'src/build-info.js' "$target/index.html"
           grep -q 'src/v0168-onboarding-ui.js' "$target/index.html"
           grep -q 'src/v0169-release-polish.js' "$target/index.html"
@@ -98,10 +102,12 @@ jobs:
           grep -q 'src/v0170-visual-foundation.js' "$target/index.html"
           grep -q 'src/v0171-decision-hud.js' "$target/index.html"
           grep -q 'src/v0172-turn-clarity.js' "$target/index.html"
+          grep -q 'src/v0173-playability-reset.js' "$target/index.html"
           grep -q 'styles/v0169-creation-flow-fix.css' "$target/index.html"
           grep -q 'styles/v0170-visual-foundation.css' "$target/index.html"
           grep -q 'styles/v0171-decision-hud.css' "$target/index.html"
           grep -q 'styles/v0172-turn-clarity.css' "$target/index.html"
+          grep -q 'styles/v0173-playability-reset.css' "$target/index.html"
           if grep -E 'v0162-playtest\.(css|js)|loadPlaytestLayer|playtestRequested' "$target/src/v0161-interaction-guard.js"; then
             echo "Release still contains the retired playtest loader" >&2
             exit 1
@@ -120,19 +126,19 @@ jobs:
       - name: Browser gate on packaged artifact
         shell: bash
         run: |
-          node tests/v0171-browser-gate.mjs dist/koryto-v0.17.2-test.1
+          node tests/v0171-browser-gate.mjs dist/koryto-v0.17.3-test.1
 
       - name: Upload browser gate screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.17.2-test.1-browser-gate
+          name: koryto-v0.17.3-test.1-browser-gate
           path: browser-artifacts
           if-no-files-found: warn
 
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.17.2-test.1
-          path: dist/koryto-v0.17.2-test.1
+          name: koryto-v0.17.3-test.1
+          path: dist/koryto-v0.17.3-test.1
           if-no-files-found: error

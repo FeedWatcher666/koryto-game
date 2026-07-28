@@ -1,0 +1,277 @@
+/*
+ * Koryto v0.17.3 TEST.1 — playability reset.
+ *
+ * The old viewport lock assumed at least 1280 × 720 CSS pixels and split short
+ * desktop screens into several independently scrolling panes. Retina notebook
+ * screenshots exposed the real 1024 × ~550 CSS viewport: controls were present
+ * in the DOM but clipped behind fixed chrome. This final layer restores one
+ * predictable vertical reading path and keeps every primary action reachable.
+ */
+
+html.k173-playability-reset,
+html.k173-playability-reset body {
+  width: 100%;
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto;
+}
+
+html.k173-playability-reset body {
+  padding-bottom: 0 !important;
+}
+
+html.k173-playability-reset #app,
+html.k173-playability-reset #app > main {
+  height: auto !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html.k173-playability-reset .screen.active {
+  height: auto !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow: visible !important;
+  scrollbar-gutter: auto !important;
+}
+
+/* Candidate creation: one page, one scrollbar, no clipped first row. */
+
+@media (min-width: 821px) {
+  html.k173-playability-reset.k169-pregame #creationScreen.active {
+    display: grid !important;
+    place-items: start center !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    padding: 18px clamp(18px, 2.5vw, 42px) 34px !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-shell {
+    grid-template-rows: auto auto !important;
+    width: min(1500px, 100%);
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head,
+  html.k173-playability-reset.k169-pregame .k168-identity-panel,
+  html.k173-playability-reset.k169-pregame .k168-profession-panel,
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-profession-panel {
+    display: block !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-profession-panel .k168-class-grid {
+    max-height: none !important;
+    overflow: visible !important;
+    padding-right: 0 !important;
+  }
+
+  html.k173-playability-reset.k169-pregame #confirmBtn.k168-confirm-button {
+    position: static !important;
+    margin-top: 14px !important;
+  }
+}
+
+/* Main map: keep the three-part hierarchy without exceeding 1024 CSS pixels. */
+
+html.k173-playability-reset.k16-active #v0160Root,
+html.k173-playability-reset.k16-active .k16-shell {
+  height: auto !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html.k173-playability-reset.k16-active .k16-shell {
+  display: block !important;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+html.k173-playability-reset.k16-active .k16-layout,
+html.k173-playability-reset.k16-active .k16-left,
+html.k173-playability-reset.k16-active .k16-right,
+html.k173-playability-reset.k16-active .k16-center {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  scrollbar-gutter: auto !important;
+}
+
+html.k173-playability-reset.k16-active .k16-layout {
+  align-items: start !important;
+}
+
+html.k173-playability-reset.k16-active .k16-center {
+  display: block !important;
+}
+
+html.k173-playability-reset.k16-active .k16-map-card {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 16 / 9 !important;
+}
+
+html.k173-playability-reset.k16-active .k16-bottom,
+html.k173-playability-reset.k165-active .k165-bottom {
+  height: 62px;
+}
+
+html.k173-playability-reset.k16-active .k16-bottom button,
+html.k173-playability-reset.k165-active .k165-bottom button {
+  min-height: 58px !important;
+}
+
+/* Campaign surfaces: the page scrolls; fixed navigation no longer hides cards. */
+
+html.k173-playability-reset.k165-active #v0165Root,
+html.k173-playability-reset.k165-active .k165-shell {
+  height: auto !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html.k173-playability-reset.k165-active .k165-shell {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+html.k173-playability-reset.k165-active .k165-page,
+html.k173-playability-reset.k165-active .k165-event-page,
+html.k173-playability-reset.k165-active .k165-result-page {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html.k173-playability-reset.k165-active .k165-event-text {
+  overflow: visible !important;
+}
+
+/* Real-world MacBook viewport: 2048px Retina screenshot ≈ 1024 CSS pixels. */
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  html.k173-playability-reset .k16-layout {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  html.k173-playability-reset .k16-left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  html.k173-playability-reset .k16-center {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  html.k173-playability-reset .k16-right {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  html.k173-playability-reset .k16-topbar,
+  html.k173-playability-reset .k165-topbar {
+    grid-template-columns: 176px minmax(230px, 1fr) 336px 42px !important;
+    min-height: 70px !important;
+  }
+
+  html.k173-playability-reset .k16-day,
+  html.k173-playability-reset .k165-day {
+    min-height: 70px !important;
+    padding: 6px 10px !important;
+  }
+
+  html.k173-playability-reset .k16-logo strong,
+  html.k173-playability-reset .k165-logo strong {
+    font-size: 38px !important;
+  }
+
+  html.k173-playability-reset .k16-resource,
+  html.k173-playability-reset .k165-resource {
+    min-height: 48px !important;
+    padding: 5px !important;
+  }
+
+  html.k173-playability-reset .k16-resource b,
+  html.k173-playability-reset .k165-resource b {
+    font-size: 14px !important;
+  }
+
+  html.k173-playability-reset .k16-case-primary {
+    grid-template-columns: 52px 1fr !important;
+  }
+
+  html.k173-playability-reset .k16-case-primary h2 {
+    font-size: 17px !important;
+  }
+
+  html.k173-playability-reset .k16-case-primary p {
+    font-size: 11px !important;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 650px) {
+  html.k173-playability-reset .k165-event-page {
+    display: block !important;
+  }
+
+  html.k173-playability-reset .k165-event-story {
+    grid-template-columns: minmax(280px, 36%) 1fr !important;
+    height: auto !important;
+    min-height: 240px !important;
+  }
+
+  html.k173-playability-reset .k165-event-image {
+    min-height: 240px !important;
+  }
+
+  html.k173-playability-reset .k165-event-text {
+    padding: 16px 20px !important;
+  }
+
+  html.k173-playability-reset .k165-event-text h1 {
+    font-size: clamp(25px, 2.4vw, 32px) !important;
+  }
+
+  html.k173-playability-reset .k165-choice-grid {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 900px) {
+  html.k173-playability-reset .k16-layout {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 820px) {
+  html.k173-playability-reset .screen.active {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+
+  html.k173-playability-reset .k168-class-grid,
+  html.k173-playability-reset .k165-choice-grid {
+    overflow: visible !important;
+  }
+}

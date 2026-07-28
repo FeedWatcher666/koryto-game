@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.17.2 TEST.1",
-    buildVersion: "0.17.2-test.1",
+    displayVersion: "0.17.3 TEST.1",
+    buildVersion: "0.17.3-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.17.2 TEST.1 – Turn Clarity",
-    description: "Koryto 0.17.2 TEST.1: čitelnější stav tahu, bezpečné ukončení dne a jasné dopady rozhodnutí v politickém RPG."
+    title: "Koryto 0.17.3 TEST.1 – Playability Reset",
+    description: "Koryto 0.17.3 TEST.1: playability reset pro běžné notebooky, přirozené rolování a vždy dosažitelné herní akce."
   });
 
   function applyLabels() {

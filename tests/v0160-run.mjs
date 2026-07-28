@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const syntax = [
-  'src/build-info.js','src/app.js','src/core-data.js','src/companion-data.js','src/faction-data.js','src/debate-data.js','src/event-data.js','src/quest-data.js','src/quest-runtime.js','src/debate-system.js','src/election-system.js','src/game-engine.js','src/event-system.js','src/faction-system.js','src/companion-system.js','src/balance-system.js','src/ux-system.js','src/v0144-test10.js','src/v0145-campaign.js','src/v0146-playtest.js','src/v0147-consequences.js','src/v0148-visual-system.js','src/v0149-assets/atlas-1.js','src/v0149-assets/atlas-2.js','src/v0149-assets/atlas-3.js','src/v0149-assets/village-1.js','src/v0149-assets/village-2.js','src/v0149-pixel-assets.js','src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js','src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js','src/v0142-rc3.js','src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js','src/v0143-test10.js','src/v0160-ui.js','src/v0161-interaction-guard.js','src/v0163-staff.js','src/v0165-campaign-ui.js','src/v0166-day-debate-ui.js','src/v0167-election-coalition-ui.js','src/v0168-onboarding-ui.js','src/v0169-release-polish.js','src/v0169-map-stability.js','src/v0169-viewport-lock.js','src/v0170-visual-foundation.js','src/v0171-decision-hud.js','src/v0172-turn-clarity.js'
+  'src/build-info.js','src/app.js','src/core-data.js','src/companion-data.js','src/faction-data.js','src/debate-data.js','src/event-data.js','src/quest-data.js','src/quest-runtime.js','src/debate-system.js','src/election-system.js','src/game-engine.js','src/event-system.js','src/faction-system.js','src/companion-system.js','src/balance-system.js','src/ux-system.js','src/v0144-test10.js','src/v0145-campaign.js','src/v0146-playtest.js','src/v0147-consequences.js','src/v0148-visual-system.js','src/v0149-assets/atlas-1.js','src/v0149-assets/atlas-2.js','src/v0149-assets/atlas-3.js','src/v0149-assets/village-1.js','src/v0149-assets/village-2.js','src/v0149-pixel-assets.js','src/v0142.js','src/v0142c.js','src/v0142d.js','src/v0142-stability.js','src/v0142-countercampaign.js','src/v0142-ui-balance.js','src/v0142-clarity.js','src/v0142-rc3.js','src/state.js','src/save-system.js','src/v0143.js','src/quest-system.js','src/v0143-test3.js','src/v0143-test10.js','src/v0160-ui.js','src/v0161-interaction-guard.js','src/v0163-staff.js','src/v0165-campaign-ui.js','src/v0166-day-debate-ui.js','src/v0167-election-coalition-ui.js','src/v0168-onboarding-ui.js','src/v0169-release-polish.js','src/v0169-map-stability.js','src/v0169-viewport-lock.js','src/v0170-visual-foundation.js','src/v0171-decision-hud.js','src/v0172-turn-clarity.js','src/v0173-playability-reset.js'
 ];
 const historical = [
   'tests/content-integrity.mjs','tests/save-migration.mjs','tests/smoke.mjs','tests/simulation.mjs','tests/v0142-stability.mjs','tests/v0142-countercampaign.mjs','tests/v0142-ui-balance.mjs','tests/v0142-clarity.mjs','tests/v0142-rc3.mjs','tests/v0143-modules.mjs','tests/v0143-quest-system.mjs','tests/v0143-test10.mjs','tests/v0144-modular.mjs','tests/v0144-simulation.mjs','tests/v0145-playability.mjs','tests/v0146-playtest.mjs','tests/v0147-consequences.mjs','tests/v0148-visual.mjs','tests/v0149-assets.mjs','tests/v0149-assets-review.mjs'
@@ -21,8 +21,10 @@ try{
   fs.mkdirSync(path.join(workspace,'.github/workflows'),{recursive:true});
   const currentIndex=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const legacyIndex=currentIndex
-    .replaceAll('0.17.2 TEST.1','0.14.9 TEST.10')
-    .replaceAll('0.17.2-test.1','0.14.9-test.10')
+    .replaceAll('0.17.3 TEST.1','0.14.9 TEST.10')
+    .replaceAll('0.17.3-test.1','0.14.9-test.10')
+    .replaceAll('Playability Reset','komunální politické RPG')
+    .replaceAll('playability reset pro běžné notebooky, přirozené rolování a vždy dosažitelné herní akce.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
     .replaceAll('Turn Clarity','komunální politické RPG')
     .replaceAll('čitelnější stav tahu, bezpečné ukončení dne a jasné dopady rozhodnutí v politickém RPG.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
     .replaceAll('Decision HUD','komunální politické RPG')
@@ -45,6 +47,7 @@ const legacyIndex=currentIndex
     .replace('\n<link rel="stylesheet" href="styles/v0170-visual-foundation.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0171-decision-hud.css">','')
     .replace('\n<link rel="stylesheet" href="styles/v0172-turn-clarity.css">','')
+    .replace('\n<link rel="stylesheet" href="styles/v0173-playability-reset.css">','')
     .replace('<script src="src/build-info.js"></script>','')
     .replace('<script src="src/v0160-ui.js"></script>','')
     .replace('<script src="src/v0161-interaction-guard.js"></script>','')
@@ -58,7 +61,8 @@ const legacyIndex=currentIndex
     .replace('<script src="src/v0169-viewport-lock.js"></script>','')
     .replace('<script src="src/v0170-visual-foundation.js"></script>','')
     .replace('<script src="src/v0171-decision-hud.js"></script>','')
-    .replace('<script src="src/v0172-turn-clarity.js"></script>','');
+    .replace('<script src="src/v0172-turn-clarity.js"></script>','')
+    .replace('<script src="src/v0173-playability-reset.js"></script>','');
   fs.writeFileSync(path.join(workspace,'index.html'),legacyIndex);
   fs.writeFileSync(path.join(workspace,'VERSION'),'0.14.9-test.10\n');
   fs.writeFileSync(path.join(workspace,'.github/workflows/v0142-stability.yml'),'name: Koryto v0.14.9 TEST.10\n\non:\n  push:\n    branches: [test/v0.14.9-test10, fix/pr19-v0149-wiring]\n\njobs:\n  package:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo koryto-v0.14.9-test.10\n');
@@ -78,7 +82,7 @@ const current = [
   'tests/v0160-clean-ui.mjs','tests/v0166-day-debate.mjs','tests/v0167-election-coalition.mjs',
   'tests/v0168-onboarding.mjs','tests/v0169-release-polish.mjs','tests/v0169-map-stability.mjs',
   'tests/v0169-viewport-lock.mjs','tests/v0169-release-integrity.mjs','tests/v0170-visual-foundation.mjs',
-  'tests/v0171-decision-hud.mjs','tests/v0172-turn-clarity.mjs'
+  'tests/v0171-decision-hud.mjs','tests/v0172-turn-clarity.mjs','tests/v0173-playability-reset.mjs'
 ];
 for(const file of current)run(root,[file],file);
-console.log(`Koryto v0.17.2 TEST.1 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);
+console.log(`Koryto v0.17.3 TEST.1 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);

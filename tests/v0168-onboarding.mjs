@@ -7,8 +7,8 @@ const runtime = read('src/v0168-onboarding-ui.js');
 const css = read('styles/v0168-onboarding-ui.css');
 const core = read('src/core-data.js');
 
-assert.equal(read('VERSION').trim(), '0.17.2-test.1');
-assert.match(html, /0\.17\.2 TEST\.1/);
+assert.equal(read('VERSION').trim(), '0.17.3-test.1');
+assert.match(html, /0\.17\.3 TEST\.1/);
 assert.match(html, /styles\/v0168-onboarding-ui\.css/);
 assert.match(html, /src\/v0168-onboarding-ui\.js/);
 
@@ -41,5 +41,4 @@ assert.match(css, /min-height:\s*44px/);
 assert.match(css, /@media \(max-width: 820px\)/);
 assert.match(css, /safe-area-inset-bottom/);
 
-console.log('v0.16.8 onboarding remains deterministic inside v0.17.2 TEST.1');
-
+console.log('v0.16.8 onboarding remains deterministic inside v0.17.3 TEST.1');

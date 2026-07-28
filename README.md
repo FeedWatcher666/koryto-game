@@ -1,4 +1,4 @@
-# Koryto v0.17.2 TEST.1
+# Koryto v0.17.3 TEST.1
 
 Hratelný offline test nové vizuální základny kampaně a prvního průchodu
 čitelností rozhodování.
@@ -32,6 +32,16 @@ Rozbalte ZIP a otevřete `index.html`.
 - dostupné a zamčené volby mají explicitní stav,
 - rozhodovací i výsledkové obrazovky uvádějí cenu jedné akce,
 - dopady výsledku jsou rozdělené na kladné, záporné a neutrální položky,
+- mechaniky, balanc, questy a save formát zůstávají beze změny.
+
+## Co opravuje v0.17.3
+
+- ruší nehratelný zámek celé obrazovky na noteboocích s nízkou výškou,
+- místo několika vnořených posuvníků používá jednu předvídatelnou svislou stránku,
+- opravuje skutečný Retina/MacBook viewport kolem `1024 × 550` CSS pixelů,
+- zpřístupňuje první řadu povolání, potvrzení kandidáta, rozhodovací karty i návraty,
+- zabraňuje překrytí hlavních akcí pevnou spodní navigací,
+- přidává gate skutečné dosažitelnosti ovládání, ne pouze existence prvků v DOM,
 - mechaniky, balanc, questy a save formát zůstávají beze změny.
 
 ## Zachované hratelné části řady v0.16
@@ -69,4 +79,4 @@ Rozbalte ZIP a otevřete `index.html`.
 5. Dokončit volby a koaliční vyjednávání.
 6. Ověřit celý tok na desktopu a při šířce 390 px.
 
-Podrobný popis iterace je v `docs/v0.17/v0172-turn-clarity.md`.
+Podrobný popis iterace je v `docs/v0.17/v0173-playability-reset.md`.

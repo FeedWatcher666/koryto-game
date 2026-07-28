@@ -20,8 +20,13 @@
     html.classList.toggle("k169-pregame", pregame);
     html.dataset.k169ActiveScreen = screenId;
 
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
+    // v0.17.3 restores one natural document scroll on short notebook screens.
+    // Keep the historical reset for older builds, but never fight the player's
+    // scroll position once the playability-reset layer is active.
+    if (!html.classList.contains("k173-playability-reset")) {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
 
     document.querySelectorAll(".screen").forEach(item => {
       item.setAttribute("aria-hidden", String(!item.classList.contains("active")));
