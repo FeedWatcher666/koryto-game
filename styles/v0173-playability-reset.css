@@ -62,6 +62,12 @@ html.k173-playability-reset .k173-end-day {
   color: #ffe0a0 !important;
 }
 
+/* Status toasts are informative and must never form an invisible click shield. */
+html.k173-playability-reset #v0148Toast,
+html.k173-playability-reset .v0148-toast {
+  pointer-events: none !important;
+}
+
 /* Desktop and notebook: fixed game frame. */
 
 @media (min-width: 821px) {
