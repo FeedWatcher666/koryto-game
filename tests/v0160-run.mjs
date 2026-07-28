@@ -102,7 +102,9 @@ try{
     const target=path.join(currentWorkspace,file);
     const patched=fs.readFileSync(target,'utf8')
       .replaceAll('0.17.3-test.1','0.17.4-test.1')
-      .replaceAll('0.17.3 TEST.1','0.17.4 TEST.1');
+      .replaceAll('0.17.3 TEST.1','0.17.4 TEST.1')
+      .replaceAll('0\\.17\\.3-test\\.1','0\\.17\\.4-test\\.1')
+      .replaceAll('0\\.17\\.3 TEST\\.1','0\\.17\\.4 TEST\\.1');
     fs.writeFileSync(target,patched);
   }
   for(const file of current)run(currentWorkspace,[file],file);
