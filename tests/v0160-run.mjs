@@ -20,9 +20,11 @@ try{
   fs.cpSync(path.join(root,'tests'),path.join(workspace,'tests'),{recursive:true});
   fs.mkdirSync(path.join(workspace,'.github/workflows'),{recursive:true});
   const currentIndex=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  const legacyIndex=currentIndex
+const legacyIndex=currentIndex
     .replaceAll('0.17.1 TEST.1','0.14.9 TEST.10')
     .replaceAll('0.17.1-test.1','0.14.9-test.10')
+    .replaceAll('Decision HUD','komunální politické RPG')
+    .replaceAll('čitelnější mapa, viditelné volby a kompaktní rozhodovací HUD politického RPG.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
     .replaceAll('Visual Foundation','komunální politické RPG')
     .replaceAll('první hratelný vizuální základ mapy, událostí a responzivního politického RPG rozhraní.','třináctidenní komunální kampaň, kauzy, štáb, debaty, volby a bezpečné offline rozhraní.')
     .replace('\n<link rel="stylesheet" href="styles/v0160.css">','')
