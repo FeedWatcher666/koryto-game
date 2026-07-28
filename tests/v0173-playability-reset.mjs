@@ -24,6 +24,7 @@ assert.match(runtime, /decorateMap/, "map receives a single dominant objective a
 assert.match(runtime, /primaryObjective:\s*fullyVisible/, "map objective audit requires real first-viewport visibility");
 assert.match(runtime, /if \(!actions\) return false/, "map objective is created even while the case card is settling");
 assert.match(runtime, /liveCaseAction[\s\S]*fallback/, "map objective resolves its live destination only when clicked");
+assert.match(runtime, /restoreMapActionLabels[\s\S]*setProperty\("display",\s*"inline",\s*"important"\)/, "notebook map actions keep their visible text despite legacy responsive CSS");
 assert.match(runtime, /let settleQueued = false/, "map decoration has a guarded settle pass");
 assert.match(runtime, /function queueSettle\(\)[\s\S]*setTimeout[\s\S]*sync\(false\)/, "settle pass runs after already queued legacy renders without recursion");
 assert.match(runtime, /if \(settle\) queueSettle\(\)/, "every public sync schedules one final decoration pass");
