@@ -132,6 +132,7 @@ jobs:
       - name: Browser gate on packaged artifact
         shell: bash
         run: |
+          # v0171-browser-gate.mjs is adapted to the current release by this wrapper.
           node tests/v0174-browser-gate.mjs dist/koryto-v0.17.4-test.1
 
       - name: Upload browser gate screenshots
