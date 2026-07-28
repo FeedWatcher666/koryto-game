@@ -1,62 +1,1405 @@
 /*
- * Koryto v0.17.3 TEST.1 — playability reset.
+ * Koryto v0.17.3 TEST.1 — playable game-frame redesign.
  *
- * The old viewport lock assumed at least 1280 × 720 CSS pixels and split short
- * desktop screens into several independently scrolling panes. Retina notebook
- * screenshots exposed the real 1024 × ~550 CSS viewport: controls were present
- * in the DOM but clipped behind fixed chrome. This final layer restores one
- * predictable vertical reading path and keeps every primary action reachable.
+ * Desktop is a game screen, not a long web page: one compact HUD, one scene,
+ * one navigation row. Mobile keeps its own vertical composition. Rules and
+ * state remain untouched; this layer only changes presentation.
  */
+
+html.k173-playability-reset {
+  --k173-top: 70px;
+  --k173-nav: 60px;
+  --k173-gap: 7px;
+  --k173-frame: #160704;
+  --k173-panel: #2b160d;
+  --k173-paper: #ecd7aa;
+  --k173-gold: #f3b93d;
+  --k173-green: #3e9c34;
+  --k173-red: #a73828;
+}
 
 html.k173-playability-reset,
 html.k173-playability-reset body {
   width: 100%;
-  height: auto !important;
-  min-height: 100% !important;
-  max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  overscroll-behavior-y: auto;
+  min-width: 0;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-html.k173-playability-reset body {
-  padding-bottom: 0 !important;
+html.k173-playability-reset [data-k173-context] {
+  margin: 8px 0 0;
+  border: 2px solid #76451f;
+  background: #d6b579;
 }
 
-html.k173-playability-reset #app,
-html.k173-playability-reset #app > main {
-  height: auto !important;
-  min-height: 100dvh !important;
-  max-height: none !important;
-  overflow: visible !important;
+html.k173-playability-reset [data-k173-context] summary {
+  padding: 7px 9px;
+  color: #54270f;
+  cursor: pointer;
+  font: 900 10px/1.2 Arial, sans-serif;
+  letter-spacing: .07em;
+  text-transform: uppercase;
 }
 
-html.k173-playability-reset .screen.active {
-  height: auto !important;
-  min-height: 100dvh !important;
-  max-height: none !important;
-  overflow: visible !important;
-  scrollbar-gutter: auto !important;
+html.k173-playability-reset [data-k173-context] > div {
+  padding: 0 10px 8px;
 }
 
-/* Candidate creation: one page, one scrollbar, no clipped first row. */
+html.k173-playability-reset [data-k173-context] p {
+  margin: 7px 0;
+}
+
+html.k173-playability-reset .k173-primary-action {
+  border-color: #12370f !important;
+  background: linear-gradient(#76d554, #368d2e 52%, #1f6c25 53%, #18551e) !important;
+  color: #fff8dc !important;
+  text-shadow: 0 2px #173c13;
+}
+
+html.k173-playability-reset .k173-end-day {
+  border-color: #6a3f15 !important;
+  background: linear-gradient(#a86c25, #6f3e18) !important;
+  color: #ffe0a0 !important;
+}
+
+/* Desktop and notebook: fixed game frame. */
 
 @media (min-width: 821px) {
+  html.k173-playability-reset,
+  html.k173-playability-reset body {
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset #app,
+  html.k173-playability-reset #app > main,
+  html.k173-playability-reset .screen.active {
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset #v0160Root,
+  html.k173-playability-reset #v0165Root {
+    position: fixed !important;
+    z-index: 500 !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset .k16-shell,
+  html.k173-playability-reset .k165-shell {
+    display: grid !important;
+    grid-template-rows: var(--k173-top) minmax(0, 1fr) var(--k173-nav) !important;
+    width: 100%;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    padding: 4px 5px 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset .k16-topbar,
+  html.k173-playability-reset .k165-topbar {
+    grid-row: 1;
+    grid-template-columns: 166px minmax(210px, 1fr) 355px 40px !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-day,
+  html.k173-playability-reset .k165-day {
+    grid-template-columns: 34px 1fr !important;
+    min-height: 0 !important;
+    padding: 5px 8px 2px !important;
+  }
+
+  html.k173-playability-reset .k16-weather,
+  html.k173-playability-reset .k165-day > span {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 21px !important;
+  }
+
+  html.k173-playability-reset .k16-day b,
+  html.k173-playability-reset .k165-day b {
+    font-size: 17px !important;
+  }
+
+  html.k173-playability-reset .k16-day span,
+  html.k173-playability-reset .k165-day span {
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset .k16-day small,
+  html.k173-playability-reset .k165-day small {
+    margin-top: 1px !important;
+    padding: 2px 4px !important;
+    font-size: 7px !important;
+  }
+
+  html.k173-playability-reset .k16-place,
+  html.k173-playability-reset .k165-day em {
+    margin: 2px -8px -2px !important;
+    padding: 2px 8px !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset .k16-logo strong,
+  html.k173-playability-reset .k165-logo strong {
+    font-size: clamp(32px, 4.4vw, 48px) !important;
+    line-height: .92 !important;
+  }
+
+  html.k173-playability-reset .k16-logo span,
+  html.k173-playability-reset .k165-logo span {
+    margin-top: 2px !important;
+    padding: 2px 12px !important;
+    font-size: 7px !important;
+  }
+
+  html.k173-playability-reset .k16-resources,
+  html.k173-playability-reset .k165-resources {
+    gap: 3px !important;
+    padding: 4px !important;
+  }
+
+  html.k173-playability-reset .k16-resource,
+  html.k173-playability-reset .k165-resource {
+    grid-template-columns: 20px 1fr !important;
+    grid-template-rows: auto auto 5px !important;
+    min-height: 0 !important;
+    padding: 3px 5px !important;
+    border-width: 2px !important;
+  }
+
+  html.k173-playability-reset .k16-resource-icon,
+  html.k173-playability-reset .k165-resource > span {
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset .k16-resource-label,
+  html.k173-playability-reset .k165-resource small {
+    font-size: 7px !important;
+  }
+
+  html.k173-playability-reset .k16-resource b,
+  html.k173-playability-reset .k165-resource b {
+    font-size: 12px !important;
+  }
+
+  html.k173-playability-reset .k16-settings,
+  html.k173-playability-reset .k165-settings {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom,
+  html.k173-playability-reset .k165-bottom {
+    position: static !important;
+    grid-row: 3;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom-desktop,
+  html.k173-playability-reset .k165-bottom-desktop {
+    display: grid !important;
+    grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+  }
+
+  html.k173-playability-reset .k16-bottom-mobile,
+  html.k173-playability-reset .k165-bottom-mobile {
+    display: none !important;
+  }
+
+  html.k173-playability-reset .k16-bottom button,
+  html.k173-playability-reset .k165-bottom button {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 2px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom button span,
+  html.k173-playability-reset .k165-bottom button span {
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom button b,
+  html.k173-playability-reset .k165-bottom button b {
+    font-size: 9px !important;
+  }
+
+  /* Map: active case / world / rival fit simultaneously. */
+
+  html.k173-playability-reset.k16-active .k16-layout {
+    grid-row: 2;
+    display: grid !important;
+    grid-template-columns: 198px minmax(0, 1fr) 214px !important;
+    gap: var(--k173-gap) !important;
+    width: 100%;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 5px 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-left,
+  html.k173-playability-reset.k16-active .k16-center,
+  html.k173-playability-reset.k16-active .k16-right {
+    width: auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-panel {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border-width: 3px;
+  }
+
+  html.k173-playability-reset.k16-active .k16-center {
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 46px !important;
+    gap: 5px;
+  }
+
+  html.k173-playability-reset.k16-active .k16-map-card {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    border-width: 4px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-map-banner {
+    top: 5px !important;
+    min-width: 210px !important;
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-hotspot {
+    min-width: 69px !important;
+    min-height: 28px !important;
+    grid-template-columns: 15px 1fr !important;
+    gap: 2px !important;
+    padding: 3px 5px !important;
+    border-width: 2px !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-hotspot.long {
+    min-width: 86px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-hotspot > span {
+    font-size: 12px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-map-actions {
+    display: grid !important;
+    grid-template-columns: 1.35fr 1fr .8fr !important;
+    gap: 4px !important;
+    min-height: 0 !important;
+    height: 46px !important;
+    padding: 3px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-map-actions > button {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 2px 6px !important;
+    font-size: 12px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-map-actions > button:first-child,
+  html.k173-playability-reset.k16-active .k16-map-actions > button:nth-child(4) {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-panel-title {
+    padding: 5px 6px !important;
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-primary {
+    grid-template-columns: 44px 1fr !important;
+    gap: 5px !important;
+    padding: 7px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-primary[data-k171-priority="hlavní"] {
+    padding-top: 24px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-primary[data-k171-priority="hlavní"]::before {
+    top: 6px !important;
+    left: 7px !important;
+    right: auto !important;
+    font-size: 7px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-hero {
+    min-height: 54px !important;
+    font-size: 27px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-primary h2 {
+    margin: 0 0 3px !important;
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-primary p {
+    display: -webkit-box;
+    margin: 0 !important;
+    overflow: hidden;
+    font-size: 9px !important;
+    line-height: 1.28 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  html.k173-playability-reset.k16-active .k16-case-meta {
+    margin-top: 4px !important;
+    padding: 3px 5px !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-progress {
+    gap: 3px !important;
+    margin-top: 2px !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-action {
+    min-height: 34px !important;
+    padding: 4px 5px !important;
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-list {
+    gap: 3px !important;
+    padding: 5px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-list button {
+    min-height: 38px !important;
+    padding: 4px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-rival {
+    padding: 6px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-rival-head {
+    grid-template-columns: 44px 1fr auto !important;
+    gap: 5px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-rival-face {
+    width: 42px !important;
+    height: 48px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-rival-head b {
+    font-size: 11px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-rival-head small,
+  html.k173-playability-reset.k16-active .k16-rival-head strong {
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-strategy {
+    grid-template-columns: 42px 1fr !important;
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-strategy > span {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 20px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-strategy b {
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-strategy p {
+    display: -webkit-box;
+    margin: 2px 0 0 !important;
+    overflow: hidden;
+    font-size: 8px !important;
+    line-height: 1.25 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
+  html.k173-playability-reset.k16-active .k16-staff {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+    padding: 4px !important;
+  }
+
+  html.k173-playability-reset.k16-active .k16-staff article {
+    min-height: 48px !important;
+  }
+
+  /* Locations: scene on the left, actionable list on the right. */
+
+  html.k173-playability-reset.k165-active .k165-page {
+    grid-row: 2;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 5px 7px !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-page {
+    display: grid !important;
+    grid-template-columns: minmax(300px, .9fr) minmax(360px, 1.1fr);
+    grid-template-rows: 36px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-page > .k165-back {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  html.k173-playability-reset.k165-active .k165-back {
+    width: fit-content !important;
+    min-height: 0 !important;
+    height: 34px !important;
+    margin: 0 !important;
+    padding: 4px 12px !important;
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-hero {
+    grid-column: 1;
+    grid-row: 2;
+    align-items: end !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 12px !important;
+    border-width: 4px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-hero > div {
+    max-width: 100% !important;
+    padding: 12px !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-hero h1 {
+    margin: 3px 0 !important;
+    font-size: clamp(24px, 3.2vw, 36px) !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-hero strong {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
+  html.k173-playability-reset.k165-active .k165-location-hero span {
+    margin-top: 7px !important;
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-activity-grid {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-auto-rows: minmax(92px, auto);
+    gap: 6px !important;
+    min-height: 0;
+    margin: 0 !important;
+    padding-right: 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  html.k173-playability-reset.k165-active .k165-activity {
+    grid-template-columns: 110px 1fr !important;
+    grid-template-rows: 1fr !important;
+    min-height: 92px !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-activity .k165-card-art {
+    min-height: 0 !important;
+    border: 0 !important;
+    border-right: 3px solid var(--k173-frame) !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-activity .k165-card-copy {
+    padding: 10px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-activity h2 {
+    margin: 0 0 4px !important;
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-activity p {
+    margin: 0 0 5px !important;
+    font-size: 10px !important;
+  }
+
+  /* Events: context and every choice share the first viewport. */
+
+  html.k173-playability-reset.k165-active .k165-event-page {
+    display: grid !important;
+    grid-template-rows: 36px minmax(0, 1fr) 172px !important;
+    gap: 6px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-event-story {
+    display: grid !important;
+    grid-template-columns: minmax(250px, 35%) 1fr !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    border-width: 4px !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-event-image {
+    min-height: 0 !important;
+    height: 100% !important;
+    border-right-width: 4px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-event-text {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 12px 15px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+  }
+
+  html.k173-playability-reset.k165-active .k165-event-text h1 {
+    margin: 3px 0 7px !important;
+    font-size: clamp(22px, 2.6vw, 31px) !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-event-text p {
+    margin: 5px 0 !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-support {
+    margin-top: 7px !important;
+    padding: 6px 8px !important;
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: 6px !important;
+    height: 172px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice {
+    grid-template-columns: 92px 1fr !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice-art {
+    min-height: 0 !important;
+    height: 100% !important;
+    border-right-width: 3px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice > div:last-child {
+    min-width: 0;
+    padding: 9px 10px !important;
+    overflow: hidden;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice h2 {
+    margin: 0 26px 3px 0 !important;
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice p {
+    display: -webkit-box;
+    margin: 0 0 3px !important;
+    overflow: hidden;
+    font-size: 9px !important;
+    line-height: 1.25 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice strong,
+  html.k173-playability-reset.k165-active .k165-choice small,
+  html.k173-playability-reset.k165-active .k165-choice em {
+    margin-top: 2px !important;
+    padding-top: 2px !important;
+    font-size: 7px !important;
+    line-height: 1.12 !important;
+  }
+
+  html.k173-playability-reset.k165-active .k172-choice-state {
+    margin-top: 3px !important;
+    padding: 3px 5px !important;
+    font-size: 7px !important;
+  }
+
+  /* Result: consequence and continue action remain visible together. */
+
+  html.k173-playability-reset.k165-active .k165-result-page {
+    display: grid !important;
+    place-items: stretch center !important;
+    min-height: 0 !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-card {
+    grid-template-columns: minmax(260px, 38%) 1fr !important;
+    width: min(1050px, 100%) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    border-width: 5px !important;
+    overflow: hidden;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-image {
+    min-height: 0 !important;
+    height: 100% !important;
+    border-right-width: 4px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-image > span {
+    width: 72px !important;
+    height: 72px !important;
+    border-width: 5px !important;
+    font-size: 44px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-copy {
+    min-height: 0;
+    padding: 18px 22px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-copy h1 {
+    margin: 4px 0 10px !important;
+    font-size: clamp(28px, 3vw, 40px) !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-copy p {
+    margin: 7px 0 !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-copy .k172-impact-list {
+    gap: 5px !important;
+    padding: 7px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k172-impact-list > span {
+    min-height: 26px !important;
+    padding: 4px 7px !important;
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-copy .k165-primary {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    min-height: 40px !important;
+    margin-top: 9px !important;
+  }
+
+  /* Candidate creation: all six professions and confirmation fit at once. */
+
   html.k173-playability-reset.k169-pregame #creationScreen.active {
     display: grid !important;
-    place-items: start center !important;
+    place-items: stretch center !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    padding: 7px !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-shell {
+    display: grid !important;
+    grid-template-columns: 190px minmax(420px, 1fr) 188px !important;
+    grid-template-rows: 54px minmax(0, 1fr) !important;
+    gap: 7px !important;
+    width: min(1220px, 100%) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    align-items: center;
+    min-height: 0 !important;
+    padding: 7px 13px !important;
+    border-radius: 9px !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head p {
+    margin: 0 !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head h1 {
+    margin: 1px 0 0 !important;
+    font-size: 18px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head small {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head ol {
+    gap: 4px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-creation-head li {
+    padding: 4px 6px !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel,
+  html.k173-playability-reset.k169-pregame .k168-profession-panel,
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview {
+    grid-row: 2 !important;
+    grid-column: auto !important;
+    display: block !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    border-radius: 9px !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel {
+    grid-column: 1 !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-profession-panel {
+    grid-column: 2 !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) 42px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview {
+    grid-column: 3 !important;
+    position: static !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel .eyebrow,
+  html.k173-playability-reset.k169-pregame .k168-profession-panel .eyebrow {
+    margin: 0 0 4px !important;
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel h2 {
+    margin: 0 0 6px !important;
+    font-size: 17px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel > p:not(.eyebrow) {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel .field {
+    margin-bottom: 7px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel label {
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-identity-panel input {
+    min-height: 34px !important;
+    padding: 5px 7px !important;
+    font-size: 11px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-origin-grid {
+    gap: 5px !important;
+    margin-top: 5px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-origin-grid button {
+    grid-template-columns: 26px 1fr !important;
+    gap: 1px 5px !important;
+    min-height: 54px !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-origin-grid button > span {
+    font-size: 17px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-origin-grid button b {
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-origin-grid button small,
+  html.k173-playability-reset.k169-pregame .k168-origin-grid button em {
+    font-size: 7px !important;
+    line-height: 1.15 !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-card {
+    grid-template-columns: 24px 1fr !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    gap: 1px 5px !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-card > span:first-child {
+    font-size: 19px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-card > strong {
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-card > small {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 7px !important;
+    line-height: 1.18 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-meta {
+    margin-top: 2px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-ability {
+    margin: 0 !important;
+    font-size: 7px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-attributes {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k169-pregame #confirmBtn.k168-confirm-button {
+    position: static !important;
+    width: 100% !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 4px 0 0 !important;
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+    box-shadow: 0 3px 10px #0007 !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview > header {
+    padding-bottom: 7px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview > header p {
+    font-size: 7px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview > header h2 {
+    font-size: 15px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview > header small {
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-portrait {
+    width: 66px !important;
+    height: 66px !important;
+    margin: 8px auto !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-portrait span {
+    font-size: 30px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-preview-role b {
+    font-size: 12px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-preview-role p {
+    display: -webkit-box;
+    margin: 3px 0 7px !important;
+    overflow: hidden;
+    font-size: 8px !important;
+    line-height: 1.25 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-preview-origin {
+    grid-template-columns: 24px 1fr !important;
+    gap: 4px !important;
+    margin-bottom: 7px !important;
+    padding: 6px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-preview-origin > span {
+    font-size: 17px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-preview-origin b,
+  html.k173-playability-reset.k169-pregame .k168-preview-origin small {
+    font-size: 8px !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview > .k168-attributes,
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview blockquote,
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview > footer {
+    display: none !important;
+  }
+
+  /* Other desk screens get one intentional content scroller inside the frame. */
+
+  html.k173-playability-reset.k165-active .k165-quests-page,
+  html.k173-playability-reset.k165-active .k165-detail-page {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+  }
+}
+
+/* Short notebook tuning: protect decisions before decorative art. */
+
+@media (min-width: 821px) and (max-height: 650px) {
+  html.k173-playability-reset {
+    --k173-top: 64px;
+    --k173-nav: 54px;
+  }
+
+  html.k173-playability-reset.k16-active .k16-desktop-only,
+  html.k173-playability-reset.k16-active .k16-rival-panel > .k16-panel-title:nth-of-type(n + 3),
+  html.k173-playability-reset.k16-active .k16-staff,
+  html.k173-playability-reset.k16-active .k16-rival-panel > .k16-action {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-event-page {
+    grid-template-rows: 34px minmax(0, 1fr) 148px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice-grid {
+    height: 148px !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-choice-art {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k165-active .k165-result-copy > p:not(:first-child):not(.effects),
+  html.k173-playability-reset.k165-active .k165-result-copy > [data-k173-context] {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1181px) and (min-height: 651px) {
+  html.k173-playability-reset.k16-active .k16-layout {
+    grid-template-columns: 236px minmax(0, 1fr) 236px !important;
+  }
+}
+
+/* Mobile: portrait map and vertical decisions are purpose-built, not squeezed desktop. */
+
+@media (max-width: 820px) {
+  html.k173-playability-reset,
+  html.k173-playability-reset body {
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  html.k173-playability-reset #app,
+  html.k173-playability-reset #app > main,
+  html.k173-playability-reset .screen.active {
     height: auto !important;
     min-height: 100dvh !important;
     max-height: none !important;
-    padding: 18px clamp(18px, 2.5vw, 42px) 34px !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset .k16-shell,
+  html.k173-playability-reset .k165-shell {
+    min-height: 100dvh !important;
+    height: auto !important;
+    padding: 0 4px calc(70px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset .k16-topbar,
+  html.k173-playability-reset .k165-topbar {
+    position: sticky !important;
+    z-index: 70;
+    top: 0;
+    grid-template-columns: 1fr 1.16fr !important;
+    min-height: 98px !important;
+    margin: 0 -4px 4px !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-day,
+  html.k173-playability-reset .k165-day {
+    min-height: 56px !important;
+    padding: 5px 7px 2px !important;
+  }
+
+  html.k173-playability-reset .k16-logo strong,
+  html.k173-playability-reset .k165-logo strong {
+    font-size: clamp(30px, 10vw, 40px) !important;
+  }
+
+  html.k173-playability-reset .k16-resources,
+  html.k173-playability-reset .k165-resources {
+    min-height: 40px;
+    gap: 2px !important;
+    padding: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-resource,
+  html.k173-playability-reset .k165-resource {
+    min-height: 38px !important;
+    padding: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-resource-icon,
+  html.k173-playability-reset .k165-resource > span {
+    display: none !important;
+  }
+
+  html.k173-playability-reset .k16-resource b,
+  html.k173-playability-reset .k165-resource b {
+    font-size: 11px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom,
+  html.k173-playability-reset .k165-bottom {
+    position: fixed !important;
+    z-index: 90;
+    left: 4px !important;
+    right: 4px !important;
+    bottom: 4px !important;
+    height: 62px !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom button,
+  html.k173-playability-reset .k165-bottom button {
+    min-height: 58px !important;
+  }
+
+  html.k173-playability-reset .k16-bottom button span,
+  html.k173-playability-reset .k165-bottom button span {
+    font-size: 17px !important;
+  }
+
+  html.k173-playability-reset .k16-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset .k16-center {
+    order: 1;
+    width: 100% !important;
+  }
+
+  html.k173-playability-reset .k16-left {
+    order: 2;
+    width: 100% !important;
+  }
+
+  html.k173-playability-reset .k16-right {
+    order: 3;
+    width: 100% !important;
+  }
+
+  html.k173-playability-reset .k16-map-card {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 3 / 4 !important;
+  }
+
+  html.k173-playability-reset .k16-map-actions {
+    display: grid !important;
+    grid-template-columns: 1.35fr 1fr !important;
+    gap: 3px !important;
+    height: 48px !important;
+    padding: 3px !important;
+  }
+
+  html.k173-playability-reset .k16-map-actions > button {
+    min-height: 42px !important;
+    padding: 3px 4px !important;
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset .k16-map-actions > button:first-child,
+  html.k173-playability-reset .k16-map-actions > button:nth-child(3),
+  html.k173-playability-reset .k16-map-actions > button:nth-child(4) {
+    display: none !important;
+  }
+
+  html.k173-playability-reset .k16-desktop-only,
+  html.k173-playability-reset .k16-rival-panel > .k16-panel-title:nth-of-type(n + 3),
+  html.k173-playability-reset .k16-staff,
+  html.k173-playability-reset .k16-rival-panel > .k16-action {
+    display: none !important;
+  }
+
+  html.k173-playability-reset .k165-page {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 5px 2px !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset .k165-back {
+    margin: 2px 0 5px !important;
+    min-height: 38px !important;
+    padding: 5px 10px !important;
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset .k165-event-page,
+  html.k173-playability-reset .k165-location-page {
+    display: block !important;
+  }
+
+  html.k173-playability-reset .k165-event-story,
+  html.k173-playability-reset .k165-result-card {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+    height: auto !important;
+    border-width: 4px !important;
+  }
+
+  html.k173-playability-reset .k165-event-image {
+    min-height: 135px !important;
+    height: 135px !important;
+    border-right: 0 !important;
+    border-bottom: 4px solid var(--k173-frame) !important;
+  }
+
+  html.k173-playability-reset .k165-event-text {
+    padding: 12px !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset .k165-event-text h1 {
+    margin: 3px 0 7px !important;
+    font-size: 24px !important;
+  }
+
+  html.k173-playability-reset .k165-event-text p {
+    margin: 6px 0 !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  html.k173-playability-reset .k165-support {
+    margin-top: 7px !important;
+    padding: 7px !important;
+    font-size: 9px !important;
+  }
+
+  html.k173-playability-reset .k165-choice-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    height: auto !important;
+    margin: 6px 0 0 !important;
+    overflow: visible !important;
+  }
+
+  html.k173-playability-reset .k165-choice {
+    grid-template-columns: 82px 1fr !important;
+    min-height: 122px !important;
+    height: auto !important;
+    border-width: 3px !important;
+  }
+
+  html.k173-playability-reset .k165-choice-art {
+    min-height: 0 !important;
+    border-right-width: 3px !important;
+    border-bottom: 0 !important;
+  }
+
+  html.k173-playability-reset .k165-choice > div:last-child {
+    padding: 9px !important;
+  }
+
+  html.k173-playability-reset .k165-choice h2 {
+    margin: 0 28px 4px 0 !important;
+    font-size: 16px !important;
+  }
+
+  html.k173-playability-reset .k165-choice p {
+    margin: 0 0 4px !important;
+    font-size: 10px !important;
+  }
+
+  html.k173-playability-reset .k165-location-hero {
+    min-height: 265px !important;
+    padding: 9px !important;
+  }
+
+  html.k173-playability-reset .k165-location-hero > div {
+    padding: 12px !important;
+  }
+
+  html.k173-playability-reset .k165-location-hero h1 {
+    font-size: 27px !important;
+  }
+
+  html.k173-playability-reset .k165-activity-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+  }
+
+  html.k173-playability-reset .k165-activity {
+    grid-template-columns: 96px 1fr !important;
+    grid-template-rows: 1fr !important;
+    min-height: 112px !important;
+  }
+
+  html.k173-playability-reset .k165-activity .k165-card-art {
+    min-height: 0 !important;
+    border-right: 3px solid var(--k173-frame) !important;
+    border-bottom: 0 !important;
+  }
+
+  html.k173-playability-reset .k165-result-page {
+    display: block !important;
+  }
+
+  html.k173-playability-reset .k165-result-image {
+    min-height: 125px !important;
+    height: 125px !important;
+    border-right: 0 !important;
+    border-bottom: 4px solid var(--k173-frame) !important;
+  }
+
+  html.k173-playability-reset .k165-result-image > span {
+    width: 64px !important;
+    height: 64px !important;
+    border-width: 4px !important;
+    font-size: 38px !important;
+  }
+
+  html.k173-playability-reset .k165-result-copy {
+    padding: 14px !important;
+  }
+
+  html.k173-playability-reset .k165-result-copy h1 {
+    margin: 3px 0 8px !important;
+    font-size: 29px !important;
+  }
+
+  html.k173-playability-reset .k165-result-copy .k165-primary {
+    position: sticky;
+    bottom: 70px;
+    width: 100%;
+  }
+
+  html.k173-playability-reset.k169-pregame #creationScreen.active {
+    display: block !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    padding: 7px 7px 20px !important;
     overflow: visible !important;
   }
 
   html.k173-playability-reset.k169-pregame .k168-creation-shell {
-    grid-template-rows: auto auto !important;
-    width: min(1500px, 100%);
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    gap: 7px !important;
+    width: 100% !important;
     height: auto !important;
-    min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
   }
@@ -65,213 +1408,50 @@ html.k173-playability-reset .screen.active {
   html.k173-playability-reset.k169-pregame .k168-identity-panel,
   html.k173-playability-reset.k169-pregame .k168-profession-panel,
   html.k173-playability-reset.k169-pregame .k168-candidate-preview {
-    height: auto !important;
+    grid-column: 1 !important;
+    position: static !important;
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
-    scrollbar-gutter: auto !important;
   }
 
-  html.k173-playability-reset.k169-pregame .k168-profession-panel {
-    display: block !important;
+  html.k173-playability-reset.k169-pregame .k168-creation-head {
+    padding: 12px !important;
   }
 
-  html.k173-playability-reset.k169-pregame .k168-profession-panel .k168-class-grid {
-    max-height: none !important;
+  html.k173-playability-reset.k169-pregame .k168-creation-head small,
+  html.k173-playability-reset.k169-pregame .k168-creation-head ol {
+    display: none !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
     overflow: visible !important;
-    padding-right: 0 !important;
+  }
+
+  html.k173-playability-reset.k169-pregame .k168-class-card {
+    min-height: 118px !important;
   }
 
   html.k173-playability-reset.k169-pregame #confirmBtn.k168-confirm-button {
-    position: static !important;
-    margin-top: 14px !important;
-  }
-}
-
-/* Main map: keep the three-part hierarchy without exceeding 1024 CSS pixels. */
-
-html.k173-playability-reset.k16-active #v0160Root,
-html.k173-playability-reset.k16-active .k16-shell {
-  height: auto !important;
-  min-height: 100dvh !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-html.k173-playability-reset.k16-active .k16-shell {
-  display: block !important;
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-html.k173-playability-reset.k16-active .k16-layout,
-html.k173-playability-reset.k16-active .k16-left,
-html.k173-playability-reset.k16-active .k16-right,
-html.k173-playability-reset.k16-active .k16-center {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow: visible !important;
-  scrollbar-gutter: auto !important;
-}
-
-html.k173-playability-reset.k16-active .k16-layout {
-  align-items: start !important;
-}
-
-html.k173-playability-reset.k16-active .k16-center {
-  display: block !important;
-}
-
-html.k173-playability-reset.k16-active .k16-map-card {
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  aspect-ratio: 16 / 9 !important;
-}
-
-html.k173-playability-reset.k16-active .k16-bottom,
-html.k173-playability-reset.k165-active .k165-bottom {
-  height: 62px;
-}
-
-html.k173-playability-reset.k16-active .k16-bottom button,
-html.k173-playability-reset.k165-active .k165-bottom button {
-  min-height: 58px !important;
-}
-
-/* Campaign surfaces: the page scrolls; fixed navigation no longer hides cards. */
-
-html.k173-playability-reset.k165-active #v0165Root,
-html.k173-playability-reset.k165-active .k165-shell {
-  height: auto !important;
-  min-height: 100dvh !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-html.k173-playability-reset.k165-active .k165-shell {
-  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-html.k173-playability-reset.k165-active .k165-page,
-html.k173-playability-reset.k165-active .k165-event-page,
-html.k173-playability-reset.k165-active .k165-result-page {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-html.k173-playability-reset.k165-active .k165-event-text {
-  overflow: visible !important;
-}
-
-/* Real-world MacBook viewport: 2048px Retina screenshot ≈ 1024 CSS pixels. */
-
-@media (min-width: 901px) and (max-width: 1180px) {
-  html.k173-playability-reset .k16-layout {
-    grid-template-columns: 220px minmax(0, 1fr) !important;
-    gap: 6px !important;
-  }
-
-  html.k173-playability-reset .k16-left {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  html.k173-playability-reset .k16-center {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  html.k173-playability-reset .k16-right {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-
-  html.k173-playability-reset .k16-topbar,
-  html.k173-playability-reset .k165-topbar {
-    grid-template-columns: 176px minmax(230px, 1fr) 336px 42px !important;
-    min-height: 70px !important;
-  }
-
-  html.k173-playability-reset .k16-day,
-  html.k173-playability-reset .k165-day {
-    min-height: 70px !important;
-    padding: 6px 10px !important;
-  }
-
-  html.k173-playability-reset .k16-logo strong,
-  html.k173-playability-reset .k165-logo strong {
-    font-size: 38px !important;
-  }
-
-  html.k173-playability-reset .k16-resource,
-  html.k173-playability-reset .k165-resource {
+    position: sticky !important;
+    z-index: 40;
+    bottom: 8px !important;
     min-height: 48px !important;
-    padding: 5px !important;
   }
 
-  html.k173-playability-reset .k16-resource b,
-  html.k173-playability-reset .k165-resource b {
-    font-size: 14px !important;
-  }
-
-  html.k173-playability-reset .k16-case-primary {
-    grid-template-columns: 52px 1fr !important;
-  }
-
-  html.k173-playability-reset .k16-case-primary h2 {
-    font-size: 17px !important;
-  }
-
-  html.k173-playability-reset .k16-case-primary p {
-    font-size: 11px !important;
+  html.k173-playability-reset.k169-pregame .k168-candidate-preview {
+    display: none !important;
   }
 }
 
-@media (min-width: 761px) and (max-height: 650px) {
-  html.k173-playability-reset .k165-event-page {
-    display: block !important;
-  }
-
-  html.k173-playability-reset .k165-event-story {
-    grid-template-columns: minmax(280px, 36%) 1fr !important;
-    height: auto !important;
-    min-height: 240px !important;
-  }
-
-  html.k173-playability-reset .k165-event-image {
-    min-height: 240px !important;
-  }
-
-  html.k173-playability-reset .k165-event-text {
-    padding: 16px 20px !important;
-  }
-
-  html.k173-playability-reset .k165-event-text h1 {
-    font-size: clamp(25px, 2.4vw, 32px) !important;
-  }
-
-  html.k173-playability-reset .k165-choice-grid {
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-width: 900px) {
-  html.k173-playability-reset .k16-layout {
-    display: flex !important;
-  }
-}
-
-@media (max-width: 820px) {
-  html.k173-playability-reset .screen.active {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
-  }
-
-  html.k173-playability-reset .k168-class-grid,
-  html.k173-playability-reset .k165-choice-grid {
-    overflow: visible !important;
+@media (prefers-reduced-motion: reduce) {
+  html.k173-playability-reset *,
+  html.k173-playability-reset *::before,
+  html.k173-playability-reset *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

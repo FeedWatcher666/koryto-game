@@ -13,7 +13,10 @@
     if (!(element instanceof Element)) return false;
     const style = getComputedStyle(element);
     const rect = element.getBoundingClientRect();
-    return style.display !== "none" &&
+    return !element.hidden &&
+      !element.inert &&
+      element.getAttribute("aria-hidden") !== "true" &&
+      style.display !== "none" &&
       style.visibility !== "hidden" &&
       Number(style.opacity || 1) > 0 &&
       rect.width > 0 &&
@@ -24,8 +27,23 @@
       rect.top < innerHeight;
   };
 
-  const bottomNavigation = () =>
-    document.querySelector("#v0160Root .k16-bottom, #v0165Root .k165-bottom");
+  const fullyVisible = element => {
+    if (!visible(element)) return false;
+    const rect = element.getBoundingClientRect();
+    const nav = activeNavigation();
+    const navTop = visible(nav) ? nav.getBoundingClientRect().top : innerHeight;
+    return rect.top >= -1 && rect.bottom <= navTop + 1 && rect.left >= -1 && rect.right <= innerWidth + 1;
+  };
+
+  const activeNavigation = () => {
+    if (document.documentElement.classList.contains("k165-active")) {
+      return document.querySelector("#v0165Root .k165-bottom");
+    }
+    if (document.documentElement.classList.contains("k16-active")) {
+      return document.querySelector("#v0160Root .k16-bottom");
+    }
+    return null;
+  };
 
   const surfaceKey = () => {
     const activeScreen = document.querySelector(".screen.active")?.id || "none";
@@ -43,40 +61,88 @@
     return true;
   }
 
-  function resetNestedScroll() {
-    document.querySelectorAll(
-      ".k168-class-grid,.k168-identity-panel,.k168-profession-panel,.k168-candidate-preview," +
-      ".k16-left,.k16-right,.k165-event-text"
-    ).forEach(element => {
-      if (element.scrollTop && getComputedStyle(element).overflowY === "visible") {
-        element.scrollTop = 0;
-      }
-    });
-  }
-
   function removeNativeMapTooltips() {
     document.querySelectorAll(".k16-hotspot[title]").forEach(hotspot => {
       const label = hotspot.getAttribute("title")?.trim();
-      if (label && !hotspot.getAttribute("aria-label")) {
-        hotspot.setAttribute("aria-label", label);
-      }
+      if (label && !hotspot.getAttribute("aria-label")) hotspot.setAttribute("aria-label", label);
       hotspot.removeAttribute("title");
     });
+  }
+
+  function decorateMap() {
+    const actions = document.querySelector("#v0160Root .k16-map-actions");
+    const caseAction = document.querySelector("#v0160Root .k16-case-primary [data-k16-location]");
+    const endDay = actions?.querySelector("[data-k16-end]");
+    if (!actions || !caseAction) return false;
+
+    endDay?.classList.remove("primary");
+    endDay?.classList.add("k173-end-day");
+
+    let primary = actions.querySelector("[data-k173-primary]");
+    if (!primary) {
+      primary = document.createElement("button");
+      primary.type = "button";
+      primary.className = "primary k173-primary-action";
+      primary.dataset.k173Primary = "objective";
+      actions.prepend(primary);
+    }
+    const title = document.querySelector("#v0160Root .k16-case-primary h2")?.textContent?.trim() || "aktivní kauza";
+    primary.innerHTML = `<span aria-hidden="true">▶</span><span>POKRAČOVAT: ${escapeHtml(title)}</span>`;
+    primary.setAttribute("aria-label", `Pokračovat v hlavní kauze: ${title}`);
+    primary.onclick = () => caseAction.click();
+    return true;
+  }
+
+  function compactEventStory() {
+    const copy = document.querySelector("#v0165Root .k165-event-text");
+    if (!copy || copy.dataset.k173Compacted === "1") return false;
+    const support = copy.querySelector(".k165-support");
+    const paragraphs = [...copy.children].filter(node => node.tagName === "P");
+    const narrative = paragraphs.slice(1);
+    if (narrative.length > 1) {
+      const details = document.createElement("details");
+      details.dataset.k173Context = "event";
+      const summary = document.createElement("summary");
+      summary.textContent = "Celý kontext události";
+      const body = document.createElement("div");
+      narrative.slice(1).forEach(paragraph => body.appendChild(paragraph));
+      details.append(summary, body);
+      copy.insertBefore(details, support || null);
+    }
+    copy.dataset.k173Compacted = "1";
+    return true;
+  }
+
+  function markSurface() {
+    const surface = globalThis.KorytoUI165?.visualAudit?.()?.activeView;
+    const campaignShell = document.querySelector("#v0165Root .k165-shell");
+    const mapShell = document.querySelector("#v0160Root .k16-shell");
+    if (campaignShell && surface && surface !== "none") campaignShell.dataset.k173Surface = surface;
+    if (mapShell && document.documentElement.classList.contains("k16-active")) mapShell.dataset.k173Surface = "map";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#039;"
+    })[char]);
   }
 
   function sync() {
     installRoot();
     const nextSurface = surfaceKey();
-    if (lastSurface && nextSurface !== lastSurface) {
+    if (lastSurface && nextSurface !== lastSurface && innerWidth <= 820) {
       requestAnimationFrame(() => globalThis.scrollTo({top: 0, left: 0, behavior: "auto"}));
     }
     lastSurface = nextSurface;
-    resetNestedScroll();
-    // The map renderer replaces action buttons as campaign state changes.
-    // Re-apply the previous turn-clarity decoration after that replacement so
-    // the exact early-end penalty does not disappear from the live UI.
     globalThis.KorytoUI172?.decorate?.();
     removeNativeMapTooltips();
+    decorateMap();
+    compactEventStory();
+    markSurface();
     return true;
   }
 
@@ -90,7 +156,7 @@
   }
 
   function overlapWithNavigation(element) {
-    const nav = bottomNavigation();
+    const nav = activeNavigation();
     if (!visible(element) || !visible(nav)) return 0;
     const a = element.getBoundingClientRect();
     const b = nav.getBoundingClientRect();
@@ -100,27 +166,18 @@
   }
 
   function audit() {
-    const activeScreen = document.querySelector(".screen.active");
     const root = document.documentElement;
+    const activeScreen = document.querySelector(".screen.active");
+    const choices = [...document.querySelectorAll("#v0165Root [data-k165-choice]:not([disabled])")];
+    const classCards = [...document.querySelectorAll("#classGrid [data-class]")];
+    const hotspots = [...document.querySelectorAll("#v0160Root .k16-hotspot")];
     const primary = [
       document.getElementById("confirmBtn"),
-      document.querySelector("#v0165Root [data-k165-choice]:not([disabled])"),
+      choices[0],
       document.querySelector("#v0165Root [data-k165-continue]"),
+      document.querySelector("#v0160Root [data-k173-primary]"),
       document.querySelector("#v0160Root [data-k16-end]")
     ].filter(visible);
-    const nestedScrollers = [
-      ".k168-class-grid",
-      ".k168-profession-panel",
-      ".k16-left",
-      ".k16-right",
-      ".k165-event-text"
-    ].filter(selector => {
-      const element = document.querySelector(selector);
-      if (!visible(element)) return false;
-      const style = getComputedStyle(element);
-      return /(auto|scroll)/.test(style.overflowY) &&
-        element.scrollHeight > element.clientHeight + 1;
-    });
 
     return {
       buildVersion: INFO.buildVersion,
@@ -129,12 +186,22 @@
       active: root.classList.contains("k173-playability-reset"),
       viewport: {width: innerWidth, height: innerHeight},
       surface: surfaceKey(),
-      documentScrollable: document.documentElement.scrollHeight > innerHeight + 1,
+      desktopFrame: innerWidth <= 820 || (
+        getComputedStyle(document.body).overflowY === "hidden" &&
+        document.documentElement.scrollHeight <= innerHeight + 1
+      ),
       bodyOverflowY: getComputedStyle(document.body).overflowY,
       activeScreenOverflowY: activeScreen ? getComputedStyle(activeScreen).overflowY : null,
-      nestedScrollers,
       primaryActions: primary.length,
-      coveredPrimaryActions: primary.filter(element => overlapWithNavigation(element) > 0).length
+      coveredPrimaryActions: primary.filter(element => overlapWithNavigation(element) > 0).length,
+      visibleChoices: choices.filter(visible).length,
+      fullyVisibleChoices: choices.filter(fullyVisible).length,
+      visibleClassCards: classCards.filter(visible).length,
+      fullyVisibleClassCards: classCards.filter(fullyVisible).length,
+      confirmVisible: fullyVisible(document.getElementById("confirmBtn")),
+      visibleHotspots: hotspots.filter(visible).length,
+      primaryObjective: Boolean(document.querySelector("#v0160Root [data-k173-primary]")),
+      compactEventContext: Boolean(document.querySelector("#v0165Root [data-k173-context]"))
     };
   }
 
@@ -144,11 +211,8 @@
     globalThis.addEventListener?.("resize", queueSync, {passive: true});
     document.addEventListener("click", queueSync, true);
     document.addEventListener("change", queueSync, true);
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", sync, {once: true});
-    } else {
-      sync();
-    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", sync, {once: true});
+    else sync();
     return true;
   }
 

@@ -1,35 +1,45 @@
-# Koryto v0.17.3 TEST.1 — playability reset
+# Koryto v0.17.3 TEST.1 — playable game-frame redesign
 
-Třetí iterace řady v0.17 je blokující oprava hratelnosti. Ruční test na Retina
-Macu odhalil, že screenshot široký přibližně 2048 fyzických pixelů odpovídá
-viewportu jen kolem 1024 CSS pixelů a výšce přibližně 550 pixelů. Předchozí gate
-začínal na 1280 × 720 a neověřoval tedy skutečné zařízení hráče.
+Třetí iterace řady v0.17 je blokující strukturální oprava hratelnosti. Ruční test
+na Retina Macu ukázal, že předchozí rozhraní sice technicky obsahovalo ovládací
+prvky, ale v reálném viewportu kolem `1024 × 550` CSS pixelů je skrývalo pod
+okrajem, navigací nebo několika navzájem soupeřícími panely.
 
 ## Nalezená příčina
 
-- vrstva `v0169-viewport-lock` zamykala dokument na `100dvh`,
-- tvorba kandidáta, mapa a postranní panely používaly několik vlastních scrollů,
-- v0.17.1 na šířce nad 900 px vyžadovala minimálně 1114 px pro třísloupcovou mapu,
-- pevná spodní navigace překrývala obsah na krátkém viewportu,
-- automatický test dokazoval existenci tlačítek, ne jejich dosažitelnost.
+- mapa neměla stabilní prostor mezi horním HUDem a spodní navigací,
+- událost ukázala příběh, ale samotné rozhodnutí až pod prvním viewportem,
+- tvorba kandidáta vyžadovala rolování mezi povoláními, náhledem a potvrzením,
+- lokality používaly velkou dekorativní plochu a akce odsouvaly dolů,
+- automatický test si hlavní tlačítko sám odroloval do záběru, a tím problém skryl.
 
-## Oprava
+## Strukturální oprava
 
-- jedna přirozená svislá stránka namísto vnořených scrollů,
-- čitelná dvousloupcová mapa `220 px / fluid` pro šířky 901–1180 px;
-  panel soupeře pokračuje pod mapou místo třetího stlačeného sloupce,
-- kompaktnější horní HUD pro běžný notebook,
-- kandidátní karty bez interního ořezu,
-- události a volby mohou přirozeně pokračovat pod první obrazovkou,
-- rezerva pod pevnou navigací na desktopu i mobilu,
-- nový audit `KorytoUI173`.
+- desktop používá pevný herní rám: kompaktní HUD, jedna herní scéna a jedna
+  navigace, bez dlouhého dokumentu,
+- mapa zachovává současně aktivní kauzu, svět a tlak rivala i na `1024 × 550`,
+- hlavní kauza dostává jedinou dominantní akci přímo pod mapou,
+- událost drží příběhový kontext a všechny dostupné volby v prvním viewportu;
+  delší text zůstává dostupný přes rozbalovací „Celý kontext události“,
+- lokalita je rozdělena na scénu a samostatný seznam skutečně kliknutelných akcí,
+- šest povolání tvoří mřížku `2 × 3` a tlačítko potvrzení je viditelné bez rolování,
+- mobil používá vlastní portrétní mapu, vertikální volby a pětiprvkovou navigaci,
+- nový audit `KorytoUI173` měří skutečnou viditelnost, ne pouze existenci v DOM.
+
+## Co se nemění
+
+- dvě akce za den a jejich spotřeba,
+- penalizace za předčasné ukončení dne,
+- questy, události, hody, balanc a pravděpodobnosti,
+- save `0.14.3-test.2`, schema `1`.
 
 ## Release gate
 
-- nový cíl `1024 × 550`,
-- kontrola, že hlavní akci lze po rolování dostat celou nad spodní navigaci,
-- kontrola nulového překrytí hlavní akce navigací,
-- kontrola odstranění vnořených scrollů z kritických povrchů,
-- zachování tras 1366 × 768, 1280 × 720 a 390 × 844,
+- cíle `1366 × 768`, `1280 × 720`, `1024 × 550` a `390 × 844`,
+- všech šest povolání a potvrzení viditelné bez rolování na desktopu,
+- všechny dostupné volby události v prvním desktopovém viewportu,
+- osm viditelných lokalit a jediná dominantní akce mapy,
+- nulové překrytí hlavních akcí spodní navigací,
+- událost → výsledek → mapa → potvrzení dne → lokalita,
 - úplný save/load roundtrip,
-- save `0.14.3-test.2`, schema `1`.
+- žádné vzdálené runtime závislosti.

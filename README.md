@@ -36,12 +36,15 @@ Rozbalte ZIP a otevřete `index.html`.
 
 ## Co opravuje v0.17.3
 
-- ruší nehratelný zámek celé obrazovky na noteboocích s nízkou výškou,
-- místo několika vnořených posuvníků používá jednu předvídatelnou svislou stránku,
+- nahrazuje dlouhou webovou stránku pevným herním rámem na desktopu,
 - opravuje skutečný Retina/MacBook viewport kolem `1024 × 550` CSS pixelů,
-- zpřístupňuje první řadu povolání, potvrzení kandidáta, rozhodovací karty i návraty,
+- drží aktivní kauzu, mapu a soupeře současně v jedné scéně,
+- ukazuje všechny volby události společně s kontextem ještě před rolováním,
+- zobrazuje všech šest povolání a potvrzení kandidáta v jednom viewportu,
+- skládá lokalitu do scény a samostatného seznamu kliknutelných akcí,
+- používá samostatnou portrétní kompozici mapy a voleb na mobilu,
 - zabraňuje překrytí hlavních akcí pevnou spodní navigací,
-- přidává gate skutečné dosažitelnosti ovládání, ne pouze existence prvků v DOM,
+- přidává gate skutečné viditelnosti ovládání, ne pouze existence prvků v DOM,
 - mechaniky, balanc, questy a save formát zůstávají beze změny.
 
 ## Zachované hratelné části řady v0.16

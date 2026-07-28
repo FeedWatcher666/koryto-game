@@ -146,7 +146,9 @@ try {
       assert.ok(audit.markedSurfaces >= 2, `${target.name} ${label}: live surfaces are marked`);
       assert.equal(audit.playability?.buildVersion, '0.17.3-test.1', `${target.name} ${label}: playability build`);
       assert.equal(audit.playability?.active, true, `${target.name} ${label}: playability reset active`);
-      assert.deepEqual(audit.playability?.nestedScrollers, [], `${target.name} ${label}: no critical nested scroll traps`);
+      if (target.width > 820) {
+        assert.equal(audit.playability?.desktopFrame, true, `${target.name} ${label}: fixed desktop game frame`);
+      }
       if (requireReachablePrimary) {
         assert.equal(audit.playability?.coveredPrimaryActions, 0, `${target.name} ${label}: primary actions are not covered`);
       }
@@ -183,6 +185,12 @@ try {
       await page.click('#startBtn');
       await page.waitForSelector('#creationScreen.active');
       await page.fill('#heroName', `Gate ${target.name}`);
+      await page.evaluate(() => globalThis.KorytoUI173?.sync?.());
+      const creationAudit = await page.evaluate(() => globalThis.KorytoUI173?.audit?.());
+      if (target.width > 820) {
+        assert.equal(creationAudit?.fullyVisibleClassCards, 6, `${target.name}: all professions share the first viewport`);
+        assert.equal(creationAudit?.confirmVisible, true, `${target.name}: candidate confirmation is visible without scrolling`);
+      }
       const firstClass = page.locator('#classGrid [data-class]').first();
       await assertReachable(firstClass, 'first candidate class');
       await firstClass.click();
@@ -206,7 +214,10 @@ try {
       assert.equal(turnDecisionAudit?.buildVersion, '0.17.3-test.1', `${target.name}: turn clarity build`);
       assert.ok(turnDecisionAudit?.availableChoices >= 2, `${target.name}: explicit available choices`);
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), true, `${target.name}: save disabled in event`);
-      await auditSurface('event', {requireReachablePrimary: false});
+      const eventAudit = await auditSurface('event', {requireReachablePrimary: false});
+      if (target.width > 820) {
+        assert.equal(eventAudit.playability?.fullyVisibleChoices, decisionAudit?.numberedChoices, `${target.name}: every decision is visible before scrolling`);
+      }
       await page.screenshot({path: `browser-artifacts/${target.name}-event.png`, fullPage: false});
       await assertReachable(page.locator('#v0165Root [data-k165-choice]:not([disabled])').first(), 'event choice');
       await auditSurface('event-decision');
@@ -254,6 +265,8 @@ try {
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), false, `${target.name}: save enabled on map`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot').count(), 8, `${target.name}: hotspots`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot[title]').count(), 0, `${target.name}: native tooltips`);
+      assert.equal(mapAudit.playability?.visibleHotspots, 8, `${target.name}: all map locations are visible`);
+      assert.equal(mapAudit.playability?.primaryObjective, true, `${target.name}: map exposes one dominant objective action`);
       const beforeEarlyEnd = await page.evaluate(() => {
         const state = globalThis.KorytoApp.getState();
         return {day: state.day, actions: state.actions, momentum: state.opponent.momentum};
@@ -366,4 +379,4 @@ try {
   await browser.close();
 }
 
-console.log('v0.17.3 TEST.1 packaged Chromium playability and complete save/load gate passed');
+console.log('v0.17.3 TEST.1 packaged Chromium game-frame playability and complete save/load gate passed');
