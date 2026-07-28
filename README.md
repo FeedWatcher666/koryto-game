@@ -1,4 +1,4 @@
-# Koryto v0.17.1 TEST.1
+# Koryto v0.17.2 TEST.1
 
 Hratelný offline test nové vizuální základny kampaně a prvního průchodu
 čitelností rozhodování.
@@ -24,6 +24,15 @@ Rozbalte ZIP a otevřete `index.html`.
 - mobil používá kompaktní horizontální volby místo dlouhých obrazových bloků,
 - výsledky mají výraznější oddělení dopadů od příběhového textu,
 - mechaniky a save formát zůstávají beze změny.
+
+## Co dolaďuje v0.17.2
+
+- horní HUD jasně odlišuje plný tah, poslední akci a vyčerpaný tah,
+- předčasné ukončení dne ukazuje přesnou penalizaci a vyžaduje potvrzení,
+- dostupné a zamčené volby mají explicitní stav,
+- rozhodovací i výsledkové obrazovky uvádějí cenu jedné akce,
+- dopady výsledku jsou rozdělené na kladné, záporné a neutrální položky,
+- mechaniky, balanc, questy a save formát zůstávají beze změny.
 
 ## Zachované hratelné části řady v0.16
 
@@ -60,4 +69,4 @@ Rozbalte ZIP a otevřete `index.html`.
 5. Dokončit volby a koaliční vyjednávání.
 6. Ověřit celý tok na desktopu a při šířce 390 px.
 
-Podrobný popis iterace je v `docs/v0.17/v0171-decision-hud.md`.
+Podrobný popis iterace je v `docs/v0.17/v0172-turn-clarity.md`.

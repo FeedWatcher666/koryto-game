@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
-const dist = path.resolve(process.argv[2] || 'dist/koryto-v0.17.1-test.1');
+const dist = path.resolve(process.argv[2] || 'dist/koryto-v0.17.2-test.1');
 const index = path.join(dist, 'index.html');
 assert.ok(fs.existsSync(index), `Missing packaged index: ${index}`);
 fs.mkdirSync('browser-artifacts', {recursive: true});
@@ -66,7 +66,7 @@ try {
           legacyNavigationCount: legacy.length,
           disabledLegacyNavigationCount: legacy.filter(nav => nav.hidden && nav.inert && nav.getAttribute('aria-hidden') === 'true').length,
           horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1 || document.body.scrollWidth > innerWidth + 1,
-          footerVersionCount: (footer.match(/0\.17\.1 TEST\.1/g) || []).length,
+          footerVersionCount: (footer.match(/0\.17\.2 TEST\.1/g) || []).length,
           title: document.title,
           meta: document.querySelector('meta[name="description"]')?.content || '',
           build: document.documentElement.dataset.korytoBuild || null,
@@ -81,10 +81,10 @@ try {
       assert.equal(audit.disabledLegacyNavigationCount, audit.legacyNavigationCount, `${target.name} ${label}: legacy navigation hidden, inert and aria-hidden`);
       assert.equal(audit.horizontalOverflow, false, `${target.name} ${label}: no horizontal overflow`);
       assert.equal(audit.footerVersionCount, 1, `${target.name} ${label}: footer version exactly once`);
-      assert.match(audit.title, /0\.17\.1 TEST\.1/, `${target.name} ${label}: title`);
-      assert.match(audit.meta, /0\.17\.1 TEST\.1/, `${target.name} ${label}: meta`);
-      assert.equal(audit.build, '0.17.1-test.1', `${target.name} ${label}: data build`);
-      assert.equal(audit.visual, '0.17.1-test.1', `${target.name} ${label}: visual marker`);
+      assert.match(audit.title, /0\.17\.2 TEST\.1/, `${target.name} ${label}: title`);
+      assert.match(audit.meta, /0\.17\.2 TEST\.1/, `${target.name} ${label}: meta`);
+      assert.equal(audit.build, '0.17.2-test.1', `${target.name} ${label}: data build`);
+      assert.equal(audit.visual, '0.17.2-test.1', `${target.name} ${label}: visual marker`);
       assert.equal(audit.foundationActive, true, `${target.name} ${label}: visual foundation active`);
       assert.ok(audit.markedSurfaces >= 2, `${target.name} ${label}: live surfaces are marked`);
       return audit;
@@ -95,7 +95,7 @@ try {
       const url = `${pathToFileURL(index).href}?browsergate=1`;
       await page.goto(url, {waitUntil: 'load'});
       await page.waitForSelector('#startBtn', {state: 'visible'});
-      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.1-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active);
+      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.2-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active && globalThis.KorytoUI172?.audit?.().active);
 
       const identity = await page.evaluate(() => {
         const footer = document.querySelector('.footer-note')?.textContent || '';
@@ -104,16 +104,16 @@ try {
           meta: document.querySelector('meta[name="description"]')?.content || '',
           build: document.documentElement.dataset.korytoBuild,
           brand: document.querySelector('.brand h1 span')?.textContent || '',
-          footerVersionCount: (footer.match(/0\.17\.1 TEST\.1/g) || []).length,
+          footerVersionCount: (footer.match(/0\.17\.2 TEST\.1/g) || []).length,
           visual: document.documentElement.dataset.korytoVisual,
           visualAudit: globalThis.KorytoUI170?.visualAudit?.()
         };
       });
-      assert.match(identity.title, /0\.17\.1 TEST\.1/, `${target.name}: title`);
-      assert.match(identity.meta, /0\.17\.1 TEST\.1/, `${target.name}: meta`);
-      assert.equal(identity.build, '0.17.1-test.1', `${target.name}: data build`);
-      assert.equal(identity.visual, '0.17.1-test.1', `${target.name}: visual data build`);
-      assert.match(identity.brand, /0\.17\.1 TEST\.1/, `${target.name}: brand`);
+      assert.match(identity.title, /0\.17\.2 TEST\.1/, `${target.name}: title`);
+      assert.match(identity.meta, /0\.17\.2 TEST\.1/, `${target.name}: meta`);
+      assert.equal(identity.build, '0.17.2-test.1', `${target.name}: data build`);
+      assert.equal(identity.visual, '0.17.2-test.1', `${target.name}: visual data build`);
+      assert.match(identity.brand, /0\.17\.2 TEST\.1/, `${target.name}: brand`);
       assert.equal(identity.footerVersionCount, 1, `${target.name}: footer version once`);
       assert.equal(identity.visualAudit?.remoteAssets, 0, `${target.name}: offline visual assets`);
 
@@ -126,11 +126,17 @@ try {
       await page.waitForFunction(() => globalThis.KorytoApp?.getState?.().phase === 'event');
       await page.waitForSelector('#v0165Root [data-k165-choice]:not([disabled])', {state: 'visible'});
       await page.evaluate(() => globalThis.KorytoUI169?.syncStatus?.());
-      await page.evaluate(() => globalThis.KorytoUI171?.decorate?.());
+      await page.evaluate(() => {
+        globalThis.KorytoUI171?.decorate?.();
+        globalThis.KorytoUI172?.decorate?.();
+      });
       const decisionAudit = await page.evaluate(() => globalThis.KorytoUI171?.audit?.());
-      assert.equal(decisionAudit?.buildVersion, '0.17.1-test.1', `${target.name}: decision HUD build`);
+      const turnDecisionAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
+      assert.equal(decisionAudit?.buildVersion, '0.17.2-test.1', `${target.name}: decision HUD build`);
       assert.ok(decisionAudit?.numberedChoices >= 2, `${target.name}: numbered decision cards`);
       assert.equal(decisionAudit?.accessibleChoices, decisionAudit?.numberedChoices, `${target.name}: accessible decision labels`);
+      assert.equal(turnDecisionAudit?.buildVersion, '0.17.2-test.1', `${target.name}: turn clarity build`);
+      assert.ok(turnDecisionAudit?.availableChoices >= 2, `${target.name}: explicit available choices`);
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), true, `${target.name}: save disabled in event`);
       await auditSurface('event');
       await page.screenshot({path: `browser-artifacts/${target.name}-event.png`, fullPage: false});
@@ -143,6 +149,10 @@ try {
       await page.waitForSelector('#diceClose:not(.hidden)', {timeout: 5000});
       await page.click('#diceClose');
       await page.waitForSelector('#v0165Root [data-k165-continue]', {state: 'visible'});
+      await page.evaluate(() => globalThis.KorytoUI172?.decorate?.());
+      const resultAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
+      assert.ok(resultAudit?.impactChips >= 1, `${target.name}: result impact chips`);
+      assert.match(await page.locator('#v0165Root [data-k165-continue]').textContent(), /1 AKCI/, `${target.name}: result action cost`);
       await auditSurface('result');
       await page.screenshot({path: `browser-artifacts/${target.name}-result.png`, fullPage: false});
 
@@ -152,10 +162,14 @@ try {
       await page.evaluate(() => {
         globalThis.KorytoMapStability169?.forceCanonicalMap?.();
         globalThis.KorytoUI169?.syncStatus?.();
+        globalThis.KorytoUI172?.decorate?.();
         globalThis.KorytoBuildInfo?.applyLabels?.();
       });
       const mapAudit = await auditSurface('map');
       assert.equal(mapAudit.phase, 'map', `${target.name}: map phase`);
+      const turnMapAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
+      assert.ok(turnMapAudit?.turnIndicators >= 1, `${target.name}: turn indicator`);
+      assert.equal(turnMapAudit?.endDayWarnings, 1, `${target.name}: early end warning`);
       assert.equal(await page.locator('[data-k169-action="save"]').isDisabled(), false, `${target.name}: save enabled on map`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot').count(), 8, `${target.name}: hotspots`);
       assert.equal(await page.locator('#v0160Root .k16-hotspot[title]').count(), 0, `${target.name}: native tooltips`);
@@ -165,6 +179,32 @@ try {
         await page.click('#v0145CoachClose');
         await page.waitForSelector('#v0145CoachOverlay', {state: 'hidden'});
       }
+
+      const beforeEarlyEnd = await page.evaluate(() => {
+        const state = globalThis.KorytoApp.getState();
+        return {day: state.day, actions: state.actions, momentum: state.opponent.momentum};
+      });
+      await page.click('[data-k16-end]');
+      const afterEarlyEnd = await page.evaluate(() => {
+        const state = globalThis.KorytoApp.getState();
+        return {
+          day: state.day,
+          actions: state.actions,
+          momentum: state.opponent.momentum,
+          daySummaryOpen: document.documentElement.classList.contains('k166-day-open')
+        };
+      });
+      assert.deepEqual(
+        {day: afterEarlyEnd.day, actions: afterEarlyEnd.actions, momentum: afterEarlyEnd.momentum},
+        beforeEarlyEnd,
+        `${target.name}: first early-end click is non-destructive`
+      );
+      assert.equal(afterEarlyEnd.daySummaryOpen, true, `${target.name}: early end opens confirmation`);
+      await page.waitForSelector('.k172-day-warning', {state: 'visible'});
+      assert.match(await page.locator('.k172-day-warning').textContent(), /Věčný.*\+\d+.*tlaku/is, `${target.name}: exact early-end penalty`);
+      await page.screenshot({path: `browser-artifacts/${target.name}-day-confirm.png`, fullPage: false});
+      await page.click('[data-k166-cancel-day]');
+      await page.waitForSelector('#v0166Root', {state: 'hidden'});
 
       await page.locator('#v0160Root .k16-hotspot').first().click();
       await page.waitForFunction(() => globalThis.KorytoUI165?.visualAudit?.().activeView === 'location');
@@ -191,7 +231,7 @@ try {
 
       await page.reload({waitUntil: 'load'});
       await page.waitForSelector('#startBtn', {state: 'visible'});
-      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.1-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active);
+      await page.waitForFunction(() => globalThis.KorytoBuildInfo?.buildVersion === '0.17.2-test.1' && globalThis.KorytoUI170?.visualAudit?.().active && globalThis.KorytoUI171?.audit?.().active && globalThis.KorytoUI172?.audit?.().active);
       await page.click('[data-k169-open]');
       await page.click('[data-k169-action="load"]');
       await page.waitForFunction(() => globalThis.KorytoApp?.getState?.().phase === 'map');
@@ -246,4 +286,4 @@ try {
   await browser.close();
 }
 
-console.log('v0.17.1 TEST.1 packaged Chromium decision HUD and complete save/load gate passed');
+console.log('v0.17.2 TEST.1 packaged Chromium turn clarity and complete save/load gate passed');

@@ -7,11 +7,11 @@ const buildInfo = read("src/build-info.js");
 const runtime = read("src/v0171-decision-hud.js");
 const styles = read("styles/v0171-decision-hud.css");
 
-assert.equal(read("VERSION").trim(), "0.17.1-test.1", "VERSION identifies v0.17.1");
+assert.equal(read("VERSION").trim(), "0.17.2-test.1", "VERSION identifies v0.17.1");
 assert.match(html, /styles\/v0171-decision-hud\.css/, "decision HUD CSS is loaded");
 assert.match(html, /src\/v0171-decision-hud\.js/, "decision HUD runtime is loaded");
-assert.match(buildInfo, /displayVersion:\s*"0\.17\.1 TEST\.1"/, "display version is current");
-assert.match(buildInfo, /buildVersion:\s*"0\.17\.1-test\.1"/, "build version is current");
+assert.match(buildInfo, /displayVersion:\s*"0\.17\.2 TEST\.1"/, "display version is current");
+assert.match(buildInfo, /buildVersion:\s*"0\.17\.2-test\.1"/, "build version is current");
 assert.match(buildInfo, /saveVersion:\s*"0\.14\.3-test\.2"/, "save version stays compatible");
 assert.match(buildInfo, /saveSchema:\s*1/, "save schema stays compatible");
 assert.match(runtime, /KorytoUI171/, "decision HUD audit API is exported");
@@ -25,4 +25,4 @@ assert.match(styles, /@media \(min-width: 761px\)/, "desktop decision visibility
 assert.match(styles, /@media \(max-width: 620px\)/, "mobile decision compaction exists");
 assert.doesNotMatch(`${html}\n${runtime}\n${styles}`, /https?:\/\/(?:fonts|cdn|unpkg|jsdelivr)/i, "no remote runtime dependency");
 
-console.log("v0.17.1 TEST.1 decision HUD contract passed");
+console.log("v0.17.2 TEST.1 decision HUD contract passed");

@@ -19,16 +19,16 @@ const browserGate = read('tests/v0171-browser-gate.mjs');
 const decisionHud = read('src/v0171-decision-hud.js');
 const decisionHudCss = read('styles/v0171-decision-hud.css');
 
-assert.equal(read('VERSION').trim(), '0.17.1-test.1');
-for (const token of ['0.17.1 TEST.1','0.17.1-test.1','0.14.3-test.2']) assert.match(buildInfo, new RegExp(token.replaceAll('.', '\\.')));
+assert.equal(read('VERSION').trim(), '0.17.2-test.1');
+for (const token of ['0.17.2 TEST.1','0.17.2-test.1','0.14.3-test.2']) assert.match(buildInfo, new RegExp(token.replaceAll('.', '\\.')));
 assert.match(buildInfo, /globalThis\.KorytoBuildInfo/);
 assert.match(buildInfo, /applyLabels/);
 assert.match(buildInfo, /\(\?:\\s\*·\\s\*0/);
-assert.match(html, /<title>Koryto 0\.17\.1 TEST\.1/);
+assert.match(html, /<title>Koryto 0\.17\.2 TEST\.1/);
 assert.match(html, /src\/build-info\.js/);
-assert.match(html, /Dolní Vejprnice 0\.17\.1 TEST\.1/);
+assert.match(html, /Dolní Vejprnice 0\.17\.2 TEST\.1/);
 const staticFooter = html.match(/<div class="footer-note">([^<]*)<\/div>/)?.[1] || '';
-assert.doesNotMatch(staticFooter, /0\.17\.1 TEST\.1/);
+assert.doesNotMatch(staticFooter, /0\.17\.2 TEST\.1/);
 
 const productionStyles = [
   'styles/v0168-onboarding-ui.css','styles/v0169-release-polish.css','styles/v0169-map-stability.css',
@@ -58,7 +58,7 @@ assert.match(navCss, /html\.k16-active #v0148Nav/);
 
 assert.match(workflow, /Browser gate on packaged artifact/);
 assert.match(workflow, /v0171-browser-gate\.mjs/);
-assert.match(workflow, /0\.17\.1-test\.1/);
+assert.match(workflow, /0\.17\.2-test\.1/);
 assert.match(browserGate, /complete save\/load roundtrip state/);
 assert.match(visual, /KorytoUI170/);
 assert.match(visual, /data-k170-surface|dataset\.k170Surface/);
@@ -74,4 +74,4 @@ assert.match(browserGate, /footer version exactly once/);
 assert.match(browserGate, /\?playtest=1/);
 assert.doesNotMatch(html + buildInfo + guard + release + mapRuntime + campaignRuntime + campaignCss + navCss + visual + visualCss + decisionHud + decisionHudCss, /https?:\/\/(?:fonts|cdn|unpkg|jsdelivr)/);
 
-console.log('v0.17.1 TEST.1 release integrity closure contract passed');
+console.log('v0.17.2 TEST.1 release integrity closure contract passed');

@@ -8,12 +8,12 @@ const runtime = read('src/v0169-release-polish.js');
 const css = read('styles/v0169-release-polish.css');
 const browserPolish = read('styles/v0166-browser-polish.css');
 
-assert.equal(read('VERSION').trim(), '0.17.1-test.1');
+assert.equal(read('VERSION').trim(), '0.17.2-test.1');
 assert.match(html, /src\/build-info\.js/);
 assert.match(html, /styles\/v0169-release-polish\.css/);
 assert.match(html, /src\/v0169-release-polish\.js/);
-assert.match(buildInfo, /displayVersion:\s*"0\.17\.1 TEST\.1"/);
-assert.match(buildInfo, /buildVersion:\s*"0\.17\.1-test\.1"/);
+assert.match(buildInfo, /displayVersion:\s*"0\.17\.2 TEST\.1"/);
+assert.match(buildInfo, /buildVersion:\s*"0\.17\.2-test\.1"/);
 assert.match(buildInfo, /saveVersion:\s*"0\.14\.3-test\.2"/);
 assert.match(buildInfo, /saveSchema:\s*1/);
 assert.match(runtime, /globalThis\.KorytoBuildInfo/);
@@ -40,5 +40,5 @@ assert.match(css, /@media \(max-width: 390px\)/);
 assert.match(css, /safe-area-inset-bottom/);
 assert.doesNotMatch(browserPolish, /0\.16\.9 TEST\.1|0\.14\.9 TEST\.10/);
 
-console.log('v0.17.1 TEST.1 release polish uses the canonical build contract');
+console.log('v0.17.2 TEST.1 release polish uses the canonical build contract');
 
