@@ -200,7 +200,7 @@
       fullyVisibleClassCards: classCards.filter(fullyVisible).length,
       confirmVisible: fullyVisible(document.getElementById("confirmBtn")),
       visibleHotspots: hotspots.filter(visible).length,
-      primaryObjective: Boolean(document.querySelector("#v0160Root [data-k173-primary]")),
+      primaryObjective: fullyVisible(document.querySelector("#v0160Root [data-k173-primary]")),
       compactEventContext: Boolean(document.querySelector("#v0165Root [data-k173-context]"))
     };
   }

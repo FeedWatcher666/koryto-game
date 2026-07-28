@@ -326,7 +326,7 @@ html.k173-playability-reset .v0148-toast {
 
   html.k173-playability-reset.k16-active .k16-map-actions {
     display: grid !important;
-    grid-template-columns: 1.35fr 1fr .8fr !important;
+    grid-template-columns: minmax(0, 1.5fr) minmax(135px, .7fr) !important;
     gap: 4px !important;
     min-height: 0 !important;
     height: 46px !important;
@@ -334,15 +334,18 @@ html.k173-playability-reset .v0148-toast {
   }
 
   html.k173-playability-reset.k16-active .k16-map-actions > button {
+    display: none !important;
     min-height: 0 !important;
     height: 100% !important;
     padding: 2px 6px !important;
     font-size: 12px !important;
   }
 
-  html.k173-playability-reset.k16-active .k16-map-actions > button:first-child,
-  html.k173-playability-reset.k16-active .k16-map-actions > button:nth-child(4) {
-    display: none !important;
+  html.k173-playability-reset.k16-active .k16-map-actions > [data-k173-primary],
+  html.k173-playability-reset.k16-active .k16-map-actions > [data-k16-end] {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
 
   html.k173-playability-reset.k16-active .k16-panel-title {
@@ -1210,22 +1213,24 @@ html.k173-playability-reset .v0148-toast {
 
   html.k173-playability-reset .k16-map-actions {
     display: grid !important;
-    grid-template-columns: 1.35fr 1fr !important;
+    grid-template-columns: minmax(0, 1.45fr) minmax(108px, .75fr) !important;
     gap: 3px !important;
     height: 48px !important;
     padding: 3px !important;
   }
 
   html.k173-playability-reset .k16-map-actions > button {
+    display: none !important;
     min-height: 42px !important;
     padding: 3px 4px !important;
     font-size: 10px !important;
   }
 
-  html.k173-playability-reset .k16-map-actions > button:first-child,
-  html.k173-playability-reset .k16-map-actions > button:nth-child(3),
-  html.k173-playability-reset .k16-map-actions > button:nth-child(4) {
-    display: none !important;
+  html.k173-playability-reset .k16-map-actions > [data-k173-primary],
+  html.k173-playability-reset .k16-map-actions > [data-k16-end] {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
 
   html.k173-playability-reset .k16-desktop-only,

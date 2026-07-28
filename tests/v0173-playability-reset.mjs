@@ -21,6 +21,7 @@ assert.match(runtime, /desktopFrame/, "runtime audits the fixed desktop game fra
 assert.match(runtime, /fullyVisibleChoices/, "runtime audits decisions before interaction");
 assert.match(runtime, /fullyVisibleClassCards/, "runtime audits the complete profession grid");
 assert.match(runtime, /decorateMap/, "map receives a single dominant objective action");
+assert.match(runtime, /primaryObjective:\s*fullyVisible/, "map objective audit requires real first-viewport visibility");
 assert.match(runtime, /compactEventStory/, "long event context is progressively disclosed");
 assert.match(runtime, /nextSurface !== lastSurface && innerWidth <= 820/, "only mobile surface changes reset document scroll");
 assert.match(runtime, /KorytoUI172\?\.decorate/, "turn-cost feedback survives map rerenders");
@@ -28,6 +29,7 @@ assert.match(runtime, /removeNativeMapTooltips/, "native hotspot tooltips cannot
 assert.match(styles, /grid-template-rows:\s*var\(--k173-top\) minmax\(0,\s*1fr\) var\(--k173-nav\)/, "desktop uses a fixed three-row game frame");
 assert.match(styles, /#app\s*\{[\s\S]*padding:\s*0\s*!important/, "legacy app padding cannot steal notebook viewport height");
 assert.match(styles, /\.v0148-toast[\s\S]*pointer-events:\s*none\s*!important/, "invisible status toast cannot block a primary action");
+assert.match(styles, /\.k16-map-actions > \[data-k173-primary\],[\s\S]*\.k16-map-actions > \[data-k16-end\][\s\S]*display:\s*flex\s*!important/, "map actions expose the objective and day ending explicitly");
 assert.match(styles, /grid-template-columns:\s*198px minmax\(0,\s*1fr\) 214px/, "1024px notebook keeps case, map and rival visible");
 assert.match(styles, /grid-template-rows:\s*36px minmax\(0,\s*1fr\) 172px/, "event context and decisions share the first viewport");
 assert.match(styles, /\.k165-day em[\s\S]*display:\s*none\s*!important/, "legacy place row cannot cover compact-header controls");

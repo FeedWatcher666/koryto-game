@@ -255,8 +255,8 @@ try {
         globalThis.KorytoUI172?.decorate?.();
         globalThis.KorytoUI173?.sync?.();
       });
+      await assertReachable(page.locator('#v0160Root [data-k173-primary]'), 'dominant map objective');
       await assertReachable(page.locator('#v0160Root [data-k16-end]'), 'end day');
-      await page.evaluate(() => globalThis.KorytoUI173?.sync?.());
       const mapAudit = await auditSurface('map');
       assert.equal(mapAudit.phase, 'map', `${target.name}: map phase`);
       const turnMapAudit = await page.evaluate(() => globalThis.KorytoUI172?.audit?.());
