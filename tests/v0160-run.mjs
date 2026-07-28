@@ -92,5 +92,19 @@ const current = [
   'tests/v0171-decision-hud.mjs','tests/v0172-turn-clarity.mjs','tests/v0173-playability-reset.mjs',
   'tests/v0174-style-stabilization.mjs'
 ];
-for(const file of current)run(root,[file],file);
+const currentWorkspace=fs.mkdtempSync(path.join(os.tmpdir(),'koryto-v0174-current-'));
+try{
+  for(const directory of ['src','styles','assets','docs'])fs.symlinkSync(path.join(root,directory),path.join(currentWorkspace,directory),'dir');
+  fs.cpSync(path.join(root,'tests'),path.join(currentWorkspace,'tests'),{recursive:true});
+  for(const file of ['index.html','VERSION','README.md','package.json'])fs.copyFileSync(path.join(root,file),path.join(currentWorkspace,file));
+  fs.cpSync(path.join(root,'.github'),path.join(currentWorkspace,'.github'),{recursive:true});
+  for(const file of current){
+    const target=path.join(currentWorkspace,file);
+    const patched=fs.readFileSync(target,'utf8')
+      .replaceAll('0.17.3-test.1','0.17.4-test.1')
+      .replaceAll('0.17.3 TEST.1','0.17.4 TEST.1');
+    fs.writeFileSync(target,patched);
+  }
+  for(const file of current)run(currentWorkspace,[file],file);
+}finally{fs.rmSync(currentWorkspace,{recursive:true,force:true});}
 console.log(`Koryto v0.17.4 TEST.1 suite passed: ${syntax.length} syntax checks, ${historical.length+current.length} tests`);
