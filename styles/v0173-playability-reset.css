@@ -82,6 +82,12 @@ html.k173-playability-reset .k173-end-day {
     overflow: hidden !important;
   }
 
+  html.k173-playability-reset #app {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   html.k173-playability-reset #v0160Root,
   html.k173-playability-reset #v0165Root {
     position: fixed !important;
