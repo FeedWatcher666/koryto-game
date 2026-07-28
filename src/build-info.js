@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.17.0 TEST.1",
-    buildVersion: "0.17.0-test.1",
+    displayVersion: "0.17.1 TEST.1",
+    buildVersion: "0.17.1-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.17.0 TEST.1 – Visual Foundation",
-    description: "Koryto 0.17.0 TEST.1: první hratelný vizuální základ mapy, událostí a responzivního politického RPG rozhraní."
+    title: "Koryto 0.17.1 TEST.1 – Decision HUD",
+    description: "Koryto 0.17.1 TEST.1: čitelnější mapa, viditelné volby a kompaktní rozhodovací HUD politického RPG."
   });
 
   function applyLabels() {
