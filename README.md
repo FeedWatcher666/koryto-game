@@ -1,4 +1,4 @@
-# Koryto v0.17.3 TEST.1
+# Koryto v0.17.4 TEST.1
 
 Hratelný offline test nové vizuální základny kampaně a prvního průchodu
 čitelností rozhodování.
@@ -47,6 +47,17 @@ Rozbalte ZIP a otevřete `index.html`.
 - přidává gate skutečné viditelnosti ovládání, ne pouze existence prvků v DOM,
 - mechaniky, balanc, questy a save formát zůstávají beze změny.
 
+## Co sjednocuje v0.17.4
+
+- používá mapu Dolních Vejprnic jako vizuální zdroj pravdy pro celou hru,
+- zavádí centrální design tokeny a společné panelové a tlačítkové komponenty,
+- sjednocuje kandidáta, detail kauzy, události, výsledky a štáb,
+- převádí rychlé ovládání do stejného dřevěného a mosazného materiálového systému,
+- odstraňuje viditelné přechody mezi několika generacemi UI,
+- označuje aktivní povrch a nové legacy rendery v mikrotasku bez časovaného překreslení,
+- přidává audit společných panelů, tlačítek, overflow a geometrie HUD/navigace,
+- mechaniky, balance, questy a save formát zůstávají beze změny.
+
 ## Zachované hratelné části řady v0.16
 
 - úvodní briefing třináctidenní kampaně,
@@ -82,4 +93,4 @@ Rozbalte ZIP a otevřete `index.html`.
 5. Dokončit volby a koaliční vyjednávání.
 6. Ověřit celý tok na desktopu a při šířce 390 px.
 
-Podrobný popis iterace je v `docs/v0.17/v0173-playability-reset.md`.
+Podrobný popis iterace je v `docs/v0.17/v0174-style-stabilization.md`.
