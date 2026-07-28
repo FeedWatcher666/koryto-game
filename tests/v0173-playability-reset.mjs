@@ -24,6 +24,9 @@ assert.match(runtime, /decorateMap/, "map receives a single dominant objective a
 assert.match(runtime, /primaryObjective:\s*fullyVisible/, "map objective audit requires real first-viewport visibility");
 assert.match(runtime, /if \(!actions\) return false/, "map objective is created even while the case card is settling");
 assert.match(runtime, /liveCaseAction[\s\S]*fallback/, "map objective resolves its live destination only when clicked");
+assert.match(runtime, /let settleQueued = false/, "map decoration has a guarded settle pass");
+assert.match(runtime, /function queueSettle\(\)[\s\S]*setTimeout[\s\S]*sync\(false\)/, "settle pass runs after already queued legacy renders without recursion");
+assert.match(runtime, /if \(settle\) queueSettle\(\)/, "every public sync schedules one final decoration pass");
 assert.match(runtime, /compactEventStory/, "long event context is progressively disclosed");
 assert.match(runtime, /nextSurface !== lastSurface && innerWidth <= 820/, "only mobile surface changes reset document scroll");
 assert.match(runtime, /KorytoUI172\?\.decorate/, "turn-cost feedback survives map rerenders");
