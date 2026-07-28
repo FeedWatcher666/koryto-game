@@ -22,6 +22,8 @@ assert.match(runtime, /fullyVisibleChoices/, "runtime audits decisions before in
 assert.match(runtime, /fullyVisibleClassCards/, "runtime audits the complete profession grid");
 assert.match(runtime, /decorateMap/, "map receives a single dominant objective action");
 assert.match(runtime, /primaryObjective:\s*fullyVisible/, "map objective audit requires real first-viewport visibility");
+assert.match(runtime, /if \(!actions\) return false/, "map objective is created even while the case card is settling");
+assert.match(runtime, /liveCaseAction[\s\S]*fallback/, "map objective resolves its live destination only when clicked");
 assert.match(runtime, /compactEventStory/, "long event context is progressively disclosed");
 assert.match(runtime, /nextSurface !== lastSurface && innerWidth <= 820/, "only mobile surface changes reset document scroll");
 assert.match(runtime, /KorytoUI172\?\.decorate/, "turn-cost feedback survives map rerenders");

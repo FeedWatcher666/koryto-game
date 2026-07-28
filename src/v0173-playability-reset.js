@@ -71,9 +71,8 @@
 
   function decorateMap() {
     const actions = document.querySelector("#v0160Root .k16-map-actions");
-    const caseAction = document.querySelector("#v0160Root .k16-case-primary [data-k16-location]");
     const endDay = actions?.querySelector("[data-k16-end]");
-    if (!actions || !caseAction) return false;
+    if (!actions) return false;
 
     endDay?.classList.remove("primary");
     endDay?.classList.add("k173-end-day");
@@ -89,7 +88,12 @@
     const title = document.querySelector("#v0160Root .k16-case-primary h2")?.textContent?.trim() || "aktivní kauza";
     primary.innerHTML = `<span aria-hidden="true">▶</span><span>POKRAČOVAT: ${escapeHtml(title)}</span>`;
     primary.setAttribute("aria-label", `Pokračovat v hlavní kauze: ${title}`);
-    primary.onclick = () => caseAction.click();
+    primary.onclick = () => {
+      const liveCaseAction = document.querySelector("#v0160Root .k16-case-primary [data-k16-location]");
+      const fallback = document.querySelector("#v0160Root .k16-hotspot.hot, #v0160Root .k16-hotspot");
+      if (liveCaseAction) liveCaseAction.click();
+      else if (fallback) fallback.click();
+    };
     return true;
   }
 
