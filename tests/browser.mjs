@@ -9,7 +9,7 @@ const index = path.join(dist, "index.html");
 assert.ok(fs.existsSync(index), `Missing offline index: ${index}`);
 fs.mkdirSync("browser-artifacts", {recursive: true});
 
-async function openGame(browser, {rolls, viewport, classId = "bard", originId = "idealist"}) {
+async function openGame(browser, {rolls, viewport, classId = "bard", originId = "idealist", takePen = true}) {
   const context = await browser.newContext({viewport});
   const page = await context.newPage();
   const errors = [];
@@ -23,7 +23,7 @@ async function openGame(browser, {rolls, viewport, classId = "bard", originId = 
   if (originId !== "idealist") await page.click(`[data-origin="${originId}"]`);
   await page.fill("#heroName", `Tester ${classId}`);
   await page.click('button[type="submit"]');
-  await page.click('[data-action="take-pen"]');
+  if (takePen) await page.click('[data-action="take-pen"]');
   return {context, page, errors};
 }
 
@@ -42,6 +42,7 @@ async function expectPlayableHierarchy(page, {mobile = false} = {}) {
       worldTop: world?.getBoundingClientRect().top ?? null,
       heroTop: hero?.getBoundingClientRect().top ?? null,
       headingTop: heading?.getBoundingClientRect().top ?? null,
+      worldBeforeHero: Boolean(world && hero && (world.compareDocumentPosition(hero) & Node.DOCUMENT_POSITION_FOLLOWING)),
       viewportHeight: innerHeight
     };
   });
@@ -52,6 +53,7 @@ async function expectPlayableHierarchy(page, {mobile = false} = {}) {
     `new scene heading must be visible after transition, got top ${hierarchy.headingTop}`
   );
   if (mobile) {
+    assert.equal(hierarchy.worldBeforeHero, true, "mobile scene must precede the character sheet in DOM order");
     assert.ok(
       hierarchy.worldTop < hierarchy.heroTop,
       `mobile scene must appear before character sheet (${hierarchy.worldTop} !< ${hierarchy.heroTop})`
@@ -218,6 +220,51 @@ try {
 
   {
     const {context, page, errors} = await openGame(browser, {
+      rolls: [18, 18],
+      viewport: {width: 900, height: 680},
+      takePen: false
+    });
+
+    await saveReloadCheckpoint(page, "arrival", '[data-action="take-pen"]');
+    await page.click('[data-action="take-pen"]');
+
+    await saveReloadCheckpoint(page, "firstCheck", '[data-check="ask-local"]');
+    await performCheck(page, '[data-check="ask-local"]');
+    await saveReloadCheckpoint(page, "firstResult", '[data-action="accept-first"]', restored => {
+      assert.equal(restored.flags.lastResult.choiceId, "ask-local", "first-check result survives reload");
+    });
+    await page.click('[data-action="accept-first"]');
+
+    await saveReloadCheckpoint(page, "companion", '[data-companion="marie"]');
+    await page.click('[data-companion="marie"]');
+
+    await saveReloadCheckpoint(page, "registration", '[data-check="find-paragraph"]', restored => {
+      assert.deepEqual(restored.party.members, ["marie"], "first companion survives reload");
+    });
+    await performCheck(page, '[data-check="find-paragraph"]');
+    await saveReloadCheckpoint(page, "registrationResult", '[data-action="accept-registration"]', restored => {
+      assert.ok(restored.flags.lastResult, "registration result survives reload");
+    });
+    await page.click('[data-action="accept-registration"]');
+
+    await saveReloadCheckpoint(page, "chapterOpen", '[data-action="start-jzd"]', restored => {
+      assert.equal(restored.flags.chapterOneUnlocked, true, "chapter unlock survives reload");
+    });
+    await page.click('[data-action="start-jzd"]');
+
+    await saveReloadCheckpoint(page, "jzdBriefing", '[data-action="jzd-briefing-next"]', restored => {
+      assert.equal(restored.quest.status, "active", "active quest briefing survives reload");
+      assert.equal(restored.quest.phase, "briefing", "briefing phase survives reload");
+    });
+    await page.click('[data-action="jzd-briefing-next"]');
+    await page.waitForFunction(() => globalThis.KorytoClean.getState().scene === "jzdPrep");
+
+    assert.deepEqual(errors, [], "pre-JZD checkpoint reloads: no browser errors");
+    await context.close();
+  }
+
+  {
+    const {context, page, errors} = await openGame(browser, {
       rolls: [1, 1],
       viewport: {width: 900, height: 680}
     });
@@ -301,4 +348,4 @@ try {
   await browser.close();
 }
 
-console.log("Koryto CLEAN TEST.7 hierarchy, full JZD quest, every checkpoint reload, and save reroll browser gate passed.");
+console.log("Koryto CLEAN TEST.7 hierarchy, full JZD quest, every actionable checkpoint reload, and save reroll browser gate passed.");

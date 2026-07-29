@@ -59,3 +59,29 @@ Human feel testing of agency, pacing, and humor is still pending.
 - Proposed smallest fix: validate compatibility by `saveSchema` and upgrade the display version in memory
 - Regression test: unit test loads a TEST.6/schema-2 save and still rejects schema 1
 - Status: fixed in TEST.7; full exact-SHA verification pending
+
+### P1 — Non-JZD save checkpoints lacked packaged continuation coverage
+
+- Build and commit: `0.20.0-clean-test.7`, `82451d2be883f97d3f84dcfd726c333a84162c08`
+- Device and viewport: packaged Chromium build, 900 × 680
+- Starting state: new campaign before the first arrival choice
+- Reproduction: inspect the release gate's save/reload scenarios before `jzdPrep`
+- Expected: every actionable scene can be saved, reloaded, rendered, and continued
+- Actual: only `firstResult` had non-JZD reload coverage
+- Evidence: exact-SHA Codex review `4812636673`
+- Proposed smallest fix: add one sequential packaged scenario covering every actionable checkpoint from `arrival` through `jzdBriefing`
+- Regression test: browser gate saves, reloads, verifies, and continues all seven missing scene shapes plus `firstResult`
+- Status: fixed in TEST.7; full exact-SHA verification pending
+
+### P2 — Mobile visual order differed from DOM order
+
+- Build and commit: `0.20.0-clean-test.7`, `82451d2be883f97d3f84dcfd726c333a84162c08`
+- Device and viewport: mobile and linearized/screen-reader navigation
+- Starting state: any active game scene
+- Reproduction: compare flex visual order with the DOM emitted by `gameView()`
+- Expected: the current scene precedes secondary character and support panels visually and programmatically
+- Actual: CSS displayed the scene first while the DOM still emitted the character panel first
+- Evidence: exact-SHA Codex review `4812636673`
+- Proposed smallest fix: emit the world stage first and assign explicit desktop grid cells to the three panels
+- Regression test: packaged mobile hierarchy gate checks both geometry and DOM order
+- Status: fixed in TEST.7; full exact-SHA verification pending

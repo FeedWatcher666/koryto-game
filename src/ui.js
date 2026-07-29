@@ -326,7 +326,7 @@ function sceneView(state) {
 }
 
 export function gameView(state) {
-  return `<div class="game-screen" data-scene="${esc(state.scene)}">${hud(state)}<main class="game-layout">${heroPanel(state)}<section class="world-stage" tabindex="-1" aria-label="Aktuální herní scéna">${sceneView(state)}</section>${partyPanel(state)}</main><footer>Čistý runtime v0.20 · první vícefázový quest · jediný renderer · save schema 2</footer></div>`;
+  return `<div class="game-screen" data-scene="${esc(state.scene)}">${hud(state)}<main class="game-layout"><section class="world-stage" tabindex="-1" aria-label="Aktuální herní scéna">${sceneView(state)}</section>${heroPanel(state)}${partyPanel(state)}</main><footer>Čistý runtime v0.20 · první vícefázový quest · jediný renderer · save schema 2</footer></div>`;
 }
 
 export function render(app, state) {
