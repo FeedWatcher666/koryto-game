@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.17.4 TEST.1",
-    buildVersion: "0.17.4-test.1",
+    displayVersion: "0.19.0 TEST.1",
+    buildVersion: "0.19.0-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.17.4 TEST.1 – Style Stabilization",
-    description: "Koryto 0.17.4 TEST.1: sjednocený vizuální systém mapy, kauz, štábu, kandidáta a rychlého ovládání."
+    title: "Koryto 0.19.0 TEST.1 – War Room Prototype",
+    description: "Koryto 0.19.0 TEST.1: taktický šestikolový souboj o delegáty s kartami, krizemi, štábem a aktivním soupeřem."
   });
 
   function applyLabels() {
