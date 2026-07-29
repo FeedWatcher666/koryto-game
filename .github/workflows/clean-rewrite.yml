@@ -25,24 +25,28 @@ jobs:
       - name: Verify no legacy or hand-maintained runtime
         shell: bash
         run: |
+          set -euo pipefail
           test ! -e src/app.js
           test ! -e src/v0174-style-stabilization.js
           test ! -e src/runtime.js
           ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles
 
       - name: Build deterministic offline artifact
-        run: npm run build:offline
+        run: node scripts/build-offline.mjs
 
       - name: Verify offline artifact contract
         shell: bash
         run: |
-          target="dist/koryto-v0.20.0-clean-test.2"
+          set -euo pipefail
+          target="dist/koryto-v0.20.0-clean-test.3"
           test -f "$target/index.html"
           test -f "$target/src/runtime.js"
-          grep -q 'defer src="src/runtime.js"' "$target/index.html"
-          grep -q 'playD20Roll' "$target/src/runtime.js"
-          grep -q 'dice-overlay' "$target/src/runtime.js"
-          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1|type="module"' "$target/index.html" "$target/src" "$target/styles"
+          test -f "$target/styles/game.css"
+          test -f "$target/styles/dice3d.css"
+          grep -q 'src/runtime.js' "$target/index.html"
+          grep -q 'data-d20-renderer="icosahedron"' "$target/src/runtime.js"
+          grep -q 'ICOSAHEDRON_FACES' "$target/src/runtime.js"
+          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' "$target/index.html" "$target/src" "$target/styles"
 
       - name: Install Chromium browser gate
         shell: bash
@@ -50,20 +54,20 @@ jobs:
           npm install --no-save playwright@1.54.2
           npx playwright install --with-deps chromium
 
-      - name: Test animated d20 in packaged build
-        run: node tests/browser.mjs dist/koryto-v0.20.0-clean-test.2
+      - name: Test volumetric d20 in packaged build
+        run: node tests/browser.mjs dist/koryto-v0.20.0-clean-test.3
 
       - name: Upload d20 screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.20.0-clean-test.2-d20-screenshots
+          name: koryto-v0.20.0-clean-test.3-d20-screenshots
           path: browser-artifacts
           if-no-files-found: warn
 
       - name: Upload playable offline build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.20.0-clean-test.2
-          path: dist/koryto-v0.20.0-clean-test.2
+          name: koryto-v0.20.0-clean-test.3
+          path: dist/koryto-v0.20.0-clean-test.3
           if-no-files-found: error
