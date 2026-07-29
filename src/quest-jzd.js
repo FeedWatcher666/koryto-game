@@ -235,9 +235,11 @@ export function choicesForJzd(state, phase) {
     const choice = structuredClone(item);
     if (phase === "final") {
       choice.dc = Math.max(9, choice.dc - Math.min(3, state.quest.evidence));
-      if (choice.id === "publish-dossier" && state.quest.rivalChoice === "call-bluff") choice.dc = Math.max(9, choice.dc - 2);
-      if (choice.id === "council-ambush" && state.quest.rivalChoice === "protect-workers") choice.dc = Math.max(9, choice.dc - 2);
-      if (choice.id === "trade-evidence" && state.quest.rivalChoice === "play-along") choice.dc = Math.max(9, choice.dc - 2);
+      choice.routeReduction = 0;
+      if (choice.id === "publish-dossier" && state.quest.rivalChoice === "call-bluff") choice.routeReduction = 2;
+      if (choice.id === "council-ambush" && state.quest.rivalChoice === "protect-workers") choice.routeReduction = 2;
+      if (choice.id === "trade-evidence" && state.quest.rivalChoice === "play-along") choice.routeReduction = 2;
+      choice.dc -= choice.routeReduction;
       choice.pressurePenalty = Math.min(3, Math.floor(state.quest.rivalPressure / 2));
       choice.rivalPressure = state.quest.rivalPressure;
       choice.dc = Math.min(20, choice.dc + choice.pressurePenalty);

@@ -186,6 +186,7 @@ function choiceButton(choice, state) {
       <small>${details.title}</small><b>${details.dice}</b><strong>${details.rule}</strong><span>${details.explanation}</span>
     </div>
     ${modeSources.length ? `<small class="roll-source-preview"><b>Důvod:</b> ${esc(modeSources.join(" · "))}</small>` : `<small class="roll-source-preview"><b>Důvod:</b> žádný zvláštní vliv</small>`}
+    ${choice.routeReduction ? `<small class="roll-source-preview"><b>Zvolená taktika:</b> −${choice.routeReduction} k obtížnosti</small>` : ""}
     ${choice.pressurePenalty ? `<small class="roll-source-preview"><b>Tlak Věčného:</b> +${choice.pressurePenalty} k obtížnosti za nasbíraný tlak ${choice.rivalPressure}</small>` : ""}
     <small class="technical-roll">Technicky: ${rollMode.notation} + ${modifiers.visibleModifier} proti obtížnosti ${choice.dc}${dirtyBlocked ? " · Třída tuto volbu odmítá" : ""}</small>
   </button>`;

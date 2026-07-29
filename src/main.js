@@ -257,8 +257,7 @@ app.addEventListener("click", async event => {
       next.scene = "jzdComplete";
     }, true);
   } else if (action === "save") {
-    saveGame(state);
-    actionButton.textContent = "Uloženo";
+    actionButton.textContent = saveGame(state) ? "Uloženo" : "Uložení selhalo";
   } else if (action === "restart") {
     clearSave();
     state = createInitialState();

@@ -150,7 +150,23 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.classList.contains("dice-lock")), false, "failed presentation must release dice-lock");
   assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "failed presentation must restore background interaction");
 
+  await page.evaluate(() => {
+    globalThis.__korytoOriginalStorageSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function forcedStorageFailure() {
+      throw new DOMException("Storage denied", "SecurityError");
+    };
+  });
   await page.locator("[data-action='accept-registration']").click();
+  await page.locator("[data-action='start-jzd']").waitFor();
+  await page.evaluate(() => {
+    Storage.prototype.setItem = globalThis.__korytoOriginalStorageSetItem;
+    delete globalThis.__korytoOriginalStorageSetItem;
+  });
+  assert.equal(
+    await page.evaluate(() => globalThis.KorytoClean.getState().scene),
+    "chapterOpen",
+    "a denied save must not block the persisted scene transition"
+  );
   await page.locator("[data-action='start-jzd']").click();
   await page.locator("[data-action='jzd-briefing-next']").click();
   await page.locator("[data-quest-companion]").first().waitFor();

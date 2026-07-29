@@ -73,6 +73,32 @@ Human feel testing of agency, pacing, and humor is still pending.
 - Regression test: publication after `call-bluff` is exactly one DC easier than after `protect-workers`
 - Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
 
+### P2 — Save failures blocked persisted scene transitions
+
+- Build and commit: `0.20.0-clean-test.7`, `4427c6048fcdc2b500aede808df5d8a3e93d991c`
+- Device and viewport: offline build with Web Storage denied
+- Starting state: any persisted transition, including accepting registration or quest preparation
+- Reproduction: make `Storage.setItem()` throw and activate a persisted action
+- Expected: the in-memory campaign continues even if it cannot be saved
+- Actual: the exception aborted `commit()` before the new state was rendered
+- Evidence: exact-SHA Codex review on PR #37
+- Smallest fix: make save, load, and clear operations recoverable; the manual save control reports failure
+- Regression test: packaged accessibility gate denies storage, accepts registration, and reaches `chapterOpen`
+- Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
+
+### P2 — Evidence floor erased play-along's promised trade advantage
+
+- Build and commit: `0.20.0-clean-test.7`, `4427c6048fcdc2b500aede808df5d8a3e93d991c`
+- Device and viewport: rules review
+- Starting state: JZD finale with at least three evidence
+- Reproduction: compare `trade-evidence` after `play-along` and `protect-workers`
+- Expected: accepting political debt keeps the advertised easier trade
+- Actual: both routes stopped at evidence floor DC 9
+- Evidence: exact-SHA Codex review on PR #37
+- Smallest fix: apply the route reduction after the evidence floor, then apply the shared pressure penalty
+- Regression test: all three rival choices keep their advertised favored ending at every reachable starting pressure 0–5
+- Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
+
 ### P1 — TEST.7 rejected a valid TEST.6 save
 
 - Build and commit: `0.20.0-clean-test.7`, `abbb525844c64b5c31bc93172f56f7d1cb46cb42`

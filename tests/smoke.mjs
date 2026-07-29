@@ -20,7 +20,7 @@ import {
   resolveCheck,
   resolveRollMode
 } from "../src/rules.js";
-import {createInitialState, loadGame, SAVE_SCHEMA, STORAGE_KEY} from "../src/state.js";
+import {clearSave, createInitialState, loadGame, saveGame, SAVE_SCHEMA, STORAGE_KEY} from "../src/state.js";
 
 function sequence(values) {
   let index = 0;
@@ -40,6 +40,20 @@ assert.equal(upgradedTest6Save.saveSchema, SAVE_SCHEMA);
 assert.equal(upgradedTest6Save.version, VERSION, "same-schema TEST.6 saves must upgrade to the current display version");
 storedSave = JSON.stringify({...createInitialState(), saveSchema: 1, version: "0.20.0-clean-test.6"});
 assert.equal(loadGame(), null, "incompatible save schemas must still be rejected");
+globalThis.localStorage = {
+  getItem() {
+    throw new Error("storage read denied");
+  },
+  setItem() {
+    throw new Error("storage write denied");
+  },
+  removeItem() {
+    throw new Error("storage removal denied");
+  }
+};
+assert.equal(loadGame(), null, "a denied storage read must fall back to a new campaign");
+assert.equal(saveGame(createInitialState()), false, "a denied storage write must be recoverable");
+assert.equal(clearSave(), false, "a denied storage removal must be recoverable");
 
 assert.deepEqual(Object.keys(CLASSES), ["bard", "paladin", "rogue"]);
 assert.deepEqual(Object.keys(COMPANIONS), ["marie", "bohumil", "radek"]);
@@ -110,15 +124,33 @@ for (const lowChoice of lowPressureFinals) {
   );
 }
 
-const protectedRoute = applyJzdRivalChoice(lowPressureQuest, "protect-workers");
-const bluffRoute = applyJzdRivalChoice(lowPressureQuest, "call-bluff");
-const protectedPublish = choicesForJzd(protectedRoute, "final").find(choice => choice.id === "publish-dossier");
-const bluffPublish = choicesForJzd(bluffRoute, "final").find(choice => choice.id === "publish-dossier");
-assert.equal(
-  bluffPublish.dc,
-  protectedPublish.dc - 1,
-  "call-bluff must keep its promised publishing advantage after its own pressure cost is applied"
-);
+for (let pressure = 0; pressure <= 5; pressure += 1) {
+  const routeState = startJzdQuest(createInitialState());
+  routeState.quest.evidence = 4;
+  routeState.quest.rivalPressure = pressure;
+  const protectedRoute = applyJzdRivalChoice(routeState, "protect-workers");
+  const bluffRoute = applyJzdRivalChoice(routeState, "call-bluff");
+  const playAlongRoute = applyJzdRivalChoice(routeState, "play-along");
+  const finals = route => choicesForJzd(route, "final");
+  const protectedFinals = finals(protectedRoute);
+  const bluffFinals = finals(bluffRoute);
+  const playAlongFinals = finals(playAlongRoute);
+  assert.equal(
+    bluffFinals.find(choice => choice.id === "publish-dossier").dc,
+    protectedFinals.find(choice => choice.id === "publish-dossier").dc - 1,
+    `call-bluff must keep its promised publishing advantage at starting pressure ${pressure}`
+  );
+  assert(
+    playAlongFinals.find(choice => choice.id === "trade-evidence").dc <
+      protectedFinals.find(choice => choice.id === "trade-evidence").dc,
+    `play-along must keep its promised trade advantage at starting pressure ${pressure}`
+  );
+  assert(
+    protectedFinals.find(choice => choice.id === "council-ambush").dc <
+      playAlongFinals.find(choice => choice.id === "council-ambush").dc,
+    `protect-workers must keep its promised council advantage at starting pressure ${pressure}`
+  );
+}
 
 const approachChoice = choicesForJzd(questState, "approach").find(choice => choice.id === "archive-door");
 const approachMode = resolveRollMode(questState, approachChoice);
