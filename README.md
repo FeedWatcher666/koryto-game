@@ -1,96 +1,56 @@
-# Koryto v0.17.4 TEST.1
+# Koryto v0.19.0 TEST.1
 
-Hratelný offline test nové vizuální základny kampaně a prvního průchodu
-čitelností rozhodování.
+Taktický prototyp českého politického RPG. v0.19 opouští model interaktivní povídky a testuje, zda je zábavná samotná herní smyčka.
 
 ## Spuštění
 
-Rozbalte ZIP a otevřete `index.html`.
+Rozbalte offline ZIP a otevřete `index.html`. Hra nepotřebuje server ani připojení k internetu.
 
-## Co přidává v0.17.0
+Původní v0.17 zůstává dostupná přes tlačítko **v0.17** nebo adresu `index.html?legacy=1`. Starší uložené hry se nemažou; v0.19 používá vlastní save.
 
-- jednotný dřevěný, kovový a pergamenový vizuální systém podle schváleného směru,
-- čitelnější hierarchii hlavní mapy, aktivní kauzy, rivala a klíčových lidí,
-- přepracované lokality, události, volby a výsledkové karty bez změny mechanik,
-- kompaktní mobilní rozložení se stejnými herními informacemi jako desktop,
-- komponentové CSS a lehkou dekorační vrstvu bez vzdálených závislostí,
-- plný save/load roundtrip se zachovaným formátem `0.14.3-test.2 / schema 1`.
+## Cíl hry
 
-## Co dolaďuje v0.17.1
+Během šesti kol získat alespoň 8 z 15 delegátů. Začínáte se 4 hlasy, Vladimír Věčný má 6 a pět delegátů je nerozhodnutých.
 
-- mapa dává větší prostor hernímu světu a jasně označuje hlavní cíl tahu,
-- události na desktopu ukazují rozhodovací karty ještě nad spodní navigací,
-- volby jsou očíslované, přístupně pojmenované a vizuálně rozlišují riziko,
-- mobil používá kompaktní horizontální volby místo dlouhých obrazových bloků,
-- výsledky mají výraznější oddělení dopadů od příběhového textu,
-- mechaniky a save formát zůstávají beze změny.
+## Co přidává v0.19.0
 
-## Co dolaďuje v0.17.2
+- jednu válečnou místnost místo rozvětveného formuláře,
+- šest skutečných herních kol,
+- tři akční body na kolo,
+- balíček patnácti karet,
+- pět karet na ruce,
+- aktivního soupeře s dopředu viditelným záměrem,
+- tři současné fronty: strana, média a štáb,
+- tresty za nevyřešené krize,
+- tři členy štábu s mechanickými schopnostmi,
+- čisté a špinavé operace,
+- politické dluhy, důkazy, skandál a morálku,
+- momentum za kombinování akcí na stejné frontě,
+- proměnlivé pořadí karet a soupeřových útoků podle seedu,
+- samostatný offline save/load,
+- responzivní rozhraní pro notebook i mobil.
 
-- horní HUD jasně odlišuje plný tah, poslední akci a vyčerpaný tah,
-- předčasné ukončení dne ukazuje přesnou penalizaci a vyžaduje potvrzení,
-- dostupné a zamčené volby mají explicitní stav,
-- rozhodovací i výsledkové obrazovky uvádějí cenu jedné akce,
-- dopady výsledku jsou rozdělené na kladné, záporné a neutrální položky,
-- mechaniky, balanc, questy a save formát zůstávají beze změny.
+## Jak hrát
 
-## Co opravuje v0.17.3
+1. Podívejte se, co Věčný udělá na konci kola.
+2. Zkontrolujte tlak na straně, v médiích a ve štábu.
+3. Volitelně vyberte Marii, Miloslava nebo Kláru.
+4. Zahrajte kartu a využijte jejich bonus.
+5. Rozhodněte, které krize necháte shořet.
+6. Ukončete kolo a sledujte skutečný tah soupeře.
 
-- nahrazuje dlouhou webovou stránku pevným herním rámem na desktopu,
-- opravuje skutečný Retina/MacBook viewport kolem `1024 × 550` CSS pixelů,
-- drží aktivní kauzu, mapu a soupeře současně v jedné scéně,
-- ukazuje všechny volby události společně s kontextem ještě před rolováním,
-- zobrazuje všech šest povolání a potvrzení kandidáta v jednom viewportu,
-- skládá lokalitu do scény a samostatného seznamu kliknutelných akcí,
-- používá samostatnou portrétní kompozici mapy a voleb na mobilu,
-- zabraňuje překrytí hlavních akcí pevnou spodní navigací,
-- přidává gate skutečné viditelnosti ovládání, ne pouze existence prvků v DOM,
-- mechaniky, balanc, questy a save formát zůstávají beze změny.
+## Lidé ve štábu
 
-## Co sjednocuje v0.17.4
+- **Marie:** zesílí čistou akci, zvedne morálku a odmítne špinavý tah.
+- **Miloslav:** u stranické akce přivede dalšího delegáta, ale vytvoří dluh.
+- **Klára:** u mediální akce zablokuje mediální útok a ukáže příští záměr.
 
-- používá mapu Dolních Vejprnic jako vizuální zdroj pravdy pro celou hru,
-- zavádí centrální design tokeny a společné panelové a tlačítkové komponenty,
-- sjednocuje kandidáta, detail kauzy, události, výsledky a štáb,
-- převádí rychlé ovládání do stejného dřevěného a mosazného materiálového systému,
-- odstraňuje viditelné přechody mezi několika generacemi UI,
-- označuje aktivní povrch a nové legacy rendery v mikrotasku bez časovaného překreslení,
-- přidává audit společných panelů, tlačítek, overflow a geometrie HUD/navigace,
-- mechaniky, balance, questy a save formát zůstávají beze změny.
+## Vývojové kontroly
 
-## Zachované hratelné části řady v0.16
+- `npm test` spouští historickou regresní sadu v0.17.4 a nový kontrakt v0.19,
+- CI sestaví samostatný offline balík,
+- Playwright odehraje celou šestikolovou partii,
+- testuje notebook `1024 × 550` a mobil `390 × 844`,
+- kontroluje se počet delegátů, kombinace se štábem, soupeřův tah, konec hry, overflow a chyby konzole.
 
-- úvodní briefing třináctidenní kampaně,
-- tvorba kandidáta s živým náhledem,
-- tři výchozí motivace a šest politických povolání,
-- pixel-cartoon mapa Dolních Vejprnic,
-- funkční štáb, nábor, vztahy a samostatné mise,
-- přehled a detail kauz i osmi lokalit,
-- události, hody a výsledky rozhodnutí,
-- denní uzávěrka,
-- veřejná debata a taktické karty,
-- volební noc a patnáctimandátový přehled,
-- koaliční salonek a živý log vyjednávání,
-- rychlé ovládání napojené na původní save/load/map/kronika handlery,
-- větší text, vysoký kontrast, omezení pohybu, skip link a viditelný fokus,
-- responzivní desktopové, tabletové a mobilní rozhraní.
-
-## Klávesové zkratky
-
-- `Alt+U` – panel rychlého ovládání,
-- `Alt+S` – uložit na mapě,
-- `Alt+L` – načíst,
-- `Alt+M` – návrat na mapu,
-- `Alt+K` – export kroniky,
-- `Esc` – zavřít panel.
-
-## Doporučený finální test
-
-1. Projít úvod a všech šest povolání.
-2. Odehrát několik dní, událostí, questů a jednu debatu.
-3. Vyzkoušet uložení a načtení na mapě; v události musí být uložení zablokované.
-4. Zapnout větší text, kontrast a omezení pohybu a obnovit stránku.
-5. Dokončit volby a koaliční vyjednávání.
-6. Ověřit celý tok na desktopu a při šířce 390 px.
-
-Podrobný popis iterace je v `docs/v0.17/v0174-style-stabilization.md`.
+Podrobný návrh je v `docs/v0.19/v0190-war-room.md`.
