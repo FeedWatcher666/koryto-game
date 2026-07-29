@@ -1,0 +1,33 @@
+name: Koryto clean rewrite
+
+on:
+  push:
+    branches:
+      - agent/v0200-clean-rewrite
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - run: npm run check
+      - name: Verify no legacy runtime files
+        run: |
+          test ! -e src/app.js
+          test ! -e src/v0174-style-stabilization.js
+          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles
+      - name: Package offline build
+        run: |
+          mkdir -p dist/koryto-v0.20.0-clean-test.1
+          cp -R index.html VERSION README.md src styles docs dist/koryto-v0.20.0-clean-test.1/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.20.0-clean-test.1
+          path: dist/koryto-v0.20.0-clean-test.1
+          if-no-files-found: error
