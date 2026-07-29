@@ -15,19 +15,55 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm test
-      - run: npm run check
-      - name: Verify no legacy runtime files
+
+      - name: Run clean runtime tests
+        run: npm test
+
+      - name: Check source syntax
+        run: npm run check
+
+      - name: Verify no legacy or hand-maintained runtime
+        shell: bash
         run: |
           test ! -e src/app.js
           test ! -e src/v0174-style-stabilization.js
-          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles
-      - name: Package offline build
+          test ! -e src/runtime.js
+          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles scripts
+
+      - name: Build deterministic offline artifact
+        run: npm run build:offline
+
+      - name: Verify offline artifact contract
+        shell: bash
         run: |
-          mkdir -p dist/koryto-v0.20.0-clean-test.1
-          cp -R index.html VERSION README.md src styles docs dist/koryto-v0.20.0-clean-test.1/
-      - uses: actions/upload-artifact@v4
+          target="dist/koryto-v0.20.0-clean-test.2"
+          test -f "$target/index.html"
+          test -f "$target/src/runtime.js"
+          grep -q 'defer src="src/runtime.js"' "$target/index.html"
+          grep -q 'playD20Roll' "$target/src/runtime.js"
+          grep -q 'dice-overlay' "$target/src/runtime.js"
+          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1|type="module"' "$target/index.html" "$target/src" "$target/styles"
+
+      - name: Install Chromium browser gate
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.54.2
+          npx playwright install --with-deps chromium
+
+      - name: Test animated d20 in packaged build
+        run: node tests/browser.mjs dist/koryto-v0.20.0-clean-test.2
+
+      - name: Upload d20 screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.20.0-clean-test.1
-          path: dist/koryto-v0.20.0-clean-test.1
+          name: koryto-v0.20.0-clean-test.2-d20-screenshots
+          path: browser-artifacts
+          if-no-files-found: warn
+
+      - name: Upload playable offline build
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.20.0-clean-test.2
+          path: dist/koryto-v0.20.0-clean-test.2
           if-no-files-found: error
