@@ -1,0 +1,76 @@
+:root.v0200-dnd-reset {
+  --v20-ink: #201a13;
+  --v20-paper: #f4e7c7;
+  --v20-paper-deep: #dfc690;
+  --v20-red: #8f3025;
+  --v20-green: #254e39;
+  --v20-brass: #b68a3e;
+}
+
+.v0200-attribute-preview { grid-column: 1 / -1; }
+.v0200-preview-head { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+.v0200-preview-head h3 { margin:.15rem 0 0; }
+.v0200-rule-chip { border:1px solid rgba(65,45,20,.35); border-radius:999px; padding:.45rem .7rem; font-size:.78rem; font-weight:800; background:rgba(255,255,255,.28); }
+.v0200-preview-copy { margin:.5rem 0 .8rem; opacity:.82; }
+.v0200-attribute-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.55rem; }
+.v0200-attribute { display:flex; justify-content:space-between; gap:.7rem; align-items:center; min-width:0; padding:.65rem .7rem; border:1px solid rgba(65,45,20,.25); border-radius:10px; background:rgba(255,255,255,.22); }
+.v0200-attribute div { min-width:0; }
+.v0200-attribute strong { display:block; }
+.v0200-attribute span { display:block; font-size:.72rem; line-height:1.25; opacity:.72; }
+.v0200-attribute b { display:grid; place-items:center; flex:0 0 2.15rem; height:2.15rem; border-radius:50%; background:var(--v20-green); color:#fff6d9; font-size:1.05rem; box-shadow:0 2px 0 rgba(0,0,0,.25); }
+.v0200-class-identity { display:flex; gap:.65rem; align-items:center; margin-top:.7rem; padding:.6rem .75rem; border-left:4px solid var(--v20-brass); background:rgba(118,76,27,.08); }
+.v0200-class-identity span { opacity:.78; }
+.v0200-class-note { display:block; margin-top:.35rem; font-size:.68rem; font-weight:850; letter-spacing:.025em; text-transform:uppercase; opacity:.7; }
+
+.v0200-objective { position:relative; z-index:3; display:grid; grid-template-columns:minmax(190px,.8fr) minmax(0,1.8fr); gap:12px; margin:0 0 10px; padding:10px 12px; border:2px solid rgba(50,34,15,.62); border-radius:12px; color:var(--v20-ink); background:linear-gradient(135deg,var(--v20-paper),#ead5a7); box-shadow:0 5px 0 rgba(45,29,12,.24); }
+.v0200-objective-main span { display:block; font-size:.66rem; font-weight:900; letter-spacing:.13em; color:var(--v20-red); }
+.v0200-objective-main strong { display:block; margin-top:.18rem; font-size:1.05rem; line-height:1.15; }
+.v0200-objective-meta { display:grid; grid-template-columns:1.25fr 1fr .75fr; gap:9px; font-size:.72rem; line-height:1.25; }
+.v0200-objective-meta span { padding:.42rem .5rem; border-left:2px solid rgba(70,47,20,.22); }
+.v0200-objective-meta b, .v0200-objective-meta i { display:block; font-style:normal; }
+.v0200-objective-meta i { margin-top:.1rem; opacity:.82; }
+
+.v0200-focus-mode:not(.v0200-details-open) [data-v0200-panel="advanced"] { display:none !important; }
+.v0200-focus-mode #gameScreen .game { grid-template-columns:minmax(205px,250px) minmax(0,1fr) minmax(230px,290px); }
+.v0200-focus-mode #gameScreen .side { gap:9px; }
+.v0200-focus-mode #gameScreen .side .card { margin:0; }
+#v0200DetailsToggle { white-space:nowrap; }
+
+.v0200-tutorial[hidden] { display:none !important; }
+.v0200-tutorial { position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:18px; background:radial-gradient(circle at 50% 20%,rgba(36,45,31,.64),rgba(13,12,10,.92)); backdrop-filter:blur(4px); }
+.v0200-tutorial-card { width:min(760px,100%); max-height:min(88vh,760px); overflow:auto; padding:clamp(18px,3vw,30px); border:5px solid #3a2918; outline:2px solid var(--v20-brass); border-radius:16px; color:var(--v20-ink); background:linear-gradient(145deg,#f7ebce,#dec087); box-shadow:0 24px 70px rgba(0,0,0,.55); }
+.v0200-tutorial-card h2 { margin:.25rem 0 .65rem; font-size:clamp(1.45rem,4vw,2.25rem); line-height:1.04; }
+.v0200-tutorial-card p { line-height:1.55; }
+.v0200-tutorial-progress { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:15px; }
+.v0200-tutorial-progress i { height:5px; border-radius:999px; background:rgba(55,36,18,.18); }
+.v0200-tutorial-progress i.done { background:var(--v20-red); }
+.v0200-rule { display:grid; gap:.2rem; margin:1rem 0; padding:.75rem .85rem; border-left:5px solid var(--v20-green); background:rgba(255,255,255,.34); }
+.v0200-rule span { font-size:.87rem; opacity:.8; }
+.v0200-tutorial-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:1rem; }
+.v0200-tutorial-choices, .v0200-companions { display:grid; gap:9px; margin-top:1rem; }
+.v0200-tutorial-choices button, .v0200-companions button { display:grid; gap:.25rem; width:100%; text-align:left; padding:.85rem 1rem; }
+.v0200-tutorial-choices button strong, .v0200-companions button strong { font-size:.97rem; }
+.v0200-tutorial-choices button span, .v0200-companions button span { font-size:.8rem; opacity:.8; }
+.v0200-tutorial-choices button small { font-weight:850; color:var(--v20-red); }
+.v0200-die { display:grid; place-items:center; width:82px; height:82px; margin:.5rem auto .7rem; clip-path:polygon(25% 6%,75% 6%,96% 35%,82% 88%,50% 100%,18% 88%,4% 35%); color:#fff7dd; background:var(--v20-red); font-size:2.3rem; font-weight:950; filter:drop-shadow(0 6px 0 rgba(0,0,0,.24)); }
+.v0200-formula { margin:.65rem 0; padding:.6rem .75rem; border:1px dashed rgba(45,28,12,.55); text-align:center; font-weight:900; background:rgba(255,255,255,.3); }
+.v0200-item { border-left:4px solid var(--v20-brass); }
+
+@media (max-width: 1050px) {
+  .v0200-focus-mode #gameScreen .game { grid-template-columns:minmax(190px,230px) minmax(0,1fr); }
+  .v0200-focus-mode #gameScreen .game > .side:last-child { grid-column:1 / -1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .v0200-objective { grid-template-columns:1fr; }
+}
+
+@media (max-width: 700px) {
+  .v0200-attribute-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .v0200-preview-head { display:block; }
+  .v0200-rule-chip { display:inline-block; margin-top:.5rem; }
+  .v0200-focus-mode #gameScreen .game { display:block; }
+  .v0200-focus-mode #gameScreen .game > .side:last-child { display:block; }
+  .v0200-objective-meta { grid-template-columns:1fr; }
+  .v0200-objective-meta span { border-left:0; border-top:1px solid rgba(70,47,20,.2); }
+  .v0200-tutorial { padding:8px; }
+  .v0200-tutorial-card { max-height:96vh; border-width:3px; border-radius:10px; }
+  .v0200-tutorial-actions .btn { width:100%; }
+}
