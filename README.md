@@ -1,4 +1,4 @@
-# Koryto v0.20.0 CLEAN TEST.3
+# Koryto v0.20.0 CLEAN TEST.4
 
 Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
 
@@ -10,29 +10,28 @@ Hratelný offline balík vzniká příkazem:
 node scripts/build-offline.mjs
 ```
 
-Potom otevřete `dist/koryto-v0.20.0-clean-test.3/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.4/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+
+## TEST.4
+
+- skutečná výhoda `2d20kh1` a nevýhoda `2d20kl1`,
+- dva samostatné fyzické hody d20,
+- jasně označená ponechaná a vyřazená kostka,
+- čísla vykreslená přímo na trojúhelníkových stěnách,
+- let přes stůl, první náraz, menší odskok a dojezd,
+- opotřebený bakelitový materiál, dynamické světlo a pohyblivý stín,
+- oddělený zvuk hodu, nárazů a výsledku,
+- viditelné zdroje výhody nebo nevýhody před hodem.
+
+Implementace je inspirována běžnou D&D syntaxí a chováním dice enginů, ale nepřidává Python ani externí runtime závislost.
 
 ## Ověření
 
 ```bash
 npm test
 npm run check
+node scripts/build-offline.mjs
 ```
-
-## D20 v TEST.3
-
-TEST.2 byla vizuálně plochá: CSS otáčelo jediný mnohoúhelník, takže výsledek připomínal minci. TEST.3 tento efekt kompletně nahrazuje.
-
-- skutečný matematický model dvacetistěnu,
-- 12 prostorových vrcholů a 20 trojúhelníkových stěn,
-- perspektivní projekce na canvas,
-- rotace kolem tří os,
-- odlišné stínování každé stěny,
-- měnící se vržený stín a výška nad podložkou,
-- samostatná fáze letu, dopadu a ustálení,
-- kritická 20, kritická 1, zvuk, vibrace a reakce družiny.
-
-Číslo je překryvné pouze kvůli čitelnosti. Samotné těleso pod ním se prostorově přepočítává v každém snímku. Detail je v `docs/v0.20/d20-test3-note.md`.
 
 ## Zásady
 
