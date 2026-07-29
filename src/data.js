@@ -1,4 +1,4 @@
-export const VERSION = "0.20.0-clean-test.1";
+export const VERSION = "0.20.0-clean-test.2";
 
 export const ATTRIBUTES = [
   ["charisma", "Charisma", "Přesvědčit lidi, že váš nápad byl vždycky jejich."],
