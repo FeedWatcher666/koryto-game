@@ -2,7 +2,7 @@ import {deriveAttributes} from "./rules.js";
 import {VERSION} from "./data.js";
 
 const STORAGE_KEY = "koryto.clean.v0200";
-const SAVE_SCHEMA = 1;
+const SAVE_SCHEMA = 2;
 
 export function createInitialState() {
   return {
@@ -19,8 +19,9 @@ export function createInitialState() {
       attributes: deriveAttributes("bard", "idealist")
     },
     party: {active: null, members: []},
+    relationships: {marie: 0, bohumil: 0, radek: 0},
     inventory: [],
-    resources: {reputation: 0, money: 3, heat: 0, debt: 0},
+    resources: {reputation: 0, money: 3, heat: 0, debt: 0, leverage: 0},
     flags: {
       chainedPenAvailable: false,
       chainedPenSpent: false,
@@ -28,6 +29,23 @@ export function createInitialState() {
       registrationDebt: false,
       chapterOneUnlocked: false,
       lastResult: null
+    },
+    quest: {
+      id: null,
+      status: "locked",
+      phase: null,
+      party: [],
+      itemId: null,
+      route: null,
+      evidence: 0,
+      workerTrust: 0,
+      rivalPressure: 0,
+      rivalChoice: null,
+      ending: null,
+      endingTitle: null,
+      endingText: null,
+      consequences: [],
+      results: []
     },
     history: []
   };
