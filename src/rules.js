@@ -59,28 +59,40 @@ export function resolveRollMode(state, choice) {
 }
 
 function bestContribution(entries) {
-  return entries.filter(entry => entry.value !== 0).sort((a, b) => Math.abs(b.value) - Math.abs(a.value))[0] || null;
+  return entries.filter(entry => entry.value !== 0).sort((a, b) => b.value - a.value)[0] || null;
 }
 
 export function checkModifiers(state, choice) {
   const attributeValue = state.hero.attributes[choice.attribute] || 0;
   const classBonus = choice.classBonus?.[state.hero.classId] || 0;
   const partyIds = activePartyIds(state);
-  const companionChoice = bestContribution(partyIds.map(id => ({id, label: COMPANIONS[id].name, value: choice.companionBonus?.[id] || 0})));
-  const companionPassive = bestContribution(partyIds.map(id => ({id, label: COMPANIONS[id].name, value: COMPANIONS[id]?.bonus?.[choice.attribute] || 0})));
+  const companionContribution = bestContribution(partyIds.map(id => {
+    const choiceValue = choice.companionBonus?.[id] || 0;
+    const passiveValue = COMPANIONS[id]?.bonus?.[choice.attribute] || 0;
+    return {
+      id,
+      label: COMPANIONS[id].name,
+      choiceValue,
+      passiveValue,
+      value: choiceValue + passiveValue
+    };
+  }));
   const itemId = state.quest?.itemId || null;
   const itemBonus = itemId ? choice.itemBonus?.[itemId] || 0 : 0;
   const itemLabel = choice.itemBonusLabels?.[itemId] || "Vybavení";
-  const visibleModifier = attributeValue + classBonus + (companionChoice?.value || 0) + (companionPassive?.value || 0) + itemBonus;
+  const visibleModifier = attributeValue + classBonus + (companionContribution?.value || 0) + itemBonus;
   const hiddenModifier = choice.dirty && state.hero.classId !== "rogue" ? -1 : 0;
   const modifierBreakdown = [
     {id: "attribute", label: "Atribut", value: attributeValue},
     {id: "class", label: "Třída", value: classBonus},
-    companionChoice ? {id: `companion-choice-${companionChoice.id}`, label: `${companionChoice.label} · příprava`, value: companionChoice.value} : null,
-    companionPassive ? {id: `companion-passive-${companionPassive.id}`, label: companionPassive.label, value: companionPassive.value} : null,
+    companionContribution ? {
+      id: `companion-${companionContribution.id}`,
+      label: `${companionContribution.label} · nejsilnější pomoc`,
+      value: companionContribution.value
+    } : null,
     itemBonus ? {id: `item-${itemId}`, label: itemLabel, value: itemBonus} : null
   ].filter(item => item && item.value !== 0);
-  return {attributeValue, classBonus, companionChoice, companionPassive, itemBonus, visibleModifier, hiddenModifier, modifierBreakdown};
+  return {attributeValue, classBonus, companionContribution, itemBonus, visibleModifier, hiddenModifier, modifierBreakdown};
 }
 
 export function outcomeLevel(roll, total, dc) {
