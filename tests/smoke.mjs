@@ -33,11 +33,14 @@ assert.equal(result.level, "critical");
 
 const index = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const main = fs.readFileSync(new URL("../src/main.js", import.meta.url), "utf8");
+const runtime = fs.readFileSync(new URL("../src/runtime.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../styles/game.css", import.meta.url), "utf8");
-assert.match(index, /src\/main\.js/);
-assert.doesNotMatch(index, /v017|legacy|village-rpg/i);
+assert.match(index, /src\/runtime\.js/);
+assert.doesNotMatch(index, /type="module"|v017|legacy|village-rpg/i);
 assert.doesNotMatch(main, /KorytoApp|v017|legacy/i);
-assert.match(main, /chapterOneUnlocked/);
+assert.doesNotMatch(runtime, /KorytoApp|v017|village-rpg|legacy=1/i);
+assert.match(runtime, /globalThis\.KorytoClean/);
+assert.match(runtime, /chapterOneUnlocked/);
 assert.match(css, /\.objective-card/);
 assert.match(css, /@media \(max-width: 760px\)/);
 
