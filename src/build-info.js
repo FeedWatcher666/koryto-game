@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.18.0 TEST.1",
-    buildVersion: "0.18.0-test.1",
+    displayVersion: "0.18.1 TEST.1",
+    buildVersion: "0.18.1-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.18.0 TEST.1 – Vertical Slice Reset",
-    description: "Koryto 0.18.0 TEST.1: první skutečný vertikální řez politického RPG s jasnými volbami, vztahy, dluhy a následky."
+    title: "Koryto 0.18.1 TEST.1 – Character Drama",
+    description: "Koryto 0.18.1 TEST.1: rozvětvené politické drama s osobní pamětí postav, epilogy a důvodem hrát znovu."
   });
 
   function applyLabels() {
