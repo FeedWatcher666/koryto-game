@@ -10,7 +10,7 @@ Reboot se proto vrací k původnímu příslibu: malá česká obec jako satiric
 
 1. Hráč si vybere jednu ze tří komických kandidátských rolí.
 2. Pohybuje se po mapě s omezeným počtem kroků.
-3. Věčný se po každém kroku také pohne k nejbližšímu voliči.
+3. Věčný reaguje po dokončeném setkání, minihře nebo použití šanonu a může přebrat nejbližšího voliče.
 4. Setkání s člověkem je krátká situační hádanka podle jeho jedné hlášky.
 5. Významné budovy spouštějí dovednostní minihry.
 6. Předměty a šanon mění tempo a rozložení hlasů.
@@ -22,6 +22,7 @@ Reboot se proto vrací k původnímu příslibu: malá česká obec jako satiric
 - žádná hlavní obrazovka nesmí být dashboard,
 - žádná základní akce nesmí být pouze dlouhá textová volba,
 - soupeř musí být vidět a měnit mapu,
+- úvod musí dát hráči čas naplánovat trasu a alespoň jednou si zahrát, než soupeř může kampaň ukončit,
 - humor musí vznikat z herní situace i grafiky, nejen z odstavců,
 - jedno setkání má trvat sekundy, nikoli minuty čtení,
 - důsledky mají být vidět okamžitě na počtu lidí, poloze figurek nebo mapě,
@@ -29,7 +30,7 @@ Reboot se proto vrací k původnímu příslibu: malá česká obec jako satiric
 
 ## Kritéria ručního testu
 
-- hráč chce dohnat Věčného, když míří ke stejnému voliči,
+- hráč chce reagovat na Věčného, když po setkání míří ke stejnému voliči,
 - cesta k budově nebo předmětu vytváří skutečné rozhodnutí,
 - alespoň jedna minihra je sama o sobě příjemná,
 - krátké hlášky obyvatel jsou zapamatovatelné,
