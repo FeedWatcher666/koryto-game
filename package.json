@@ -1,5 +1,0 @@
-{
-  "scripts": {
-    "test": "node tests/v0160-run.mjs"
-  }
-}
