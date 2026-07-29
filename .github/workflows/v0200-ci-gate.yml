@@ -1,0 +1,96 @@
+name: Koryto v0.20.0 isolated CI gate
+
+on:
+  pull_request:
+    branches:
+      - ci/v0200-gate-base2
+
+jobs:
+  validate-exact-head:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current v0.20 merge tree
+        uses: actions/checkout@v4
+
+      - name: Checkout historical v0.17.4 tree
+        uses: actions/checkout@v4
+        with:
+          ref: 78c595c4f4e7f578e50212673adbcdc0598daafa
+          path: .legacy-v0174
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run historical v0.17.4 regression suite
+        shell: bash
+        run: |
+          set -o pipefail
+          (cd .legacy-v0174 && node tests/v0160-run.mjs) 2>&1 | tee test-output.txt
+
+      - name: Run current v0.20 contract suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee -a test-output.txt
+
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.20.0-test.1-diagnostics
+          path: test-output.txt
+          if-no-files-found: warn
+
+      - name: Build offline package
+        shell: bash
+        run: |
+          set -euo pipefail
+          build_version="$(cat VERSION)"
+          test "$build_version" = "0.20.0-test.1"
+          target="dist/koryto-v${build_version}"
+          mkdir -p "$target"
+          cp index.html VERSION README.md "$target/"
+          cp -R src styles assets "$target/"
+          mkdir -p "$target/docs/v0.20"
+          cp docs/v0.20/v0200-dnd-rpg-reset.md "$target/docs/v0.20/"
+          cp docs/v0.20/v0200-hard-audit.md "$target/docs/v0.20/"
+          rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
+          test -f "$target/src/v0200-dnd-rpg-reset.js"
+          test -f "$target/styles/v0200-dnd-rpg-reset.css"
+          test -f "$target/src/app.js"
+          test -f "$target/src/v0174-style-stabilization.js"
+          grep -q 'src/build-info.js' "$target/index.html"
+          grep -q 'src/app.js' "$target/index.html"
+          grep -q 'src/v0174-style-stabilization.js' "$target/index.html"
+          grep -q '0.20.0-test.1' "$target/src/build-info.js"
+          if grep -R -E 'https?://(fonts|cdn|unpkg|jsdelivr)' "$target/index.html" "$target/styles" "$target/src"; then
+            echo "Release contains a forbidden network dependency" >&2
+            exit 1
+          fi
+
+      - name: Install Chromium gate dependency
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.54.2
+          npx playwright install --with-deps chromium
+
+      - name: Browser gate on packaged artifact
+        shell: bash
+        run: node tests/v0200-browser-gate.mjs dist/koryto-v0.20.0-test.1
+
+      - name: Upload browser gate screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.20.0-test.1-browser-gate
+          path: browser-artifacts
+          if-no-files-found: warn
+
+      - name: Upload playable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: koryto-v0.20.0-test.1
+          path: dist/koryto-v0.20.0-test.1
+          if-no-files-found: error
