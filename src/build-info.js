@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.17.4 TEST.1",
-    buildVersion: "0.17.4-test.1",
+    displayVersion: "0.20.0 TEST.1",
+    buildVersion: "0.20.0-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.17.4 TEST.1 – Style Stabilization",
-    description: "Koryto 0.17.4 TEST.1: sjednocený vizuální systém mapy, kauz, štábu, kandidáta a rychlého ovládání."
+    title: "Koryto 0.20.0 TEST.1 – D&D RPG Reset",
+    description: "Koryto 0.20.0 TEST.1: původní satirické politické D&D RPG s jasným tutorialem, šesti atributy a soustředěným rozhraním."
   });
 
   function applyLabels() {
@@ -23,6 +23,26 @@
       footer.textContent = `${base} · ${info.displayVersion}`;
     }
     if (document.documentElement?.dataset) document.documentElement.dataset.korytoBuild = info.buildVersion;
+    return true;
+  }
+
+  function installDndResetLayer() {
+    if (typeof document === "undefined") return false;
+    const query = new URLSearchParams(globalThis.location?.search || "");
+    if (query.has("legacy")) return false;
+    if (!document.querySelector('link[data-v0200-dnd-reset]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "styles/v0200-dnd-rpg-reset.css";
+      link.dataset.v0200DndReset = "1";
+      document.head.append(link);
+    }
+    if (!document.querySelector('script[data-v0200-dnd-reset]')) {
+      const script = document.createElement("script");
+      script.src = "src/v0200-dnd-rpg-reset.js";
+      script.dataset.v0200DndReset = "1";
+      document.body.append(script);
+    }
     return true;
   }
 
@@ -53,7 +73,9 @@
     }
   }
 
-  globalThis.KorytoBuildInfo = Object.freeze({...info, applyLabels, installLegacyReconciliation});
+  globalThis.KorytoBuildInfo = Object.freeze({...info, applyLabels, installLegacyReconciliation, installDndResetLayer});
   installLegacyReconciliation();
   applyLabels();
+  if (document.readyState === "complete") installDndResetLayer();
+  else globalThis.addEventListener?.("load", installDndResetLayer, {once: true});
 })();
