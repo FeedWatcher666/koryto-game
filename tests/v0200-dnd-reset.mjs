@@ -22,9 +22,12 @@ assert.match(js, /v0200-details-open/);
 assert.match(js, /app\(\)\.showEvent\("intro"\)/);
 assert.match(hostFix, /#v0165Root:not\(\[hidden\]\) \.k165-shell/);
 assert.match(hostFix, /insertAdjacentElement\("afterend", objective\)/);
+assert.match(hostFix, /objective\.append\(toggle\)/);
+assert.match(hostFix, /v0200ActiveControl/);
 assert.match(buildInfo, /src\/v0200-objective-host-fix\.js/);
 assert.match(css, /v0200-focus-mode/);
 assert.match(css, /v0200-tutorial/);
+assert.match(css, /\.v0200-objective > #v0200DetailsToggle/);
 
 for (const preserved of ['function startDebate', 'function finalizeElection', 'function initCoalition', 'function newGame']) {
   assert.ok(legacy.includes(preserved), `legacy campaign system removed: ${preserved}`);
