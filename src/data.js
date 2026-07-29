@@ -34,7 +34,7 @@ export const CLASSES = {
     description: "Z neúspěchu udělá příběh. Bohužel často s vlastním jménem v titulku.",
     base: {charisma: 4, intellect: 2, authority: 3, media: 5, morality: 2, luck: 3},
     perk: "Při veřejném vystoupení získává výhodu. Mediální řešení často dostává třídní bonus.",
-    weakness: "Při čtení drobného písma hází s nevýhodou. Každá ostuda zvyšuje mediální tlak o 2."
+    weakness: "Při čtení drobného písma hází s nevýhodou."
   },
   paladin: {
     name: "Aktivistický paladin",
