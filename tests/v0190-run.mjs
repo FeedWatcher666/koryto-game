@@ -43,8 +43,10 @@ try {
     .replaceAll('0.19.0', '0.17.4')
     .replaceAll('v0190-browser-gate', 'v0174-browser-gate')
     .replaceAll('v0190-war-room', 'v0174-style-stabilization')
-    .replace('      - agent/v0190-war-room', '      - agent/v0174-style-stabilization');
-  workflow = workflow.split('\n').filter((line) => !line.includes('docs/v0.19')).join('\n');
+    .replace('      - agent/v0190-war-room', '      - agent/v0174-style-stabilization')
+    .replace(' "$target/docs/v0.19"', '')
+    .replace(/\n\s*cp docs\/v0\.19\/v0174-style-stabilization\.md "\$target\/docs\/v0\.19\/"/g, '')
+    .replace(/\n\s*test -f "\$target\/docs\/v0\.19\/v0174-style-stabilization\.md"/g, '');
   fs.writeFileSync(workflowPath, workflow);
 
   run(legacyWorkspace, ['tests/v0160-run.mjs'], 'v0.17.4 compatibility suite');
