@@ -1,0 +1,121 @@
+name: One-time v0.20 idempotence patch
+
+on:
+  push:
+    branches:
+      - agent/v0200-dnd-rpg-reset
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, 'Apply v0.20 idempotence patch') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v0200-dnd-rpg-reset
+          fetch-depth: 0
+      - name: Patch runtime and contract
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'src/v0200-dnd-rpg-reset.js';
+          let text = fs.readFileSync(path, 'utf8');
+          const replacements = [
+            [
+`    const values = deriveAttributes(classId, origin);
+    grid.innerHTML = ATTRIBUTES.map(([id, label, description]) => \`
+      <article class="v0200-attribute">
+        <div><strong>\${label}</strong><span>\${description}</span></div>
+        <b>\${values[id]}</b>
+      </article>\`).join("");`,
+`    const values = deriveAttributes(classId, origin);
+    const signature = \`\${classId}:\${origin}:\${JSON.stringify(values)}\`;
+    const markup = ATTRIBUTES.map(([id, label, description]) => \`
+      <article class="v0200-attribute">
+        <div><strong>\${label}</strong><span>\${description}</span></div>
+        <b>\${values[id]}</b>
+      </article>\`).join("");
+    if (grid.dataset.signature !== signature) {
+      grid.innerHTML = markup;
+      grid.dataset.signature = signature;
+    }`
+            ],
+            [
+`  function syncObjective() {
+    const current = state();
+    const objective = objectiveFor(current);`,
+`  function syncObjective() {
+    const current = state();
+    enforceThreeActions(current);
+    const objective = objectiveFor(current);`
+            ],
+            [
+`    if (title) title.textContent = objective.title;
+    if (action) action.textContent = objective.action;
+    if (risk) risk.textContent = objective.risk;
+    if (time) time.textContent = objective.time;
+    patchInventory();
+  }`,
+`    if (title && title.textContent !== objective.title) title.textContent = objective.title;
+    if (action && action.textContent !== objective.action) action.textContent = objective.action;
+    if (risk && risk.textContent !== objective.risk) risk.textContent = objective.risk;
+    if (time && time.textContent !== objective.time) time.textContent = objective.time;
+    patchInventory();
+  }
+
+  function enforceThreeActions(current) {
+    if (!current?.flags?.v0200Rules || current.ended) return;
+    const adjusted = Number(current.flags.v0200ActionDayAdjusted) || 0;
+    if (adjusted === Number(current.day)) return;
+    if (current.phase === "map" && Number(current.actions) === 2) current.actions = 3;
+    current.flags.v0200ActionDayAdjusted = Number(current.day) || 1;
+  }`
+            ],
+            [
+`    current.actions = 3;
+    current.hero.rpgAttrs = deriveAttributes(current.hero.classId, current.hero.origin);
+    current.flags = current.flags || {};
+    current.flags.v0200Rules = BUILD;`,
+`    current.actions = 3;
+    current.hero.rpgAttrs = deriveAttributes(current.hero.classId, current.hero.origin);
+    current.hero.attrs = {
+      ...current.hero.attrs,
+      charisma: current.hero.rpgAttrs.charisma,
+      intellect: current.hero.rpgAttrs.intellect,
+      authority: current.hero.rpgAttrs.authority,
+      cunning: Math.round((current.hero.rpgAttrs.media + current.hero.rpgAttrs.luck) / 2),
+      resilience: Math.round((current.hero.rpgAttrs.morality + current.hero.rpgAttrs.authority) / 2),
+    };
+    current.flags = current.flags || {};
+    current.flags.v0200Rules = BUILD;
+    current.flags.v0200ActionDayAdjusted = Number(current.day) || 1;`
+            ]
+          ];
+          for (const [before, after] of replacements) {
+            if (!text.includes(before)) throw new Error(`Missing runtime patch target: ${before.slice(0, 80)}`);
+            text = text.replace(before, after);
+          }
+          fs.writeFileSync(path, text);
+
+          const testPath = 'tests/v0200-dnd-reset.mjs';
+          let test = fs.readFileSync(testPath, 'utf8');
+          const beforeTest = "'function startCoalition'";
+          if (!test.includes(beforeTest)) throw new Error('Missing coalition contract target');
+          test = test.replace(beforeTest, "'function initCoalition'");
+          fs.writeFileSync(testPath, test);
+          NODE
+          node --check src/v0200-dnd-rpg-reset.js
+          node --check tests/v0200-dnd-reset.mjs
+      - name: Commit patch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/v0200-dnd-rpg-reset.js tests/v0200-dnd-reset.mjs
+          git commit -m "Apply v0.20 idempotence patch"
+          git push origin HEAD:agent/v0200-dnd-rpg-reset
