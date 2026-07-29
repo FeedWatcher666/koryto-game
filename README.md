@@ -21,14 +21,18 @@ npm run check
 
 ## D20 v TEST.3
 
+TEST.2 byla vizuálně plochá: CSS otáčelo jediný mnohoúhelník, takže výsledek připomínal minci. TEST.3 tento efekt kompletně nahrazuje.
+
 - skutečný matematický model dvacetistěnu,
 - 12 prostorových vrcholů a 20 trojúhelníkových stěn,
 - perspektivní projekce na canvas,
 - rotace kolem tří os,
 - odlišné stínování každé stěny,
 - měnící se vržený stín a výška nad podložkou,
-- prostorové dosednutí místo ploché rotace jako mince,
+- samostatná fáze letu, dopadu a ustálení,
 - kritická 20, kritická 1, zvuk, vibrace a reakce družiny.
+
+Číslo je překryvné pouze kvůli čitelnosti. Samotné těleso pod ním se prostorově přepočítává v každém snímku.
 
 ## Zásady
 
