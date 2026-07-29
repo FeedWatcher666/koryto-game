@@ -25,15 +25,7 @@ TEST.6 přidává kapitolu **Krysy v JZD** jako první vícefázovou politickou 
 7. tři finální způsoby použití důkazů,
 8. trvalý následek zaznamenaný do kampaně.
 
-Hody nemění pouze reputaci. Průběžně upravují:
-
-- množství důkazů,
-- důvěru pracovníků,
-- tlak Věčného,
-- vztahy se společníky,
-- politické dluhy a páku,
-- obtížnost finální zkoušky,
-- pozdější návrat důsledku.
+Hody nemění pouze reputaci. Průběžně upravují množství důkazů, důvěru pracovníků, tlak Věčného, vztahy se společníky, politické dluhy, páku, obtížnost finální zkoušky a pozdější návrat důsledku.
 
 ## Družina a vybavení
 
@@ -60,12 +52,32 @@ Fyzický model D20 a srozumitelná výhoda/nevýhoda zůstávají uzamčené:
 ```bash
 npm test
 npm run check
+npm run project:validate
 node scripts/build-offline.mjs
 ```
 
-Browser gate prochází všechny tři konce kapitoly, veřejnou a špinavou cestu, čistě komplikovaný průchod bez soft-locku, přesnou náhradu aktivní družiny a přehod první zkoušky po uložení a reloadu.
+Browser gate prochází všechny tři konce kapitoly, veřejnou a špinavou cestu, čistě komplikovaný průchod bez soft-locku, přesnou náhradu aktivní družiny a přehod první zkoušky po uložení a reloadu. CI navíc kontroluje základní přístupnost a Lighthouse skóre z hotového offline balíku.
 
-Každý významný build navíc prochází Codex review podle pravidel v `AGENTS.md`. Nálezy týkající se stavu hry, ukládání, pravidel hodů, družiny a offline balíku jsou blokující do opravy a opakované kontroly.
+Každý významný build prochází Codex review podle pravidel v `AGENTS.md`. Po zeleném CI workflow automaticky požádá Codex o kontrolu přesného head SHA. Nálezy týkající se stavu hry, ukládání, pravidel hodů, družiny, přístupnosti a offline balíku jsou blokující do opravy a opakované kontroly.
+
+## Projektová paměť a skilly
+
+Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů:
+
+- `docs/project-status.md`,
+- `docs/decisions.md`,
+- `docs/next-session.md`,
+- `docs/content-index.md`,
+- `docs/playtest-findings.md`,
+- `docs/tooling.md`.
+
+Repo obsahuje tři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`.
+
+## Veřejný tester
+
+Po aktivaci **Settings → Pages → Source: GitHub Actions** nasazuje `pages.yml` poslední zelený push build na:
+
+`https://feedwatcher666.github.io/koryto-game/`
 
 ## Zásady
 
@@ -74,3 +86,4 @@ Každý významný build navíc prochází Codex review podle pravidel v `AGENTS
 - Save schema 2 a klíč `koryto.clean.v0200`.
 - Offline runtime se generuje z kanonických modulů, ručně se neudržuje.
 - Každý významný quest musí mít přípravu, několik scén, aktivní družinu, protiakci soupeře a trvalý následek.
+- Automatické testy dokazují stabilitu, ne zábavnost; merge vyžaduje výslovné lidské schválení.

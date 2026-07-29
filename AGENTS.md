@@ -2,6 +2,23 @@
 
 This repository contains an offline-first browser RPG. The current implementation is intentionally independent from the archived v0.17 runtime.
 
+## Startup chain
+
+Before changing code, read only the smallest useful context in this order:
+
+1. `docs/project-status.md`
+2. `docs/decisions.md`
+3. `docs/next-session.md`
+4. the relevant module, quest, test, or repo-local skill
+
+Use:
+
+- `.agents/skills/koryto-quest-designer/` for quest design or revision,
+- `.agents/skills/koryto-playtest-auditor/` for playable-build evaluation,
+- `.agents/skills/koryto-release-gate/` before presenting a build.
+
+Do not scan archives or old branches unless the task explicitly needs design reference material.
+
 ## Code Review Rules
 
 ### Playable state flow
@@ -23,4 +40,19 @@ This repository contains an offline-first browser RPG. The current implementatio
 
 ### Review focus
 
-Prioritize game-breaking regressions, state corruption, incorrect rule resolution, offline-build divergence, missing end-to-end coverage, and mobile interaction blockers. Leave formatting and other deterministic checks to CI.
+Prioritize game-breaking regressions, state corruption, incorrect rule resolution, offline-build divergence, missing end-to-end coverage, accessibility regressions, and mobile interaction blockers. Leave formatting and other deterministic checks to CI.
+
+## Mandatory delivery loop
+
+For every meaningful build:
+
+1. inspect the diff,
+2. run unit and syntax checks,
+3. generate and verify the offline build,
+4. run packaged browser, accessibility, and quality gates,
+5. inspect rendered evidence,
+6. request Codex review on the exact green head SHA,
+7. fix P0–P2 findings,
+8. rerun the full gate and request a fresh Codex review.
+
+Never claim a review or playtest happened when it did not. Never merge without explicit user instruction.

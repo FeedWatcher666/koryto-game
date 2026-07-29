@@ -7,14 +7,54 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: koryto-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_DIR: dist/koryto-v0.20.0-clean-test.6
+  PLAYWRIGHT_VERSION: 1.54.2
+  LHCI_VERSION: 0.15.1
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
+
+      - name: Determine required test scope
+        id: scope
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          full=true
+          if [[ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" && -n "${BASE_SHA}" && "${BASE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
+            git fetch --no-tags --depth=1 origin "${BASE_SHA}" || true
+            changed="$(git diff --name-only "${BASE_SHA}" "${GITHUB_SHA}" || true)"
+            printf '%s\n' "${changed}"
+            if [[ -n "${changed}" ]] && ! grep -Eq '^(src/|styles/|tests/|scripts/|index\.html$|package\.json$|VERSION$|\.lighthouserc\.json$|\.github/workflows/)' <<<"${changed}"; then
+              full=false
+            fi
+          fi
+          echo "full=${full}" >> "${GITHUB_OUTPUT}"
 
       - name: Run clean runtime tests
         run: npm test
@@ -22,24 +62,38 @@ jobs:
       - name: Check source syntax
         run: npm run check
 
+      - name: Validate project memory and local skills
+        run: npm run project:validate
+
       - name: Verify no legacy or hand-maintained runtime
         shell: bash
         run: |
           set -euo pipefail
           test -f AGENTS.md
+          test -f docs/project-status.md
+          test -f .agents/skills/koryto-release-gate/SKILL.md
           test ! -e src/app.js
           test ! -e src/v0174-style-stabilization.js
           test ! -e src/runtime.js
           ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles
 
-      - name: Build deterministic offline artifact
-        run: node scripts/build-offline.mjs
+      - name: Build deterministic offline artifact twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build-offline.mjs
+          first="$(find "${BUILD_DIR}" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+          rm -rf "${BUILD_DIR}"
+          node scripts/build-offline.mjs
+          second="$(find "${BUILD_DIR}" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)"
+          test "${first}" = "${second}"
+          echo "Deterministic build digest: ${second}"
 
       - name: Verify offline artifact contract
         shell: bash
         run: |
           set -euo pipefail
-          target="dist/koryto-v0.20.0-clean-test.6"
+          target="${BUILD_DIR}"
           test -f "$target/index.html"
           test -f "$target/src/runtime.js"
           test -f "$target/styles/game.css"
@@ -55,26 +109,127 @@ jobs:
           grep -q 'CO SE VRÁTÍ POZDĚJI' "$target/src/runtime.js"
           ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' "$target/index.html" "$target/src" "$target/styles"
 
-      - name: Install Chromium browser gate
+      - name: Restore Playwright browser cache
+        if: steps.scope.outputs.full == 'true'
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install browser and quality tools
+        if: steps.scope.outputs.full == 'true'
         shell: bash
         run: |
-          npm install --no-save playwright@1.54.2
-          npx playwright install --with-deps chromium
+          set -euo pipefail
+          npm_config_package_lock=false npm install --no-save "playwright@${PLAYWRIGHT_VERSION}" "@lhci/cli@${LHCI_VERSION}"
+          npx playwright install-deps chromium
+          if ! find ~/.cache/ms-playwright -type f -path '*/chrome-linux*/chrome' -perm -111 | grep -q .; then
+            npx playwright install chromium
+          fi
 
       - name: Play all JZD endings and save reload in packaged build
-        run: node tests/browser.mjs dist/koryto-v0.20.0-clean-test.6
+        if: steps.scope.outputs.full == 'true'
+        run: node tests/browser.mjs "${BUILD_DIR}"
+
+      - name: Check accessibility basics in packaged build
+        if: steps.scope.outputs.full == 'true'
+        run: node tests/accessibility.mjs "${BUILD_DIR}"
+
+      - name: Run Lighthouse quality gate
+        if: steps.scope.outputs.full == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || find ~/.cache/ms-playwright -type f -path '*/chrome-linux*/chrome' -perm -111 | head -1)"
+          test -x "${CHROME_PATH}"
+          npx lhci autorun --config=.lighthouserc.json
 
       - name: Upload JZD quest screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
+        if: always() && steps.scope.outputs.full == 'true'
+        id: screenshots
+        uses: actions/upload-artifact@v7
         with:
           name: koryto-v0.20.0-clean-test.6-jzd-screenshots
           path: browser-artifacts
           if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Lighthouse reports
+        if: always() && steps.scope.outputs.full == 'true'
+        id: lighthouse
+        uses: actions/upload-artifact@v7
+        with:
+          name: koryto-v0.20.0-clean-test.6-lighthouse
+          path: lighthouse-artifacts
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Upload playable offline build
-        uses: actions/upload-artifact@v4
+        id: playable
+        uses: actions/upload-artifact@v7
         with:
           name: koryto-v0.20.0-clean-test.6
-          path: dist/koryto-v0.20.0-clean-test.6
+          path: ${{ env.BUILD_DIR }}
           if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish or update PR build report
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        env:
+          TEST_SCOPE: ${{ steps.scope.outputs.full }}
+          PLAYABLE_ID: ${{ steps.playable.outputs.artifact-id }}
+          SCREENSHOT_ID: ${{ steps.screenshots.outputs.artifact-id }}
+          LIGHTHOUSE_ID: ${{ steps.lighthouse.outputs.artifact-id }}
+        with:
+          script: |
+            const marker = '<!-- koryto-ci-report -->';
+            const ok = '${{ job.status }}' === 'success';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const line = (label, value) => `- **${label}:** ${value || 'not produced'}`;
+            const body = [
+              marker,
+              `## Koryto automated build report ${ok ? '✅' : '❌'}`,
+              '',
+              line('Commit', `\`${context.sha}\``),
+              line('Run', `[${context.runId}](${runUrl})`),
+              line('Scope', process.env.TEST_SCOPE === 'true' ? 'full packaged browser + accessibility + Lighthouse' : 'fast source/build checks'),
+              line('Playable artifact ID', process.env.PLAYABLE_ID),
+              line('Screenshot artifact ID', process.env.SCREENSHOT_ID),
+              line('Lighthouse artifact ID', process.env.LIGHTHOUSE_ID),
+              '',
+              ok
+                ? 'The build passed the automated gate. Codex review is requested separately on this exact SHA; human feel testing is still required before merge.'
+                : 'The build is blocked. Do not hand off or request final approval until the failing gate is fixed.'
+            ].join('\n');
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: context.issue.number,
+              per_page: 100
+            });
+            const existing = comments.find(comment => comment.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({...context.repo, comment_id: existing.id, body});
+            } else {
+              await github.rest.issues.createComment({...context.repo, issue_number: context.issue.number, body});
+            }
+
+      - name: Request Codex review on exact green head
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const marker = `<!-- koryto-codex-request:${context.sha} -->`;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: context.issue.number,
+              per_page: 100
+            });
+            if (!comments.some(comment => comment.body?.includes(marker))) {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: `${marker}\n@codex review the exact green head \`${context.sha}\`. Follow AGENTS.md and the koryto-release-gate contract. Prioritize soft locks, save/load corruption, rule resolution, companion stacking, duplicate consequences, packaged-build divergence, accessibility, mobile blockers, and missing complication coverage.`
+              });
+            }

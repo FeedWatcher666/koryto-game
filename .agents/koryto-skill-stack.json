@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "project": "FeedWatcher666/koryto-game",
+  "policy": "Exact reviewed skills only; never install a full catalog into the active context.",
+  "local": [
+    ".agents/skills/koryto-quest-designer",
+    ".agents/skills/koryto-playtest-auditor",
+    ".agents/skills/koryto-release-gate"
+  ],
+  "approvedCapabilities": [
+    "game-design",
+    "game-audio",
+    "frontend-design",
+    "ui-review",
+    "ui-a11y",
+    "webapp-testing",
+    "systematic-debugging",
+    "code-review-checklist",
+    "skill-creator",
+    "algorithmic-art"
+  ]
+}
