@@ -26,7 +26,7 @@ Do not install a full megacatalog. Review and add exact skills only when the cur
 ## Automation
 
 - `clean-rewrite.yml` runs source checks, deterministic build, packaged browser scenarios, accessibility basics, Lighthouse, artifact upload, PR reporting, and automatic Codex review request.
-- `security.yml` runs dependency review and an advisory GitHub Actions security audit.
+- `security.yml` runs an advisory GitHub Actions audit and attempts Dependency Review. Dependency Review becomes a blocking vulnerability gate after Dependency Graph and GitHub Advanced Security are enabled in repository settings.
 - `pages.yml` deploys the last green push build to GitHub Pages after Pages is enabled in repository settings.
 - Dependabot checks GitHub Action versions weekly.
 
