@@ -30,7 +30,7 @@ Record only observed defects or clear human feedback. Do not use this file as a 
 - Evidence: exact-SHA CI screenshots `jzd-dirty-ending-desktop.png` and `jzd-publish-complication-ending.png`
 - Proposed smallest fix: make the HUD non-sticky and move focus plus scroll position to the newly rendered world stage
 - Regression test: packaged browser gate checks computed HUD position and visible scene heading after transitions
-- Status: fixed in TEST.7; packaged verification pending
+- Status: fixed and visually verified in packaged TEST.7
 
 ### P2 — Mobile character sheet delays every scene
 
@@ -43,6 +43,19 @@ Record only observed defects or clear human feedback. Do not use this file as a 
 - Evidence: exact-SHA CI screenshot `jzd-public-ending-mobile.png`
 - Proposed smallest fix: order the world stage before character and support panels below 760 px
 - Regression test: packaged mobile gate compares world-stage and hero-panel geometry after scene transitions
-- Status: fixed in TEST.7; packaged verification pending
+- Status: fixed and visually verified in packaged TEST.7
 
 Human feel testing of agency, pacing, and humor is still pending.
+
+### P1 — TEST.7 rejected a valid TEST.6 save
+
+- Build and commit: `0.20.0-clean-test.7`, `abbb525844c64b5c31bc93172f56f7d1cb46cb42`
+- Device and viewport: returning GitHub Pages session, any viewport
+- Starting state: valid TEST.6 save using save schema 2
+- Reproduction: open TEST.7 with the TEST.6 save stored under `koryto.clean.v0200`
+- Expected: the compatible campaign continues
+- Actual: the display-version mismatch caused `loadGame()` to return `null`
+- Evidence: exact-SHA Codex review `4812546958`
+- Proposed smallest fix: validate compatibility by `saveSchema` and upgrade the display version in memory
+- Regression test: unit test loads a TEST.6/schema-2 save and still rejects schema 1
+- Status: fixed in TEST.7; full exact-SHA verification pending

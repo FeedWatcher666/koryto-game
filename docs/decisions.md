@@ -12,7 +12,7 @@ Priority order: humor, story, roleplaying, collecting and upgrading, strategy, r
 - No legacy runtime imports, compatibility shims, or hand-maintained generated bundle.
 - Canonical ES modules generate one deterministic offline runtime.
 - Offline double-click play remains a release requirement.
-- Save files are validated by schema and version.
+- Save compatibility is governed by the schema. The display/build version is upgraded on load and must not invalidate a save while the schema is unchanged.
 
 ## Game rules
 

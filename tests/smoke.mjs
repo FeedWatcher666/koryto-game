@@ -20,7 +20,7 @@ import {
   resolveCheck,
   resolveRollMode
 } from "../src/rules.js";
-import {createInitialState, SAVE_SCHEMA, STORAGE_KEY} from "../src/state.js";
+import {createInitialState, loadGame, SAVE_SCHEMA, STORAGE_KEY} from "../src/state.js";
 
 function sequence(values) {
   let index = 0;
@@ -30,6 +30,17 @@ function sequence(values) {
 assert.equal(VERSION, "0.20.0-clean-test.7");
 assert.equal(SAVE_SCHEMA, 2);
 assert.equal(STORAGE_KEY, "koryto.clean.v0200");
+
+let storedSave = JSON.stringify({...createInitialState(), version: "0.20.0-clean-test.6"});
+globalThis.localStorage = {
+  getItem: key => (key === STORAGE_KEY ? storedSave : null)
+};
+const upgradedTest6Save = loadGame();
+assert.equal(upgradedTest6Save.saveSchema, SAVE_SCHEMA);
+assert.equal(upgradedTest6Save.version, VERSION, "same-schema TEST.6 saves must upgrade to the current display version");
+storedSave = JSON.stringify({...createInitialState(), saveSchema: 1, version: "0.20.0-clean-test.6"});
+assert.equal(loadGame(), null, "incompatible save schemas must still be rejected");
+
 assert.deepEqual(Object.keys(CLASSES), ["bard", "paladin", "rogue"]);
 assert.deepEqual(Object.keys(COMPANIONS), ["marie", "bohumil", "radek"]);
 assert.doesNotMatch(CLASSES.bard.perk, /jednou za scénu|změnit komplikaci/i, "class card must not advertise an unimplemented conversion");

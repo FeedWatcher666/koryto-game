@@ -71,7 +71,8 @@ export function loadGame() {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
-    if (parsed.saveSchema !== SAVE_SCHEMA || parsed.version !== VERSION) return null;
+    if (parsed.saveSchema !== SAVE_SCHEMA) return null;
+    parsed.version = VERSION;
     return parsed;
   } catch {
     return null;
