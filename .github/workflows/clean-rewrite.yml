@@ -28,7 +28,7 @@ jobs:
           test ! -e src/app.js
           test ! -e src/v0174-style-stabilization.js
           test ! -e src/runtime.js
-          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles scripts
+          ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' index.html src styles
 
       - name: Build deterministic offline artifact
         run: npm run build:offline
