@@ -23,7 +23,12 @@ assert.match(runtime, /data-staff=/);
 assert.match(runtime, /Momentum/);
 assert.match(runtime, /Kompromat/);
 assert.match(runtime, /Opoziční rešerše/);
-assert.equal((runtime.match(/id: '[a-z_]+', title:/g) || []).length >= 21, true, 'contains cards and intents');
+
+const cardSection = runtime.match(/const CARDS = Object\.freeze\(\[([\s\S]*?)\]\);/)?.[1] || '';
+const intentSection = runtime.match(/const INTENTS = Object\.freeze\(\[([\s\S]*?)\]\);/)?.[1] || '';
+assert.equal((cardSection.match(/\{ id: '[a-z_]+', title:/g) || []).length, 15, 'contains exactly 15 tactical cards');
+assert.equal((intentSection.match(/\{ id: '[a-z_]+', front: '[a-z]+', title:/g) || []).length, 6, 'contains exactly 6 rival intents');
+
 assert.match(styles, /\.k190-hand/);
 assert.match(styles, /\.k190-delegates/);
 assert.match(styles, /@media \(max-width: 600px\)/);
