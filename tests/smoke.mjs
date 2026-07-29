@@ -9,7 +9,7 @@ function sequence(values) {
   return () => (values[Math.min(index++, values.length - 1)] - 0.01) / 20;
 }
 
-assert.equal(VERSION, "0.20.0-clean-test.4");
+assert.equal(VERSION, "0.20.0-clean-test.5");
 assert.equal(SAVE_SCHEMA, 1);
 assert.equal(STORAGE_KEY, "koryto.clean.v0200");
 assert.deepEqual(Object.keys(CLASSES), ["bard", "paladin", "rogue"]);
@@ -58,13 +58,19 @@ assert.ok(paragraphMode.advantageSources.length >= 2);
 const dice = fs.readFileSync(new URL("../src/dice.js", import.meta.url), "utf8");
 const physics = fs.readFileSync(new URL("../src/dice-physics.js", import.meta.url), "utf8");
 const ui = fs.readFileSync(new URL("../src/ui.js", import.meta.url), "utf8");
+const diceCss = fs.readFileSync(new URL("../styles/dice3d.css", import.meta.url), "utf8");
 assert.match(dice, /dice-rack/);
 assert.match(dice, /is-discarded/);
 assert.match(dice, /playThrowSequence/);
 assert.match(physics, /FACE_NUMBERS/);
 assert.match(physics, /drawFaceNumber/);
 assert.match(physics, /worn-bakelite/);
-assert.match(ui, /VÝHODA · 2d20, vyšší/);
-assert.match(ui, /NEVÝHODA · 2d20, nižší/);
+assert.match(ui, /HODÍTE 2 KOSTKY/);
+assert.match(ui, /POČÍTÁ SE VYŠŠÍ ČÍSLO/);
+assert.match(ui, /POČÍTÁ SE NIŽŠÍ ČÍSLO/);
+assert.match(ui, /CO SE STALO S KOSTKAMI/);
+assert.match(ui, /Technicky:/);
+assert.match(diceCss, /PROČ JSOU TAM DVĚ KOSTKY/);
+assert.match(diceCss, /NEPOČÍTÁ SE/);
 
-console.log("Koryto CLEAN TEST.4 advantage/disadvantage and D20 polish tests passed.");
+console.log("Koryto CLEAN TEST.5 plain-language advantage/disadvantage tests passed.");
