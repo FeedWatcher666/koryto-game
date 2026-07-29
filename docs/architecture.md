@@ -1,33 +1,34 @@
-# Architecture baseline
+# Architektura čistého rewritu
 
-## Current state
+## Tvrdá hranice
 
-The verified v0.14 build is still distributed as a single self-contained HTML file. It contains:
+Nový runtime nesmí importovat, spouštět ani opravovat žádný soubor z v0.17 nebo starších verzí. Staré buildy slouží pouze jako referenční katalog nápadů, postav, questů a humoru.
 
-- markup and screen containers,
-- CSS and prototype visual styling,
-- game state and save migration,
-- event and quest data,
-- factions and autonomous world turns,
-- companion ambitions and conflicts,
-- debate combat,
-- election and coalition systems,
-- simulation and audit helpers,
-- embedded pixel-map asset.
+## Moduly
 
-## Main technical risk
+- `src/data.js` — čistá data tříd, původů, atributů, družiny a prvních scén.
+- `src/rules.js` — d20, obtížnost, stupně výsledků a následky.
+- `src/state.js` — nový stav hry a nový save kontrakt bez migrace legacy dat.
+- `src/ui.js` — jediný renderer celé hry.
+- `src/main.js` — orchestrace scén a vstupů.
+- `styles/game.css` — jediná stylová vrstva.
 
-A single-file build makes unrelated systems easy to change accidentally and makes it possible to test a different build than the one distributed. The first refactor must therefore preserve behavior before improving design.
+## Zakázané vzory
 
-## Intended boundaries
+- vrstvení oprav nad historickými renderery,
+- několik souběžných UI systémů,
+- skryté legacy obrazovky,
+- staré save schema,
+- kompatibilní shim pro staré globální objekty,
+- mřížkový pohyb, deckbuilder a administrativní dashboard.
 
-- `state` owns canonical game state and defaults.
-- `save-system` owns serialization, versioning and migration.
-- `data` contains declarative content only.
-- domain modules own rules but not direct DOM manipulation.
-- `ui` renders state and dispatches player intents.
-- tests verify content integrity, migration and representative play flows.
+## První vertikální řez
 
-## Distribution rule
-
-`main` contains the last accepted playable version. Experimental work lives in branches and enters `main` only through reviewed pull requests.
+1. Tvorba postavy se třemi třídami a třemi původy.
+2. Šest skutečných atributů.
+3. Ztracení na špatné zastávce.
+4. První transparentní d20 zkouška.
+5. Propiska na řetízku jako přehod za cenu.
+6. Marie nebo Bohumil jako první člen družiny.
+7. Registrace kandidatury s několika řešeními.
+8. První politický dluh a otevření kapitoly Krysy v JZD.

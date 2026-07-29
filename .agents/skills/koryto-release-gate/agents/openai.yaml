@@ -1,0 +1,3 @@
+interface:
+  display_name: "Koryto Release Gate"
+  short_description: "Block untested builds and require final Codex review"

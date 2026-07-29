@@ -1,0 +1,64 @@
+name: Repository security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - agent/v0200-clean-rewrite
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Review dependency changes when repository support is enabled
+        id: dependency-review
+        continue-on-error: true
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate
+      - name: Report dependency review availability
+        if: always()
+        shell: bash
+        env:
+          REVIEW_OUTCOME: ${{ steps.dependency-review.outcome }}
+        run: |
+          if [[ "${REVIEW_OUTCOME}" == "success" ]]; then
+            echo "Dependency review completed and found no blocking vulnerable additions."
+          else
+            echo "::warning::Dependency Review did not run successfully. Enable Dependency Graph and GitHub Advanced Security in repository security settings to make this gate blocking."
+          fi
+
+  actions-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Audit GitHub Actions with zizmor
+        continue-on-error: true
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d
+        with:
+          inputs: .github/workflows
+          advanced-security: false
+          annotations: true
+      - name: Explain advisory status
+        run: echo "zizmor is advisory until all third-party and official actions are SHA-pinned."

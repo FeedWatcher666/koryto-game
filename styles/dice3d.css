@@ -1,0 +1,106 @@
+/* CLEAN TEST.5: volumetric D20 with plain-language advantage/disadvantage teaching. */
+.dice-stage { width: min(860px, 100%); }
+.roll-mode-banner { position: relative; display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 3px 12px; width: min(620px, 100%); margin: 7px auto 9px; padding: 12px 15px; border: 3px solid #6f4a20; background: #fff4cfeb; box-shadow: 0 5px 0 #43270f4a; font-family: Arial, sans-serif; text-transform: uppercase; }
+.roll-mode-banner::before { grid-column: 1 / -1; content: "PRAVIDLO TOHOTO HODU"; color: #795425; font: 900 .62rem/1 Arial, sans-serif; letter-spacing: .12em; }
+.roll-mode-banner strong { color: #76261b; font-size: 1rem; letter-spacing: .04em; }
+.roll-mode-banner span { font: 900 .78rem/1.2 Arial, sans-serif; letter-spacing: .035em; }
+.roll-mode-banner::after { grid-column: 1 / -1; margin-top: 5px; padding-top: 7px; border-top: 1px solid #6f4a2047; color: #39230f; font: 900 .86rem/1.25 Arial, sans-serif; letter-spacing: .02em; }
+.roll-mode-banner.mode-advantage { border-color: #2e613a; box-shadow: 0 5px 0 #183a2047, inset 0 -4px #2e613a24; }
+.roll-mode-banner.mode-advantage::before { content: "PROČ JSOU TAM DVĚ KOSTKY?"; color: #2e613a; }
+.roll-mode-banner.mode-advantage::after { content: "HODÍTE DVĚ D20. ZAPOČÍTÁ SE VYŠŠÍ ČÍSLO."; }
+.roll-mode-banner.mode-disadvantage { border-color: #8d2a20; box-shadow: 0 5px 0 #53140f47, inset 0 -4px #8d2a2024; }
+.roll-mode-banner.mode-disadvantage::before { content: "PROČ JSOU TAM DVĚ KOSTKY?"; color: #8d2a20; }
+.roll-mode-banner.mode-disadvantage::after { content: "HODÍTE DVĚ D20. ZAPOČÍTÁ SE NIŽŠÍ ČÍSLO."; }
+.roll-mode-sources { max-width: 650px; margin: 0 auto 8px; padding: 0; list-style: none; color: #66491f; font: 700 .75rem/1.35 Arial, sans-serif; }
+.roll-mode-sources li::before { content: "Důvod: "; color: #8a2e22; font-weight: 900; }
+
+.dice-rack { display: flex; justify-content: center; align-items: flex-end; gap: clamp(4px, 2.2vw, 22px); min-height: 286px; margin: 0 auto; }
+.dice-unit { position: relative; display: grid; justify-items: center; width: min(286px, 38vw); transition: opacity .35s ease, filter .35s ease, transform .45s cubic-bezier(.18,.89,.32,1.28); }
+.dice-rack.is-single .dice-unit { width: min(310px, 76vw); }
+.dice-perspective { position: relative; width: 100%; aspect-ratio: 1; min-height: 226px; isolation: isolate; }
+.dice-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; filter: drop-shadow(0 15px 19px rgba(25, 8, 3, .32)); transition: filter .35s ease, opacity .35s ease; }
+.dice-readout { position: relative; z-index: 4; display: grid; place-items: center; min-width: 62px; min-height: 40px; margin-top: -33px; padding: 4px 13px; border: 2px solid #6d431c; color: #fff5d2; background: linear-gradient(#4b2515, #1d0b06); box-shadow: 0 5px 0 #160703, 0 9px 18px #0006; font: 900 1.55rem/1 Georgia, serif; transition: transform .35s ease, opacity .35s ease, filter .35s ease; }
+.dice-selection { min-height: 19px; margin-top: 8px; color: #66451e; font: 900 .68rem/1 Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.is-rolling .dice-readout { animation: d20-readout-rattle .16s ease-in-out infinite alternate; opacity: .76; }
+.is-landed .dice-unit.is-kept { transform: translateY(-9px) scale(1.055); }
+.is-landed .dice-unit.is-kept .dice-canvas { filter: drop-shadow(0 17px 20px rgba(25, 8, 3, .38)) drop-shadow(0 0 24px rgba(255, 201, 94, .32)); }
+.is-landed .dice-unit.is-kept .dice-readout { border-color: #bf8b2c; color: #fff7c6; background: linear-gradient(#714116, #2d1607); box-shadow: 0 5px 0 #1b0903, 0 0 22px #e5ad3c55; }
+.is-landed .dice-unit.is-discarded { opacity: .32; filter: saturate(.08) grayscale(.75); transform: translateY(8px) scale(.86); }
+.is-landed .dice-unit.is-discarded::after { content: ""; position: absolute; left: 12%; right: 12%; top: 46%; z-index: 6; height: 7px; transform: rotate(-10deg); background: #a92218e8; box-shadow: 0 2px #f4d098; }
+.is-landed .dice-unit.is-discarded .dice-readout { text-decoration: line-through 5px #c12f23; }
+.is-landed .dice-selection { display: inline-grid; place-items: center; min-width: 112px; min-height: 30px; padding: 6px 10px; border: 2px solid currentColor; font-size: 0; background: #f4e5bb; }
+.is-landed .dice-selection::after { font: 900 .72rem/1 Arial, sans-serif; letter-spacing: .08em; }
+.is-landed .dice-unit.is-kept .dice-selection { color: #1f5c2f; background: #dcefc7; }
+.is-landed .dice-unit.is-kept .dice-selection::after { content: "POČÍTÁ SE"; }
+.is-landed .dice-unit.is-discarded .dice-selection { color: #8c241b; background: #efc7bb; }
+.is-landed .dice-unit.is-discarded .dice-selection::after { content: "NEPOČÍTÁ SE"; }
+.is-critical .dice-unit.is-kept .dice-canvas { filter: drop-shadow(0 15px 18px rgba(62,35,4,.36)) drop-shadow(0 0 38px rgba(255,207,74,.8)); }
+.is-fumble .dice-unit.is-kept .dice-canvas { filter: drop-shadow(0 15px 18px rgba(45,3,2,.45)) drop-shadow(0 0 29px rgba(178,35,23,.66)); }
+
+.roll-lesson { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 16px 0 20px; }
+.roll-lesson article { display: grid; gap: 5px; padding: 12px; border: 2px solid #765020; background: #fff2c9b5; box-shadow: 0 4px 0 #44280f24; }
+.roll-lesson article > b { width: fit-content; padding: 4px 7px; background: #3f2815; color: #fff3ce; font: 900 .72rem/1 Arial, sans-serif; }
+.roll-lesson article > strong { font: 900 .9rem/1.1 Arial, sans-serif; text-transform: uppercase; }
+.roll-lesson article > span { color: #60451f; font: 700 .76rem/1.35 Arial, sans-serif; }
+.roll-lesson article em { font-style: normal; font-weight: 900; text-transform: uppercase; }
+.roll-lesson .mode-advantage { border-color: #37663e; }
+.roll-lesson .mode-advantage strong, .roll-lesson .mode-advantage em { color: #23512c; }
+.roll-lesson .mode-disadvantage { border-color: #8b2a20; }
+.roll-lesson .mode-disadvantage strong, .roll-lesson .mode-disadvantage em { color: #79251c; }
+
+.plain-roll-rule { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin-top: 10px; padding: 10px; border: 2px solid #6c4a22; text-align: left; background: #fff1c7bd; }
+.plain-roll-rule > small { grid-column: 1 / -1; color: #725226; font: 900 .6rem/1 Arial, sans-serif; letter-spacing: .1em; }
+.plain-roll-rule > b { grid-row: span 2; align-self: stretch; display: grid; place-items: center; min-width: 92px; padding: 7px; color: #fff2cc; background: #412715; font: 900 .72rem/1.15 Arial, sans-serif; }
+.plain-roll-rule > strong { font: 900 .78rem/1.2 Arial, sans-serif; }
+.plain-roll-rule > span { color: #5e431f; font: 700 .7rem/1.3 Arial, sans-serif; }
+.plain-roll-rule.mode-advantage { border-color: #37663e; box-shadow: inset 5px 0 #3e7045; }
+.plain-roll-rule.mode-advantage > small, .plain-roll-rule.mode-advantage > strong { color: #23512c; }
+.plain-roll-rule.mode-disadvantage { border-color: #8b2a20; box-shadow: inset 5px 0 #982f25; }
+.plain-roll-rule.mode-disadvantage > small, .plain-roll-rule.mode-disadvantage > strong { color: #79251c; }
+.roll-source-preview { margin-top: 7px; padding: 6px 8px; color: #5d431e !important; background: #f5e2aa80; font-style: normal !important; line-height: 1.35 !important; }
+.technical-roll { margin-top: 5px; color: #765a32 !important; font-size: .64rem !important; opacity: .82; }
+.action-card.roll-advantage { box-shadow: inset 5px 0 #3e7045; }
+.action-card.roll-disadvantage { box-shadow: inset 5px 0 #982f25; }
+.compact-roll-reminder { margin: 12px 0 16px; padding: 10px 12px; border-left: 5px solid #8b672d; background: #f3dfaa9e; color: #553b1b; font: 700 .78rem/1.4 Arial, sans-serif; }
+
+.result-roll-pair { display: flex; justify-content: center; align-items: center; gap: 13px; margin: 0 auto 18px; }
+.result-roll-pair span { position: relative; display: grid; place-items: center; min-width: 104px; min-height: 104px; border: 4px solid #684019; background: linear-gradient(145deg,#a64a2b,#4b1711); box-shadow: 0 8px 0 #32100b, 0 15px 25px #0007; color: #fff4d2; }
+.result-roll-pair b { font: 900 3rem/1 Georgia,serif; }
+.result-roll-pair small { margin-top: 5px; font: 900 .65rem/1 Arial,sans-serif; letter-spacing: .07em; text-transform: uppercase; }
+.result-roll-pair .kept { transform: translateY(-5px) scale(1.04); border-color: #c18a2a; box-shadow: 0 8px 0 #32100b, 0 0 28px #e2ac3f66; }
+.result-roll-pair .discarded { opacity: .42; filter: grayscale(.75); transform: scale(.88); }
+.result-roll-pair .discarded::after { content:""; position:absolute; left:8%; right:8%; top:50%; height:7px; transform:rotate(-12deg); background:#b8382c; }
+.human-roll-summary { display: grid; gap: 5px; margin: 0 auto 18px; padding: 12px 14px; border: 3px solid #6a451d; background: #fff0c8; color: #3c2711; box-shadow: 0 5px 0 #3d220f36; }
+.human-roll-summary small { color: #7e5927; font: 900 .62rem/1 Arial, sans-serif; letter-spacing: .11em; }
+.human-roll-summary strong { font: 900 .9rem/1.4 Arial, sans-serif; }
+.technical-result { margin: 10px 0; }
+.technical-result summary { cursor: pointer; color: #6f5128; font: 800 .7rem/1.2 Arial, sans-serif; text-decoration: underline; }
+.technical-result .formula { margin-top: 8px; }
+
+@keyframes d20-readout-rattle {
+  from { transform: translate(-2px,1px) rotate(-1deg); }
+  to { transform: translate(2px,-1px) rotate(1deg); }
+}
+
+@media (max-width: 760px) {
+  .dice-stage { padding: 17px 10px; }
+  .dice-rack { min-height: 205px; gap: 1px; }
+  .dice-unit { width: min(170px, 43vw); }
+  .dice-rack.is-single .dice-unit { width: min(238px, 72vw); }
+  .dice-perspective { min-height: 170px; }
+  .dice-readout { min-width: 52px; min-height: 34px; margin-top: -26px; font-size: 1.3rem; }
+  .dice-selection { font-size: .58rem; }
+  .roll-mode-banner { width: 100%; grid-template-columns: 1fr; text-align: center; }
+  .roll-mode-banner::before, .roll-mode-banner::after { grid-column: 1; }
+  .roll-lesson { grid-template-columns: 1fr; }
+  .plain-roll-rule { grid-template-columns: 1fr; }
+  .plain-roll-rule > b { grid-row: auto; min-width: 0; }
+  .result-roll-pair span { min-width: 88px; min-height: 88px; }
+  .result-roll-pair b { font-size: 2.55rem; }
+  .human-roll-summary strong { font-size: .82rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-rolling .dice-readout { animation-duration: .12s; animation-iteration-count: 1; }
+  .dice-unit, .dice-canvas, .dice-readout { transition-duration: .12s; }
+}

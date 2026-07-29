@@ -1,0 +1,3 @@
+interface:
+  display_name: "Koryto Playtest Auditor"
+  short_description: "Audit playability, agency, state, and mobile UX"

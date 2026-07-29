@@ -1,0 +1,84 @@
+/* CLEAN TEST.7 — first full quest with corrected playability hierarchy. */
+.quest-scene { overflow: hidden; }
+.quest-scene > h1 { max-width: 22ch; }
+.quest-brief,
+.quest-stakes,
+.quest-result-strip,
+.chapter-recap { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin: 18px 0; }
+.quest-brief > div,
+.quest-result-strip > span,
+.chapter-recap > div { padding: 12px; border: 1px solid #76572f; background: rgba(255,245,210,.14); }
+.quest-brief small,
+.chapter-recap small { display: block; margin-bottom: 5px; color: #b8914e; font: 800 .65rem/1 Arial,sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.quest-brief strong,
+.chapter-recap strong { display: block; line-height: 1.25; }
+.quest-stakes { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.quest-meter { display: grid; gap: 6px; min-width: 0; }
+.quest-meter > span { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.quest-meter small { color: #a98b55; font: 800 .66rem/1 Arial,sans-serif; text-transform: uppercase; letter-spacing: .05em; }
+.quest-meter b { color: #f3d28a; }
+.quest-meter > i { display: block; height: 7px; overflow: hidden; border: 1px solid #6e522b; background: #100d08; }
+.quest-meter > i > em { display: block; height: 100%; background: linear-gradient(90deg,#8a3024,#d29c42); }
+.quest-status-panel { display: grid; gap: 11px; }
+.quest-status-panel .quest-meter + .quest-meter { padding-top: 9px; border-top: 1px solid rgba(183,143,70,.2); }
+
+.selection-counter { display: inline-flex; gap: 7px; margin: 10px 0 14px; padding: 7px 10px; border: 2px solid #7a572d; background: #1a150d; color: #d9b56e; font: 800 .75rem/1 Arial,sans-serif; text-transform: uppercase; }
+.quest-companion-grid,
+.quest-item-grid,
+.rival-choice-grid { display: grid; gap: 11px; margin: 14px 0 22px; }
+.quest-companion-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.quest-item-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.quest-companion-card,
+.quest-item-card,
+.rival-choice-card { display: grid; align-content: start; gap: 7px; min-width: 0; padding: 14px; border: 2px solid #624621; color: #e8d6aa; background: linear-gradient(145deg,#2a2215,#17120b); text-align: left; box-shadow: 0 6px 0 #0c0805; transition: transform .15s ease,border-color .15s ease,background .15s ease; }
+.quest-companion-card:hover,
+.quest-item-card:hover,
+.rival-choice-card:hover { transform: translateY(-2px); border-color: #ba8736; }
+.quest-companion-card.selected,
+.quest-item-card.selected { border-color: #d0a147; background: linear-gradient(145deg,#4b3518,#21170d); box-shadow: 0 6px 0 #0c0805,0 0 0 2px rgba(219,170,74,.18); }
+.quest-companion-card > b,
+.quest-item-card > b { font-size: 1.65rem; }
+.quest-companion-card > strong,
+.quest-item-card > strong,
+.rival-choice-card > strong { color: #f5d88f; font-size: 1rem; line-height: 1.15; }
+.quest-companion-card > span,
+.quest-item-card > span,
+.rival-choice-card > span { color: #c7b48b; font-size: .82rem; line-height: 1.4; }
+.quest-companion-card > p { margin: 2px 0; color: #aa9877; font-size: .77rem; line-height: 1.4; }
+.quest-companion-card > small,
+.quest-item-card > small,
+.rival-choice-card > small { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(218,177,91,.2); color: #d0aa65; font-size: .72rem; line-height: 1.4; }
+.preparation-scene > h2 { margin-top: 22px; color: #e5c274; }
+
+.rival-scene blockquote { margin: 18px 0; padding: 16px 18px; border-left: 5px solid #9a3025; background: #21120f; color: #f1d49a; font: 700 1rem/1.5 Georgia,serif; }
+.rival-choice-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.rival-choice-card:first-child { border-color: #8f3629; }
+.rival-choice-card:nth-child(2) { border-color: #8a6b32; }
+.rival-choice-card:nth-child(3) { border-color: #446b46; }
+
+.quest-result-strip { grid-template-columns: repeat(3,minmax(0,1fr)); max-width: 600px; margin-inline: auto; }
+.quest-result-strip > span { display: flex; justify-content: space-between; gap: 8px; color: #ceb77f; font: 800 .72rem/1 Arial,sans-serif; text-transform: uppercase; }
+.quest-result-strip b { color: #fff0bd; }
+.quest-ending-copy { max-width: 66ch; font-size: 1.04rem; line-height: 1.6; }
+.consequence-list { margin: 20px 0; padding: 15px 18px; border: 2px solid #76562d; background: rgba(39,26,12,.72); }
+.consequence-list ul { display: grid; gap: 8px; margin: 8px 0 0; padding-left: 19px; }
+.consequence-list li { color: #dac394; line-height: 1.45; }
+.quest-complete .chapter-recap { grid-template-columns: repeat(3,minmax(0,1fr)); }
+
+@media (max-width: 980px) {
+  .quest-companion-grid,
+  .quest-item-grid,
+  .rival-choice-grid { grid-template-columns: 1fr; }
+  .quest-brief,
+  .quest-stakes,
+  .quest-result-strip,
+  .quest-complete .chapter-recap { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .quest-scene { padding-inline: 13px; }
+  .quest-companion-card,
+  .quest-item-card,
+  .rival-choice-card { padding: 12px; }
+  .selection-counter { width: 100%; justify-content: center; }
+}

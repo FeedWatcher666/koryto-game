@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "project": "FeedWatcher666/koryto-game",
+  "policy": "Exact reviewed skills only; never install a full catalog into the active context.",
+  "local": [
+    ".agents/skills/koryto-quest-designer",
+    ".agents/skills/koryto-ui-director",
+    ".agents/skills/koryto-playtest-auditor",
+    ".agents/skills/koryto-release-gate"
+  ],
+  "referenceCapabilities": [
+    "game-design",
+    "frontend-design",
+    "ui-review",
+    "ui-a11y",
+    "webapp-testing",
+    "systematic-debugging",
+    "code-review-checklist",
+    "skill-creator",
+    "algorithmic-art"
+  ],
+  "auditedSources": [
+    "sdras/awesome-actions",
+    "richenyu/codex-smart-project-memory",
+    "Egonex-AI/Understand-Anything",
+    "sickn33/agentic-awesome-skills",
+    "Yuan1z0825/nature-skills",
+    "VoltAgent/awesome-agent-skills"
+  ],
+  "deferred": [
+    {
+      "capability": "repository-knowledge-graph",
+      "source": "Egonex-AI/Understand-Anything",
+      "adoptWhen": "The active runtime exceeds 30 source modules or a second regular contributor needs cross-module onboarding."
+    }
+  ]
+}

@@ -1,50 +1,59 @@
-# Koryto
+# Koryto v0.20.0 CLEAN TEST.7
 
-Satirické české politické RPG, ve kterém hráč začíná v Dolních Vejprnicích a přes komunální politiku, kauzy, družinu, debaty, volby a koaliční vyjednávání buduje vlastní cestu ke korytu.
-
-## Aktuální stabilní verze
-
-**v0.14 – Živý politický svět**
-
-Hlavní systémy:
-
-- otevřená mapa obce a časový tlak,
-- autonomní tahy frakcí,
-- politické dluhy, sliby a protislužby,
-- družina s loajalitou, ambicemi a konflikty,
-- větvené kauzy včetně Operace SILO,
-- vícekolové debatní bossfighty,
-- volby, mandáty a koaliční vyjednávání,
-- migrace uložených her,
-- první pixel-artová mapová vrstva.
-
-## Struktura repozitáře
-
-```text
-koryto-game/
-├── index.html
-├── AGENTS.md
-├── VERSION
-├── docs/
-│   ├── architecture.md
-│   ├── codex-task-v0.14.1.md
-│   └── v0.14/
-├── builds/
-│   └── v0.14/
-└── assets/
-    └── reference/
-```
-
-## Nejbližší technický krok
-
-Větev `codex/v0.14.1-modular-refactor` je určena pro bezpečné rozdělení současného jednosouborového HTML do modulů bez změny herního chování.
-
-Codex musí před refaktoringem přečíst `AGENTS.md` a `docs/codex-task-v0.14.1.md`.
+Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
 
 ## Spuštění
 
-Po nahrání stabilního buildu otevřete `index.html` v prohlížeči. Hra nevyžaduje server ani instalaci.
+Hratelný offline balík vzniká příkazem:
 
-## Stav projektu
+```bash
+node scripts/build-offline.mjs
+```
 
-Projekt je soukromý a zatím bez licence. Zdrojový kód ani grafické podklady nejsou určeny k dalšímu šíření bez souhlasu vlastníka.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.7/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+
+## První plnohodnotný quest
+
+TEST.7 drží obsah kapitoly **Krysy v JZD** beze změny a opravuje hierarchii hraní podle ručního vizuálního auditu TEST.6. Nová scéna se po každém přechodu dostane do zorného pole, vysoký HUD už nepřekrývá obsah a na mobilu se rozhodnutí i závěr kapitoly zobrazují před listem postavy a podpůrnými statistikami.
+
+Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se použije jediná nejsilnější relevantní pomoc; bonusy různých společníků se nesčítají do jednoho hodu.
+
+## Kostky
+
+- běžný hod: jedna d20,
+- výhoda: dvě d20 a vyšší výsledek,
+- nevýhoda: dvě d20 a nižší výsledek,
+- ponechaná a vyřazená kostka jsou jasně označené,
+- technický výpočet je dostupný až v detailu.
+
+## Ověření
+
+```bash
+npm test
+npm run check
+npm run project:validate
+node scripts/build-offline.mjs
+```
+
+Browser gate prochází všechny tři konce kapitoly, veřejnou a špinavou cestu, čistě komplikovaný průchod bez soft-locku, přesnou náhradu aktivní družiny a přehod první zkoušky po uložení a reloadu. CI navíc kontroluje základní přístupnost a Lighthouse skóre z hotového offline balíku.
+
+Každý významný build prochází Codex review podle pravidel v `AGENTS.md`. CI testuje a reportuje skutečný PR head SHA. Po zeleném gate musí být review vyžádáno z připojeného uživatelského účtu na stejném SHA; komentář vytvořený účtem GitHub Actions se za Codex review nepovažuje.
+
+## Projektová paměť a skilly
+
+Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů v `docs/`. Repo obsahuje čtyři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, UI a art direction, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`. Vizuální severky a pravidla jejich převodu do živého rozhraní jsou v `docs/visual-direction.md`.
+
+## Veřejný tester
+
+Po aktivaci **Settings → Pages → Source: GitHub Actions** nasazuje `pages.yml` pouze poslední zelený build z `main` na:
+
+`https://feedwatcher666.github.io/koryto-game/`
+
+## Zásady
+
+- Staré buildy jsou pouze obsahová a designová reference.
+- Žádný import legacy skriptů.
+- Save schema 2 a klíč `koryto.clean.v0200`.
+- Offline runtime se generuje z kanonických modulů, ručně se neudržuje.
+- Každý významný quest musí mít přípravu, několik scén, aktivní družinu, protiakci soupeře a trvalý následek.
+- Automatické testy dokazují stabilitu, ne zábavnost; merge vyžaduje výslovné lidské schválení.
