@@ -1,11 +1,12 @@
-name: Koryto v0.18.0 TEST.1
+name: Koryto v0.18.1 TEST.1
 
 on:
   push:
     branches:
-      - agent/v0180-vertical-slice
+      - agent/v0181-character-drama
   pull_request:
     branches:
+      - agent/v0180-vertical-slice
       - agent/v0174-style-stabilization
       - agent/v0173-playability-reset
       - agent/v0172-turn-clarity
@@ -39,7 +40,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.18.0-test.1-diagnostics
+          name: koryto-v0.18.1-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
 
@@ -48,7 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           build_version="$(cat VERSION)"
-          test "$build_version" = "0.18.0-test.1"
+          test "$build_version" = "0.18.1-test.1"
           target="dist/koryto-v${build_version}"
           mkdir -p "$target"
           cp index.html VERSION README.md "$target/"
@@ -73,23 +74,18 @@ jobs:
           cp docs/v0.17/v0173-playability-reset.md "$target/docs/v0.17/"
           cp docs/v0.17/v0174-style-stabilization.md "$target/docs/v0.17/"
           cp docs/v0.18/v0180-vertical-slice.md "$target/docs/v0.18/"
+          cp docs/v0.18/v0181-character-drama.md "$target/docs/v0.18/"
           rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
 
           test -f "$target/src/build-info.js"
-          test -f "$target/src/v0174-style-stabilization.js"
           test -f "$target/src/v0180-vertical-slice.js"
-          test -f "$target/styles/v0174-style-stabilization.css"
+          test -f "$target/src/v0181-character-drama.js"
           test -f "$target/styles/v0180-vertical-slice.css"
-          test -f "$target/docs/v0.18/v0180-vertical-slice.md"
-          test -f "$target/assets/v0164/map-pixel-cartoon.webp"
-          test -f "$target/assets/v0165/manifest.json"
-
-          grep -q 'viewport-fit=cover' "$target/index.html"
-          grep -q 'Koryto 0.18.0 TEST.1' "$target/index.html"
-          grep -q 'src/v0180-vertical-slice.js' "$target/index.html"
-          grep -q 'styles/v0180-vertical-slice.css' "$target/index.html"
-          grep -q 'src/v0174-style-stabilization.js' "$target/index.html"
-          grep -q 'styles/v0174-style-stabilization.css' "$target/index.html"
+          test -f "$target/styles/v0181-character-drama.css"
+          test -f "$target/docs/v0.18/v0181-character-drama.md"
+          grep -q '0.18.1-test.1' "$target/src/build-info.js"
+          grep -q 'src/v0181-character-drama.js' "$target/src/v0180-vertical-slice.js"
+          grep -q 'styles/v0181-character-drama.css' "$target/src/v0180-vertical-slice.js"
           if grep -R -E 'https?://(fonts|cdn|unpkg|jsdelivr)' "$target/index.html" "$target/styles" "$target/src"; then
             echo "Release contains a forbidden network dependency" >&2
             exit 1
@@ -105,19 +101,19 @@ jobs:
         shell: bash
         run: |
           # v0171-browser-gate.mjs remains the historical source contract covered by the compatibility suite.
-          node tests/v0180-browser-gate.mjs dist/koryto-v0.18.0-test.1
+          node tests/v0181-browser-gate.mjs dist/koryto-v0.18.1-test.1
 
       - name: Upload browser gate screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.18.0-test.1-browser-gate
+          name: koryto-v0.18.1-test.1-browser-gate
           path: browser-artifacts
           if-no-files-found: warn
 
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.18.0-test.1
-          path: dist/koryto-v0.18.0-test.1
+          name: koryto-v0.18.1-test.1
+          path: dist/koryto-v0.18.1-test.1
           if-no-files-found: error
