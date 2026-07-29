@@ -13,4 +13,4 @@ TEST.3 používá skutečný model dvacetistěnu vykreslený bez externí knihov
 - měnící se vržený stín,
 - samostatná fáze letu, dopadu a ustálení.
 
-Číslo je překryvné pouze kvůli čitelnosti. Těleso pod ním je skutečně prostorově přepočítávané v každém snímku.
+Číslo je překryvné pouze kvůli čitelnosti. Těleso pod ním je skutečně prostorově přepočítávané v každém snímku. Browser gate porovnává dva snímky canvasu a musí potvrdit změnu geometrie i rozdílné osvětlení ploch.
