@@ -43,7 +43,7 @@ K Marii Čisté a Bohumilu Tichému přibyl Radek Šroub, údržbář bývalého
 - klíč od archivu,
 - termosku odborového čaje.
 
-Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se číselné bonusy nekumulují bez omezení; použije se nejsilnější relevantní pomoc.
+Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se použije jediná nejsilnější relevantní pomoc; bonusy různých společníků se nesčítají do jednoho hodu.
 
 ## Kostky
 
@@ -63,7 +63,9 @@ npm run check
 node scripts/build-offline.mjs
 ```
 
-Browser gate prochází dvě odlišné verze celé kapitoly: veřejnou cestu se svědky a špinavou výměnu důkazů za politickou páku.
+Browser gate prochází všechny tři konce kapitoly, veřejnou a špinavou cestu, čistě komplikovaný průchod bez soft-locku, přesnou náhradu aktivní družiny a přehod první zkoušky po uložení a reloadu.
+
+Každý významný build navíc prochází Codex review podle pravidel v `AGENTS.md`. Nálezy týkající se stavu hry, ukládání, pravidel hodů, družiny a offline balíku jsou blokující do opravy a opakované kontroly.
 
 ## Zásady
 
