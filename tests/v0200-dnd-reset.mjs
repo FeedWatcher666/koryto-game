@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const js = fs.readFileSync(new URL('../src/v0200-dnd-rpg-reset.js', import.meta.url), 'utf8');
+const hostFix = fs.readFileSync(new URL('../src/v0200-objective-host-fix.js', import.meta.url), 'utf8');
+const buildInfo = fs.readFileSync(new URL('../src/build-info.js', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../styles/v0200-dnd-rpg-reset.css', import.meta.url), 'utf8');
 const legacy = fs.readFileSync(new URL('../src/app.js', import.meta.url), 'utf8');
 const index = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -18,6 +20,9 @@ assert.match(js, /Bohumil Tichý/);
 assert.match(js, /v0200Objective/);
 assert.match(js, /v0200-details-open/);
 assert.match(js, /app\(\)\.showEvent\("intro"\)/);
+assert.match(hostFix, /#v0165Root:not\(\[hidden\]\) \.k165-shell/);
+assert.match(hostFix, /insertAdjacentElement\("afterend", objective\)/);
+assert.match(buildInfo, /src\/v0200-objective-host-fix\.js/);
 assert.match(css, /v0200-focus-mode/);
 assert.match(css, /v0200-tutorial/);
 
