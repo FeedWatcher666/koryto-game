@@ -21,14 +21,16 @@ env:
   BUILD_DIR: dist/koryto-v0.20.0-clean-test.6
   PLAYWRIGHT_VERSION: 1.54.2
   LHCI_VERSION: 0.15.1
+  REVIEW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout exact head
         uses: actions/checkout@v6
         with:
+          ref: ${{ env.REVIEW_SHA }}
           fetch-depth: 2
           persist-credentials: false
 
@@ -48,7 +50,7 @@ jobs:
           full=true
           if [[ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" && -n "${BASE_SHA}" && "${BASE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
             git fetch --no-tags --depth=1 origin "${BASE_SHA}" || true
-            changed="$(git diff --name-only "${BASE_SHA}" "${GITHUB_SHA}" || true)"
+            changed="$(git diff --name-only "${BASE_SHA}" "${REVIEW_SHA}" || true)"
             printf '%s\n' "${changed}"
             if [[ -n "${changed}" ]] && ! grep -Eq '^(src/|styles/|tests/|scripts/|index\.html$|package\.json$|VERSION$|\.lighthouserc\.json$|\.github/workflows/)' <<<"${changed}"; then
               full=false
@@ -187,12 +189,13 @@ jobs:
             const marker = '<!-- koryto-ci-report -->';
             const ok = '${{ job.status }}' === 'success';
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const sha = process.env.REVIEW_SHA;
             const line = (label, value) => `- **${label}:** ${value || 'not produced'}`;
             const body = [
               marker,
               `## Koryto automated build report ${ok ? '✅' : '❌'}`,
               '',
-              line('Commit', `\`${context.sha}\``),
+              line('Exact tested head', `\`${sha}\``),
               line('Run', `[${context.runId}](${runUrl})`),
               line('Scope', process.env.TEST_SCOPE === 'true' ? 'full packaged browser + accessibility + Lighthouse' : 'fast source/build checks'),
               line('Playable artifact ID', process.env.PLAYABLE_ID),
@@ -200,7 +203,7 @@ jobs:
               line('Lighthouse artifact ID', process.env.LIGHTHOUSE_ID),
               '',
               ok
-                ? 'The build passed the automated gate. Codex review is requested separately on this exact SHA; human feel testing is still required before merge.'
+                ? `The automated gate passed on exact head \`${sha}\`. A connected user account must now request Codex review on this same SHA; human feel testing is still required before merge.`
                 : 'The build is blocked. Do not hand off or request final approval until the failing gate is fixed.'
             ].join('\n');
             const comments = await github.paginate(github.rest.issues.listComments, {
@@ -213,23 +216,4 @@ jobs:
               await github.rest.issues.updateComment({...context.repo, comment_id: existing.id, body});
             } else {
               await github.rest.issues.createComment({...context.repo, issue_number: context.issue.number, body});
-            }
-
-      - name: Request Codex review on exact green head
-        if: success() && github.event_name == 'pull_request'
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const marker = `<!-- koryto-codex-request:${context.sha} -->`;
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              ...context.repo,
-              issue_number: context.issue.number,
-              per_page: 100
-            });
-            if (!comments.some(comment => comment.body?.includes(marker))) {
-              await github.rest.issues.createComment({
-                ...context.repo,
-                issue_number: context.issue.number,
-                body: `${marker}\n@codex review the exact green head \`${context.sha}\`. Follow AGENTS.md and the koryto-release-gate contract. Prioritize soft locks, save/load corruption, rule resolution, companion stacking, duplicate consequences, packaged-build divergence, accessibility, mobile blockers, and missing complication coverage.`
-              });
             }

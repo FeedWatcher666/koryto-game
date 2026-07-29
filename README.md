@@ -14,32 +14,11 @@ Potom otevřete `dist/koryto-v0.20.0-clean-test.6/index.html`. Distribuční sou
 
 ## První plnohodnotný quest
 
-TEST.6 přidává kapitolu **Krysy v JZD** jako první vícefázovou politickou D&D výpravu:
-
-1. briefing a vysvětlení kauzy,
-2. výběr přesně dvou členů aktivní družiny,
-3. výběr jednoho předmětu,
-4. tři rozdílné cesty do areálu,
-5. tři způsoby získání důkazů,
-6. vědomá reakce na protiakci Vladimíra Věčného,
-7. tři finální způsoby použití důkazů,
-8. trvalý následek zaznamenaný do kampaně.
-
-Hody nemění pouze reputaci. Průběžně upravují množství důkazů, důvěru pracovníků, tlak Věčného, vztahy se společníky, politické dluhy, páku, obtížnost finální zkoušky a pozdější návrat důsledku.
-
-## Družina a vybavení
-
-K Marii Čisté a Bohumilu Tichému přibyl Radek Šroub, údržbář bývalého JZD. Do výpravy lze vzít dva ze tří společníků a jeden předmět:
-
-- kazetový diktafon,
-- klíč od archivu,
-- termosku odborového čaje.
+TEST.6 přidává kapitolu **Krysy v JZD** jako první vícefázovou politickou D&D výpravu. Obsahuje briefing, přesně dva aktivní společníky, jeden předmět, tři přístupy, tři způsoby získání důkazů, protiakci Vladimíra Věčného, tři finální použití důkazů a trvalý následek.
 
 Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se použije jediná nejsilnější relevantní pomoc; bonusy různých společníků se nesčítají do jednoho hodu.
 
 ## Kostky
-
-Fyzický model D20 a srozumitelná výhoda/nevýhoda zůstávají uzamčené:
 
 - běžný hod: jedna d20,
 - výhoda: dvě d20 a vyšší výsledek,
@@ -58,20 +37,11 @@ node scripts/build-offline.mjs
 
 Browser gate prochází všechny tři konce kapitoly, veřejnou a špinavou cestu, čistě komplikovaný průchod bez soft-locku, přesnou náhradu aktivní družiny a přehod první zkoušky po uložení a reloadu. CI navíc kontroluje základní přístupnost a Lighthouse skóre z hotového offline balíku.
 
-Každý významný build prochází Codex review podle pravidel v `AGENTS.md`. Po zeleném CI workflow automaticky požádá Codex o kontrolu přesného head SHA. Nálezy týkající se stavu hry, ukládání, pravidel hodů, družiny, přístupnosti a offline balíku jsou blokující do opravy a opakované kontroly.
+Každý významný build prochází Codex review podle pravidel v `AGENTS.md`. CI testuje a reportuje skutečný PR head SHA. Po zeleném gate musí být review vyžádáno z připojeného uživatelského účtu na stejném SHA; komentář vytvořený účtem GitHub Actions se za Codex review nepovažuje.
 
 ## Projektová paměť a skilly
 
-Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů:
-
-- `docs/project-status.md`,
-- `docs/decisions.md`,
-- `docs/next-session.md`,
-- `docs/content-index.md`,
-- `docs/playtest-findings.md`,
-- `docs/tooling.md`.
-
-Repo obsahuje tři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`.
+Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů v `docs/`. Repo obsahuje tři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`.
 
 ## Veřejný tester
 

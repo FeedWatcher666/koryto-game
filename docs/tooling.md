@@ -10,22 +10,12 @@ The skills live under `.agents/skills/` and are intentionally small. Read the ma
 
 ## Approved external capability shortlist
 
-Do not install a full megacatalog. Review and add exact skills only when the current task needs them:
-
-- game design,
-- game audio,
-- frontend design,
-- UI review,
-- accessibility audit,
-- webapp testing,
-- systematic debugging,
-- code review checklist,
-- skill creation,
-- algorithmic art.
+Do not install a full megacatalog. Review and add exact skills only when the current task needs them: game design, game audio, frontend design, UI review, accessibility audit, webapp testing, systematic debugging, code review checklist, skill creation, and algorithmic art.
 
 ## Automation
 
-- `clean-rewrite.yml` runs source checks, deterministic build, packaged browser scenarios, accessibility basics, Lighthouse, artifact upload, PR reporting, and automatic Codex review request.
+- `clean-rewrite.yml` checks out the exact PR head, runs source checks, deterministic build, packaged browser scenarios, accessibility basics, Lighthouse, artifact upload, and one exact-SHA PR report.
+- Codex review is requested after green CI through the connected user account. GitHub Actions bot comments cannot authenticate that request.
 - `security.yml` runs an advisory GitHub Actions audit and attempts Dependency Review. Dependency Review becomes a blocking vulnerability gate after Dependency Graph and GitHub Advanced Security are enabled in repository settings.
 - `pages.yml` deploys the last green push build to GitHub Pages after Pages is enabled in repository settings.
 - Dependabot checks GitHub Action versions weekly.

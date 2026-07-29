@@ -51,8 +51,8 @@ For every meaningful build:
 3. generate and verify the offline build,
 4. run packaged browser, accessibility, and quality gates,
 5. inspect rendered evidence,
-6. request Codex review on the exact green head SHA,
+6. after the exact head SHA is green, request Codex review through a connected user account,
 7. fix P0–P2 findings,
 8. rerun the full gate and request a fresh Codex review.
 
-Never claim a review or playtest happened when it did not. Never merge without explicit user instruction.
+GitHub Actions bot comments do not count as a Codex review request. Never claim a review or playtest happened when it did not. Never merge without explicit user instruction.
