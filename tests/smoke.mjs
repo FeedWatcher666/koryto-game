@@ -11,7 +11,15 @@ import {
   choicesForJzd,
   startJzdQuest
 } from "../src/quest-jzd.js";
-import {activePartyIds, deriveAttributes, formatRollExpression, outcomeLevel, resolveCheck, resolveRollMode} from "../src/rules.js";
+import {
+  activePartyIds,
+  checkModifiers,
+  deriveAttributes,
+  formatRollExpression,
+  outcomeLevel,
+  resolveCheck,
+  resolveRollMode
+} from "../src/rules.js";
 import {createInitialState, SAVE_SCHEMA, STORAGE_KEY} from "../src/state.js";
 
 function sequence(values) {
@@ -52,6 +60,16 @@ questState.quest.party = ["marie", "radek"];
 questState.quest.itemId = "archiveKey";
 assert.deepEqual(activePartyIds(questState), ["marie", "radek"]);
 
+const workerChoice = choicesForJzd(questState, "search").find(choice => choice.id === "worker-testimony");
+const workerModifiers = checkModifiers(questState, workerChoice);
+assert.equal(workerModifiers.companionContribution.id, "radek");
+assert.equal(workerModifiers.companionContribution.value, 2);
+assert.equal(
+  workerModifiers.modifierBreakdown.filter(item => item.id.startsWith("companion-")).length,
+  1,
+  "only one strongest companion contribution may be applied"
+);
+
 const approachChoice = choicesForJzd(questState, "approach").find(choice => choice.id === "archive-door");
 const approachMode = resolveRollMode(questState, approachChoice);
 assert.equal(approachMode.mode, "advantage");
@@ -83,12 +101,15 @@ assert.ok(questState.quest.consequences.length >= 3);
 
 const dice = fs.readFileSync(new URL("../src/dice.js", import.meta.url), "utf8");
 const physics = fs.readFileSync(new URL("../src/dice-physics.js", import.meta.url), "utf8");
+const main = fs.readFileSync(new URL("../src/main.js", import.meta.url), "utf8");
 const ui = fs.readFileSync(new URL("../src/ui.js", import.meta.url), "utf8");
 const quest = fs.readFileSync(new URL("../src/quest-jzd.js", import.meta.url), "utf8");
 const questCss = fs.readFileSync(new URL("../styles/quest-jzd.css", import.meta.url), "utf8");
 assert.match(dice, /dice-rack/);
 assert.match(physics, /FACE_NUMBERS/);
 assert.match(physics, /worn-bakelite/);
+assert.match(main, /state\.flags\.lastResult\?\.choiceId/);
+assert.match(main, /next\.party\.members = \[\.\.\.next\.quest\.party\]/);
 assert.match(ui, /Zahájit výpravu do JZD/);
 assert.match(ui, /Vyberte přesně dva společníky/);
 assert.match(ui, /PROTIAKCE VLADIMÍRA VĚČNÉHO/);
