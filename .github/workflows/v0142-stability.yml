@@ -1,11 +1,12 @@
-name: Koryto v0.17.4 TEST.1
+name: Koryto v0.19.0 TEST.1
 
 on:
   push:
     branches:
-      - agent/v0174-style-stabilization
+      - agent/v0190-war-room
   pull_request:
     branches:
+      - agent/v0174-style-stabilization
       - agent/v0173-playability-reset
       - agent/v0172-turn-clarity
       - agent/v0171-decision-hud
@@ -38,7 +39,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.17.4-test.1-diagnostics
+          name: koryto-v0.19.0-test.1-diagnostics
           path: test-output.txt
           if-no-files-found: warn
 
@@ -47,12 +48,12 @@ jobs:
         run: |
           set -euo pipefail
           build_version="$(cat VERSION)"
-          test "$build_version" = "0.17.4-test.1"
+          test "$build_version" = "0.19.0-test.1"
           target="dist/koryto-v${build_version}"
           mkdir -p "$target"
           cp index.html VERSION README.md "$target/"
           cp -R src styles assets "$target/"
-          mkdir -p "$target/docs/v0.14" "$target/docs/v0.16" "$target/docs/v0.17"
+          mkdir -p "$target/docs/v0.14" "$target/docs/v0.16" "$target/docs/v0.17" "$target/docs/v0.19"
           cp docs/v0.14/v0146-playtest-report.md "$target/docs/v0.14/"
           cp docs/v0.14/v0147-consequence-report.md "$target/docs/v0.14/"
           cp docs/v0.16/v0160-clean-ui.md "$target/docs/v0.16/"
@@ -71,6 +72,7 @@ jobs:
           cp docs/v0.17/v0172-turn-clarity.md "$target/docs/v0.17/"
           cp docs/v0.17/v0173-playability-reset.md "$target/docs/v0.17/"
           cp docs/v0.17/v0174-style-stabilization.md "$target/docs/v0.17/"
+          cp docs/v0.19/v0190-war-room.md "$target/docs/v0.19/"
           rm -f "$target/src/v0142-rc2.js" "$target/src/v0142-rc3.js"
 
           test -f "$target/src/build-info.js"
@@ -83,6 +85,7 @@ jobs:
           test -f "$target/src/v0172-turn-clarity.js"
           test -f "$target/src/v0173-playability-reset.js"
           test -f "$target/src/v0174-style-stabilization.js"
+          test -f "$target/src/v0190-war-room.js"
           test -f "$target/styles/v0168-onboarding-ui.css"
           test -f "$target/styles/v0169-release-polish.css"
           test -f "$target/styles/v0169-map-stability.css"
@@ -93,11 +96,13 @@ jobs:
           test -f "$target/styles/v0172-turn-clarity.css"
           test -f "$target/styles/v0173-playability-reset.css"
           test -f "$target/styles/v0174-style-stabilization.css"
+          test -f "$target/styles/v0190-war-room.css"
+          test -f "$target/docs/v0.19/v0190-war-room.md"
           test -f "$target/assets/v0164/map-pixel-cartoon.webp"
           test -f "$target/assets/v0165/manifest.json"
 
           grep -q 'viewport-fit=cover' "$target/index.html"
-          grep -q 'Koryto 0.17.4 TEST.1' "$target/index.html"
+          grep -q 'Koryto 0.19.0 TEST.1' "$target/index.html"
           grep -q 'src/build-info.js' "$target/index.html"
           grep -q 'src/v0168-onboarding-ui.js' "$target/index.html"
           grep -q 'src/v0169-release-polish.js' "$target/index.html"
@@ -108,12 +113,14 @@ jobs:
           grep -q 'src/v0172-turn-clarity.js' "$target/index.html"
           grep -q 'src/v0173-playability-reset.js' "$target/index.html"
           grep -q 'src/v0174-style-stabilization.js' "$target/index.html"
+          grep -q 'src/v0190-war-room.js' "$target/index.html"
           grep -q 'styles/v0169-creation-flow-fix.css' "$target/index.html"
           grep -q 'styles/v0170-visual-foundation.css' "$target/index.html"
           grep -q 'styles/v0171-decision-hud.css' "$target/index.html"
           grep -q 'styles/v0172-turn-clarity.css' "$target/index.html"
           grep -q 'styles/v0173-playability-reset.css' "$target/index.html"
           grep -q 'styles/v0174-style-stabilization.css' "$target/index.html"
+          grep -q 'styles/v0190-war-room.css' "$target/index.html"
           if grep -E 'v0162-playtest\.(css|js)|loadPlaytestLayer|playtestRequested' "$target/src/v0161-interaction-guard.js"; then
             echo "Release still contains the retired playtest loader" >&2
             exit 1
@@ -132,20 +139,20 @@ jobs:
       - name: Browser gate on packaged artifact
         shell: bash
         run: |
-          # v0171-browser-gate.mjs is adapted to the current release by this wrapper.
-          node tests/v0174-browser-gate.mjs dist/koryto-v0.17.4-test.1
+          # v0171-browser-gate.mjs remains the historical source contract covered by the compatibility suite.
+          node tests/v0190-browser-gate.mjs dist/koryto-v0.19.0-test.1
 
       - name: Upload browser gate screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.17.4-test.1-browser-gate
+          name: koryto-v0.19.0-test.1-browser-gate
           path: browser-artifacts
           if-no-files-found: warn
 
       - name: Upload playable build
         uses: actions/upload-artifact@v4
         with:
-          name: koryto-v0.17.4-test.1
-          path: dist/koryto-v0.17.4-test.1
+          name: koryto-v0.19.0-test.1
+          path: dist/koryto-v0.19.0-test.1
           if-no-files-found: error
