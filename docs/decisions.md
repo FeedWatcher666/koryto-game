@@ -37,6 +37,8 @@ Priority order: humor, story, roleplaying, collecting and upgrading, strategy, r
 ## UI and tone
 
 - Present an RPG world and scene, not an administrative dashboard.
+- The committed map, debate, event, inventory, party, and election-night concepts are immutable north-star evidence; `docs/visual-direction.md` defines how they translate into live UI.
+- Required text and actions remain semantic DOM. Concept screenshots and image maps never replace accessible controls.
 - Keep day/time, actions, active quest, reputation, and money understandable.
 - Use Czech pub satire, dry irony, and absurd bureaucracy.
 - Humor must appear in mechanics, dialogue, props, and consequences.
@@ -45,6 +47,8 @@ Priority order: humor, story, roleplaying, collecting and upgrading, strategy, r
 ## Delivery
 
 - Every meaningful build is tested from the packaged offline artifact.
+- CI test jobs use read-only repository permissions; PR write permission is isolated to reporting.
+- GitHub Pages deploys only a green `main` commit.
 - Every meaningful build receives a Codex review after CI passes.
 - P0–P2 findings are fixed, retested, and reviewed again.
 - Never merge without explicit user instruction.

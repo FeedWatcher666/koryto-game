@@ -41,11 +41,11 @@ Každý významný build prochází Codex review podle pravidel v `AGENTS.md`. C
 
 ## Projektová paměť a skilly
 
-Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů v `docs/`. Repo obsahuje tři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`.
+Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů v `docs/`. Repo obsahuje čtyři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, UI a art direction, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`. Vizuální severky a pravidla jejich převodu do živého rozhraní jsou v `docs/visual-direction.md`.
 
 ## Veřejný tester
 
-Po aktivaci **Settings → Pages → Source: GitHub Actions** nasazuje `pages.yml` poslední zelený push build na:
+Po aktivaci **Settings → Pages → Source: GitHub Actions** nasazuje `pages.yml` pouze poslední zelený build z `main` na:
 
 `https://feedwatcher666.github.io/koryto-game/`
 

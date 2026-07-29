@@ -9,11 +9,13 @@ Before changing code, read only the smallest useful context in this order:
 1. `docs/project-status.md`
 2. `docs/decisions.md`
 3. `docs/next-session.md`
-4. the relevant module, quest, test, or repo-local skill
+4. `docs/visual-direction.md` when the task changes UI, art, layout, or responsive behavior
+5. the relevant module, quest, test, or repo-local skill
 
 Use:
 
 - `.agents/skills/koryto-quest-designer/` for quest design or revision,
+- `.agents/skills/koryto-ui-director/` for UI, art direction, layout, or visual review,
 - `.agents/skills/koryto-playtest-auditor/` for playable-build evaluation,
 - `.agents/skills/koryto-release-gate/` before presenting a build.
 
@@ -42,6 +44,13 @@ Do not scan archives or old branches unless the task explicitly needs design ref
 
 Prioritize game-breaking regressions, state corruption, incorrect rule resolution, offline-build divergence, missing end-to-end coverage, accessibility regressions, and mobile interaction blockers. Leave formatting and other deterministic checks to CI.
 
+### Visual implementation
+
+- Treat `docs/visual-references/` as immutable north-star evidence unless the task explicitly replaces a reference.
+- Keep the current scene and player decision above supporting statistics. A full-screen bitmap, mock screenshot, or image map is not a substitute for semantic, keyboard-operable UI.
+- Keep the HUD compact and non-obstructive. Do not reintroduce sticky or fixed panels that cover the current scene, result, or primary action.
+- Verify meaningful UI changes at desktop and 390×844 mobile sizes, with keyboard navigation and reduced motion.
+
 ## Mandatory delivery loop
 
 For every meaningful build:
@@ -53,6 +62,7 @@ For every meaningful build:
 5. inspect rendered evidence,
 6. after the exact head SHA is green, request Codex review through a connected user account,
 7. fix P0–P2 findings,
-8. rerun the full gate and request a fresh Codex review.
+8. rerun the full gate and request a fresh Codex review,
+9. deploy only a green `main` commit.
 
 GitHub Actions bot comments do not count as a Codex review request. Never claim a review or playtest happened when it did not. Never merge without explicit user instruction.

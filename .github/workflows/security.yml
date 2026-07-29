@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches:
+      - main
       - agent/v0200-clean-rewrite
   workflow_dispatch:
 

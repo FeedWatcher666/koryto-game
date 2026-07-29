@@ -3,10 +3,11 @@
 ## Canonical development line
 
 - Repository: `FeedWatcher666/koryto-game`
-- Active branch: `agent/v0200-clean-rewrite`
-- Active pull request: `#37`
+- Canonical release branch: `main`
+- Integration branch: `agent/v0200-clean-rewrite`
+- Integration pull request: `#37`
 - Current playable version: `0.20.0-clean-test.7`
-- Merge state: draft and unmerged until explicit human approval
+- Merge state: explicit human approval received; merge only after exact-head CI and Codex review
 - Stable archive reference: `archive/koryto-v0174-original`
 
 ## What is implemented
@@ -27,6 +28,8 @@
 - deterministic generated offline package,
 - packaged-build browser tests,
 - mandatory Codex review workflow.
+- committed visual north stars for the map, debate, event, inventory, party, and election-night screens,
+- four validated repo-local skills for quests, UI direction, playtesting, and releases.
 
 ## Current quality gate
 
@@ -34,7 +37,7 @@ A deliverable build must pass syntax, unit tests, deterministic offline build ch
 
 ## Current priority
 
-Do not broaden the campaign until TEST.7 receives human feel-testing feedback. TEST.7 only corrects scene priority, transition position, and HUD obstruction observed in TEST.6; the next content iteration should still improve agency, pacing, and clarity in **Krysy v JZD** based on actual play, not add another static quest chain.
+Merge the green TEST.7 integration line, verify the public `main` tester, then collect human feel-testing feedback. The next content iteration should improve agency, pacing, clarity, humor, or stability in **Krysy v JZD** based on actual play, not add another static quest chain.
 
 ## Known limitations
 

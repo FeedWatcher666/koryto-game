@@ -3,6 +3,7 @@ name: Koryto clean rewrite
 on:
   push:
     branches:
+      - main
       - agent/v0200-clean-rewrite
   pull_request:
   workflow_dispatch:
@@ -10,8 +11,6 @@ on:
 permissions:
   contents: read
   actions: read
-  issues: write
-  pull-requests: write
 
 concurrency:
   group: koryto-${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +25,15 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      full: ${{ steps.scope.outputs.full }}
+      playable-id: ${{ steps.playable.outputs.artifact-id }}
+      playable-digest: ${{ steps.playable.outputs.artifact-digest }}
+      screenshot-id: ${{ steps.screenshots.outputs.artifact-id }}
+      lighthouse-id: ${{ steps.lighthouse.outputs.artifact-id }}
     steps:
       - name: Checkout exact head
         uses: actions/checkout@v6
@@ -176,19 +184,29 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+  report:
+    if: always() && github.event_name == 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+      pull-requests: write
+    steps:
       - name: Publish or update PR build report
-        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v9
         env:
-          TEST_SCOPE: ${{ steps.scope.outputs.full }}
-          PLAYABLE_ID: ${{ steps.playable.outputs.artifact-id }}
-          PLAYABLE_DIGEST: ${{ steps.playable.outputs.artifact-digest }}
-          SCREENSHOT_ID: ${{ steps.screenshots.outputs.artifact-id }}
-          LIGHTHOUSE_ID: ${{ steps.lighthouse.outputs.artifact-id }}
+          TEST_SCOPE: ${{ needs.test.outputs.full }}
+          PLAYABLE_ID: ${{ needs.test.outputs.playable-id }}
+          PLAYABLE_DIGEST: ${{ needs.test.outputs.playable-digest }}
+          SCREENSHOT_ID: ${{ needs.test.outputs.screenshot-id }}
+          LIGHTHOUSE_ID: ${{ needs.test.outputs.lighthouse-id }}
+          TEST_RESULT: ${{ needs.test.result }}
         with:
           script: |
             const marker = '<!-- koryto-ci-report -->';
-            const ok = '${{ job.status }}' === 'success';
+            const ok = process.env.TEST_RESULT === 'success';
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const sha = process.env.REVIEW_SHA;
             const line = (label, value) => `- **${label}:** ${value || 'not produced'}`;
@@ -205,7 +223,7 @@ jobs:
               line('Lighthouse artifact ID', process.env.LIGHTHOUSE_ID),
               '',
               ok
-                ? `The automated gate passed on exact head \`${sha}\`. A connected user account must now request Codex review on this same SHA; human feel testing is still required before merge.`
+                ? `The automated gate passed on exact head \`${sha}\`. A connected user account must now request Codex review on this same SHA; explicit human merge approval is also required.`
                 : 'The build is blocked. Do not hand off or request final approval until the failing gate is fixed.'
             ].join('\n');
             const comments = await github.paginate(github.rest.issues.listComments, {

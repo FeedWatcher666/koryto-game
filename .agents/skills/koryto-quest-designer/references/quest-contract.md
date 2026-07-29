@@ -1,63 +1,72 @@
 # Koryto quest contract
 
-## 1. Premise
+Complete this contract before implementing or materially revising a quest.
 
+## Premise
+
+- Player-facing problem:
 - Political absurdity:
-- Concrete player goal:
-- Immediate stakes:
-- Later campaign stake:
-- Expected play time:
+- Player goal:
+- Rival goal:
+- Target duration:
+- Entry requirements:
 
-## 2. Preparation
+## Scene graph
 
-Specify active party slots, valid companions, item slots, and the information shown before confirmation. Preparation must alter later play.
+List every scene as `id → choices → next scene or ending`. Include:
 
-## 3. Scene graph
+- one meaningful branch before the first roll,
+- one rival counteraction based on an earlier approach,
+- at least one fail-forward complication,
+- every ending and its durable consequence.
 
-For every scene record:
+No reachable scene may lack an enabled continuation.
 
-- scene id and location,
-- new information,
-- available actions,
-- prerequisites and locks,
-- next scenes,
-- state changes,
-- soft-lock escape.
+## Choice and leverage table
 
-A significant quest normally contains briefing, preparation, approach, investigation or negotiation, rival reaction, final decision, and recap.
+For every choice record:
 
-## 4. Checks
+- visible intent,
+- required class, origin, companion, item, clue, or prior consequence,
+- immediate cost or gain,
+- delayed consequence,
+- whether another route remains comparably viable.
 
-For each check record:
+Cosmetic alternatives that immediately converge do not count as agency.
 
-- choice id,
-- attribute and DC,
-- advantage or disadvantage sources,
-- strongest companion contribution,
-- item effect,
-- critical 20 event,
-- success,
-- success at cost,
-- complication,
-- critical 1 event.
+## Check table
 
-A complication must create playable state rather than a dead end.
+For every d20 check record:
 
-## 5. Agency audit
+- attribute and visible DC,
+- visible modifiers,
+- clueable hidden modifiers,
+- advantage or disadvantage source,
+- success, complication, critical 1, and critical 20 outcome,
+- next scene for every outcome.
 
-Reject the design when:
+Only the kept die determines a critical result. Failure must advance the story.
 
-- choices change only flavor text,
-- the best route is obvious before information is gathered,
-- every class receives the same solution under a renamed button,
-- a companion is only a passive stat bonus,
-- the rival acts independently of player behavior,
-- the ending resets all consequences.
+## State mutations
 
-## 6. Humor audit
+Name the exact flags, relationships, resources, inventory changes, debts, pressure, or reputation effects written by each ending. State which future chapter can consume each mutation.
 
-Require at least one mechanical joke, one bureaucratic prop, one character reaction, and one consequence whose absurdity follows logically from the political system.
+## Implementation map
 
-## 7. Implementation handoff
+List canonical source modules, styles, tests, save-schema impact, offline-build impact, and changed selectors. Generated runtime files are never edited by hand.
 
-List data additions, state schema changes, rule changes, UI scenes, CSS additions, save migration needs, offline build changes, unit tests, and packaged browser tests.
+## Test matrix
+
+Cover:
+
+- every ending,
+- a complication-only route,
+- critical 1 and 20 where authored,
+- class, companion, and item gating,
+- rival counteraction,
+- duplicate-click protection,
+- save/reload before and after a roll,
+- desktop and 390×844 mobile,
+- keyboard navigation and reduced motion.
+
+Implementation may start only when the scene graph has no dead end and the test matrix can prove every changed path.
