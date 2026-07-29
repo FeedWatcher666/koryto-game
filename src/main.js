@@ -27,9 +27,15 @@ function selectedChoice(collection, id) {
 
 function testRandom() {
   const params = new URLSearchParams(location.search);
-  const forced = Number(params.get("roll"));
-  if (Number.isInteger(forced) && forced >= 1 && forced <= 20) return () => (forced - 0.01) / 20;
-  return Math.random;
+  const raw = params.get("rolls") || params.get("roll") || "";
+  const forced = raw.split(",").map(value => Number(value.trim())).filter(value => Number.isInteger(value) && value >= 1 && value <= 20);
+  if (!forced.length) return Math.random;
+  let index = 0;
+  return () => {
+    const value = forced[Math.min(index, forced.length - 1)];
+    index += 1;
+    return (value - 0.01) / 20;
+  };
 }
 
 async function performCheck(choice, context, sourceState = state, consequenceContext = context) {
