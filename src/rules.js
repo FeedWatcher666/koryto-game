@@ -18,6 +18,36 @@ export function rollD20(random = Math.random) {
   return 1 + Math.floor(random() * 20);
 }
 
+function matchedSource(choice, type, group, id) {
+  if (!id || !choice[type]?.[group]?.includes(id)) return null;
+  const fallback = `${type === "advantage" ? "Výhoda" : "Nevýhoda"}: ${group}`;
+  return choice[`${type}Labels`]?.[group]?.[id] || fallback;
+}
+
+export function resolveRollMode(state, choice) {
+  const advantageSources = [
+    matchedSource(choice, "advantage", "classes", state.hero.classId),
+    matchedSource(choice, "advantage", "origins", state.hero.originId),
+    matchedSource(choice, "advantage", "companions", state.party.active)
+  ].filter(Boolean);
+  const disadvantageSources = [
+    matchedSource(choice, "disadvantage", "classes", state.hero.classId),
+    matchedSource(choice, "disadvantage", "origins", state.hero.originId),
+    matchedSource(choice, "disadvantage", "companions", state.party.active)
+  ].filter(Boolean);
+
+  if (choice.honest && state.hero.classId === "paladin" && state.resources.debt === 0) {
+    advantageSources.push("Přísaha paladina: čestné řešení bez předchozího politického dluhu.");
+  }
+
+  const cancelled = advantageSources.length > 0 && disadvantageSources.length > 0;
+  const mode = cancelled ? "normal" : advantageSources.length > 0 ? "advantage" : disadvantageSources.length > 0 ? "disadvantage" : "normal";
+  const notation = mode === "advantage" ? "2d20kh1" : mode === "disadvantage" ? "2d20kl1" : "1d20";
+  const label = mode === "advantage" ? "Výhoda" : mode === "disadvantage" ? "Nevýhoda" : cancelled ? "Výhoda a nevýhoda se ruší" : "Běžný hod";
+
+  return {mode, notation, label, advantageSources, disadvantageSources, cancelled};
+}
+
 export function outcomeLevel(roll, total, dc) {
   if (roll === 20) return "critical";
   if (roll === 1) return "complication";
@@ -34,7 +64,14 @@ export function resolveCheck(state, choice, random = Math.random) {
   const passiveBonus = companion?.bonus?.[choice.attribute] || 0;
   const visibleModifier = attributeValue + classBonus + companionBonus + passiveBonus;
   const hiddenModifier = choice.dirty && state.hero.classId !== "rogue" ? -1 : 0;
-  const roll = rollD20(random);
+  const rollMode = resolveRollMode(state, choice);
+  const rolls = rollMode.mode === "normal" ? [rollD20(random)] : [rollD20(random), rollD20(random)];
+  const keptIndex = rollMode.mode === "advantage"
+    ? (rolls[1] > rolls[0] ? 1 : 0)
+    : rollMode.mode === "disadvantage"
+      ? (rolls[1] < rolls[0] ? 1 : 0)
+      : 0;
+  const roll = rolls[keptIndex];
   const total = roll + visibleModifier + hiddenModifier;
   const level = outcomeLevel(roll, total, choice.dc);
   const modifierBreakdown = [
@@ -48,6 +85,15 @@ export function resolveCheck(state, choice, random = Math.random) {
     choiceId: choice.id,
     attribute: choice.attribute,
     roll,
+    rolls,
+    keptIndex,
+    discardedIndex: rolls.length > 1 ? (keptIndex === 0 ? 1 : 0) : null,
+    rollMode: rollMode.mode,
+    rollModeLabel: rollMode.label,
+    rollNotation: rollMode.notation,
+    advantageSources: rollMode.advantageSources,
+    disadvantageSources: rollMode.disadvantageSources,
+    cancelledRollModes: rollMode.cancelled,
     dc: choice.dc,
     visibleModifier,
     hiddenModifier,
@@ -56,6 +102,12 @@ export function resolveCheck(state, choice, random = Math.random) {
     level,
     outcome: OUTCOMES[level]
   };
+}
+
+export function formatRollExpression(result) {
+  const rolled = result.rolls.length > 1 ? `(${result.rolls.join(", ")}; ponecháno ${result.roll})` : `(${result.roll})`;
+  const hidden = result.hiddenModifier ? ` ${result.hiddenModifier > 0 ? "+" : "−"} ${Math.abs(result.hiddenModifier)}` : "";
+  return `${result.rollNotation} ${rolled} + ${result.visibleModifier}${hidden} = ${result.total} proti ${result.dc}`;
 }
 
 export function applyCheckConsequences(state, result, context) {
