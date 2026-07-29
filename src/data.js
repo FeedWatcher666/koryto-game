@@ -1,4 +1,4 @@
-export const VERSION = "0.20.0-clean-test.3";
+export const VERSION = "0.20.0-clean-test.4";
 
 export const ATTRIBUTES = [
   ["charisma", "Charisma", "Přesvědčit lidi, že váš nápad byl vždycky jejich."],
@@ -33,15 +33,15 @@ export const CLASSES = {
     icon: "🎙️",
     description: "Z neúspěchu udělá příběh. Bohužel často s vlastním jménem v titulku.",
     base: {charisma: 4, intellect: 2, authority: 3, media: 5, morality: 2, luck: 3},
-    perk: "Jednou za scénu může změnit komplikaci na úspěch za cenu.",
-    weakness: "Každá ostuda zvyšuje mediální tlak o 2."
+    perk: "Při veřejném vystoupení získává výhodu. Jednou za scénu může změnit komplikaci na úspěch za cenu.",
+    weakness: "Při čtení drobného písma hází s nevýhodou. Každá ostuda zvyšuje mediální tlak o 2."
   },
   paladin: {
     name: "Aktivistický paladin",
     icon: "🛡️",
     description: "Přísahá na transparentnost. Obec přísahá, že nic neslyšela.",
     base: {charisma: 3, intellect: 3, authority: 4, media: 2, morality: 5, luck: 2},
-    perk: "Čestné řešení má +2, pokud jste v této kapitole nepřijali politický dluh.",
+    perk: "Čestné řešení má výhodu, pokud jste v této kapitole nepřijali politický dluh.",
     weakness: "Nemůže zvolit řešení označené jako otevřený podvod."
   },
   rogue: {
@@ -49,7 +49,7 @@ export const CLASSES = {
     icon: "🗝️",
     description: "Nezná správný vchod. Zná ale vchod, který se nezapisuje do knihy návštěv.",
     base: {charisma: 3, intellect: 4, authority: 2, media: 2, morality: 1, luck: 5},
-    perk: "Před hodem může odhalit jeden skrytý modifikátor.",
+    perk: "Při sledování lidí a použití zadního vchodu získává výhodu. Před hodem může odhalit skrytý modifikátor.",
     weakness: "Při kritické jedničce získá navíc vydíratelnost."
   }
 };
@@ -61,7 +61,7 @@ export const COMPANIONS = {
     role: "Bývalá úřednice",
     description: "Zná předpisy, zásuvky a rozdíl mezi kopií a kopií určenou ke ztrátě.",
     bonus: {intellect: 2, morality: 1},
-    demand: "Nesnáší otevřené lhaní občanům."
+    demand: "Nesnáší otevřené lhaní občanům. Při hledání paragrafu dává výhodu."
   },
   bohumil: {
     name: "Bohumil Tichý",
@@ -69,7 +69,7 @@ export const COMPANIONS = {
     role: "Hospodský diplomat",
     description: "Ví, kdo s kým nemluví a kdo s kým nemluví jen před manželkou.",
     bonus: {charisma: 2, luck: 1},
-    demand: "Nechce, aby hospoda přišla o obecní zakázky."
+    demand: "Nechce, aby hospoda přišla o obecní zakázky. Při veřejném projevu dává výhodu."
   }
 };
 
@@ -79,21 +79,31 @@ export const FIRST_CHECKS = [
     label: "Zeptat se muže čekajícího od roku 1998",
     detail: "Možná čeká na autobus. Možná na kanalizaci.",
     attribute: "charisma",
-    dc: 10
+    dc: 10,
+    advantage: {classes: ["bard"]},
+    advantageLabels: {classes: {bard: "Mediální bard umí zahájit rozhovor dřív než protistrana uteče."}}
   },
   {
     id: "read-board",
     label: "Rozluštit obecní vývěsku",
     detail: "Pět šipek, tři razítka a jedna příloha bez přílohy.",
     attribute: "intellect",
-    dc: 11
+    dc: 11,
+    advantage: {origins: ["revenge"]},
+    disadvantage: {classes: ["bard"]},
+    advantageLabels: {origins: {revenge: "Navrátilec si pamatuje, kam obec schovává důležité přílohy."}},
+    disadvantageLabels: {classes: {bard: "Mediální bard rozezná titulek. Drobné písmo už méně."}}
   },
   {
     id: "follow-folders",
     label: "Následovat lidi s deskami",
     detail: "Metoda bez dat, zato s tradicí.",
     attribute: "luck",
-    dc: 12
+    dc: 12,
+    advantage: {classes: ["rogue"]},
+    disadvantage: {origins: ["idealist"]},
+    advantageLabels: {classes: {rogue: "Rogue bezpečně pozná člověka, který používá vedlejší vchod."}},
+    disadvantageLabels: {origins: {idealist: "Idealista předpokládá, že lidé s deskami jdou za veřejným zájmem."}}
   }
 ];
 
@@ -105,7 +115,12 @@ export const REGISTRATION_CHECKS = [
     attribute: "charisma",
     dc: 13,
     classBonus: {bard: 2},
-    companionBonus: {bohumil: 1}
+    companionBonus: {bohumil: 1},
+    advantage: {classes: ["bard"], companions: ["bohumil"]},
+    advantageLabels: {
+      classes: {bard: "Bard promění vestibul v pódium."},
+      companions: {bohumil: "Bohumil přivedl publikum, které už má názor i žízeň."}
+    }
   },
   {
     id: "find-paragraph",
@@ -114,7 +129,10 @@ export const REGISTRATION_CHECKS = [
     attribute: "intellect",
     dc: 13,
     classBonus: {paladin: 1, rogue: 1},
-    companionBonus: {marie: 2}
+    companionBonus: {marie: 2},
+    honest: true,
+    advantage: {companions: ["marie"]},
+    advantageLabels: {companions: {marie: "Marie zná číslo zásuvky i člověka, který tvrdí, že neexistuje."}}
   },
   {
     id: "back-door",
@@ -124,7 +142,11 @@ export const REGISTRATION_CHECKS = [
     dc: 12,
     classBonus: {rogue: 2},
     companionBonus: {bohumil: 1},
-    dirty: true
+    dirty: true,
+    advantage: {classes: ["rogue"]},
+    disadvantage: {origins: ["idealist"]},
+    advantageLabels: {classes: {rogue: "Zákulisní rogue pozná neoficiální vchod podle toho, že je lépe udržovaný."}},
+    disadvantageLabels: {origins: {idealist: "Idealistovi se při držení cizího razítka třese ruka i svědomí."}}
   }
 ];
 
