@@ -1,96 +1,41 @@
-# Koryto v0.17.4 TEST.1
+# Koryto v0.18.0 TEST.1
 
-Hratelný offline test nové vizuální základny kampaně a prvního průchodu
-čitelností rozhodování.
+První skutečný vertikální řez satirického českého politického RPG.
 
 ## Spuštění
 
-Rozbalte ZIP a otevřete `index.html`.
+Rozbalte offline ZIP a otevřete `index.html`. Hra nepotřebuje server ani připojení k internetu.
 
-## Co přidává v0.17.0
+Původní třináctidenní prototyp v0.17 zůstává dostupný přes tlačítko **v0.17** nebo adresu `index.html?legacy=1`. Starší uložené hry se nemažou; v0.18 používá vlastní oddělený save.
 
-- jednotný dřevěný, kovový a pergamenový vizuální systém podle schváleného směru,
-- čitelnější hierarchii hlavní mapy, aktivní kauzy, rivala a klíčových lidí,
-- přepracované lokality, události, volby a výsledkové karty bez změny mechanik,
-- kompaktní mobilní rozložení se stejnými herními informacemi jako desktop,
-- komponentové CSS a lehkou dekorační vrstvu bez vzdálených závislostí,
-- plný save/load roundtrip se zachovaným formátem `0.14.3-test.2 / schema 1`.
+## Co je nové ve v0.18.0
 
-## Co dolaďuje v0.17.1
+- izolovaná nová hlavní herní obrazovka bez dashboardové změti,
+- třídenní boj o vedení kandidátky v Dolních Vejprnicích,
+- pět postav s vlastní motivací, hranicí a pamětí rozhodnutí,
+- čtyři čitelné zdroje: vliv, důvěra, peníze a energie,
+- politické dluhy, skryté riziko skandálu a podmíněné volby,
+- okamžitá obrazovka následků po každém rozhodnutí,
+- večerní bilance vztahů a závazků,
+- několik odlišných konců podle způsobu vítězství nebo prohry,
+- samostatný offline save/load,
+- responzivní layout pro notebook 1024×550 i mobil 390×844.
 
-- mapa dává větší prostor hernímu světu a jasně označuje hlavní cíl tahu,
-- události na desktopu ukazují rozhodovací karty ještě nad spodní navigací,
-- volby jsou očíslované, přístupně pojmenované a vizuálně rozlišují riziko,
-- mobil používá kompaktní horizontální volby místo dlouhých obrazových bloků,
-- výsledky mají výraznější oddělení dopadů od příběhového textu,
-- mechaniky a save formát zůstávají beze změny.
+## První průchod
 
-## Co dolaďuje v0.17.2
+1. Zvolte výchozí profil kandidáta.
+2. Vyberte prioritu prvního rána.
+3. Reagujte na nabídku starosty.
+4. Ustůjte mediální tlak a krizi ve štábu.
+5. Rozhodněte nominaci na stranickém sněmu.
 
-- horní HUD jasně odlišuje plný tah, poslední akci a vyčerpaný tah,
-- předčasné ukončení dne ukazuje přesnou penalizaci a vyžaduje potvrzení,
-- dostupné a zamčené volby mají explicitní stav,
-- rozhodovací i výsledkové obrazovky uvádějí cenu jedné akce,
-- dopady výsledku jsou rozdělené na kladné, záporné a neutrální položky,
-- mechaniky, balanc, questy a save formát zůstávají beze změny.
+Jeden průchod je záměrně krátký. Cílem TEST.1 je ověřit, že samotné rozhodování, vztahy a následky fungují jako hra ještě před rozšiřováním mapy a obsahu.
 
-## Co opravuje v0.17.3
+## Vývojové kontroly
 
-- nahrazuje dlouhou webovou stránku pevným herním rámem na desktopu,
-- opravuje skutečný Retina/MacBook viewport kolem `1024 × 550` CSS pixelů,
-- drží aktivní kauzu, mapu a soupeře současně v jedné scéně,
-- ukazuje všechny volby události společně s kontextem ještě před rolováním,
-- zobrazuje všech šest povolání a potvrzení kandidáta v jednom viewportu,
-- skládá lokalitu do scény a samostatného seznamu kliknutelných akcí,
-- používá samostatnou portrétní kompozici mapy a voleb na mobilu,
-- zabraňuje překrytí hlavních akcí pevnou spodní navigací,
-- přidává gate skutečné viditelnosti ovládání, ne pouze existence prvků v DOM,
-- mechaniky, balanc, questy a save formát zůstávají beze změny.
+- `npm test` spouští kompatibilní v0.17 regresní sadu a nový v0.18 kontrakt,
+- CI sestaví offline balík,
+- Playwright projde začátek kampaně na notebooku a mobilu,
+- kontroluje se horizontální overflow, konzolové chyby a dostupnost voleb.
 
-## Co sjednocuje v0.17.4
-
-- používá mapu Dolních Vejprnic jako vizuální zdroj pravdy pro celou hru,
-- zavádí centrální design tokeny a společné panelové a tlačítkové komponenty,
-- sjednocuje kandidáta, detail kauzy, události, výsledky a štáb,
-- převádí rychlé ovládání do stejného dřevěného a mosazného materiálového systému,
-- odstraňuje viditelné přechody mezi několika generacemi UI,
-- označuje aktivní povrch a nové legacy rendery v mikrotasku bez časovaného překreslení,
-- přidává audit společných panelů, tlačítek, overflow a geometrie HUD/navigace,
-- mechaniky, balance, questy a save formát zůstávají beze změny.
-
-## Zachované hratelné části řady v0.16
-
-- úvodní briefing třináctidenní kampaně,
-- tvorba kandidáta s živým náhledem,
-- tři výchozí motivace a šest politických povolání,
-- pixel-cartoon mapa Dolních Vejprnic,
-- funkční štáb, nábor, vztahy a samostatné mise,
-- přehled a detail kauz i osmi lokalit,
-- události, hody a výsledky rozhodnutí,
-- denní uzávěrka,
-- veřejná debata a taktické karty,
-- volební noc a patnáctimandátový přehled,
-- koaliční salonek a živý log vyjednávání,
-- rychlé ovládání napojené na původní save/load/map/kronika handlery,
-- větší text, vysoký kontrast, omezení pohybu, skip link a viditelný fokus,
-- responzivní desktopové, tabletové a mobilní rozhraní.
-
-## Klávesové zkratky
-
-- `Alt+U` – panel rychlého ovládání,
-- `Alt+S` – uložit na mapě,
-- `Alt+L` – načíst,
-- `Alt+M` – návrat na mapu,
-- `Alt+K` – export kroniky,
-- `Esc` – zavřít panel.
-
-## Doporučený finální test
-
-1. Projít úvod a všech šest povolání.
-2. Odehrát několik dní, událostí, questů a jednu debatu.
-3. Vyzkoušet uložení a načtení na mapě; v události musí být uložení zablokované.
-4. Zapnout větší text, kontrast a omezení pohybu a obnovit stránku.
-5. Dokončit volby a koaliční vyjednávání.
-6. Ověřit celý tok na desktopu a při šířce 390 px.
-
-Podrobný popis iterace je v `docs/v0.17/v0174-style-stabilization.md`.
+Podrobný návrh je v `docs/v0.18/v0180-vertical-slice.md`.
