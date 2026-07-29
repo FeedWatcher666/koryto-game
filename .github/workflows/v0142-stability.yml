@@ -10,19 +10,31 @@ jobs:
   test-and-package:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout current v0.20 tree
         uses: actions/checkout@v4
+
+      - name: Checkout historical v0.17.4 tree
+        uses: actions/checkout@v4
+        with:
+          ref: 78c595c4f4e7f578e50212673adbcdc0598daafa
+          path: .legacy-v0174
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Run tests
+      - name: Run historical v0.17.4 regression suite
         shell: bash
         run: |
           set -o pipefail
-          npm test 2>&1 | tee test-output.txt
+          (cd .legacy-v0174 && node tests/v0160-run.mjs) 2>&1 | tee test-output.txt
+
+      - name: Run current v0.20 contract suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee -a test-output.txt
 
       - name: Upload test diagnostics
         if: always()
