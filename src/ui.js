@@ -71,10 +71,10 @@ export function creationView(state) {
 function objectiveFor(state) {
   const objectives = {
     arrival: ["Najděte Dolní Vejprnice", "Rozhlédněte se po špatné zastávce.", "Ztracenost postavy je záměrná. Ztracenost hráče ne.", "Bez spotřeby akce"],
-    firstCheck: ["Najděte cestu do obce", "Vyberte atribut a proveďte první hod d20.", "Výhoda hází dvakrát a ponechá vyšší výsledek. Nevýhoda nižší.", "Bez spotřeby akce"],
-    firstResult: ["Přijměte výsledek", "Rozhodněte, zda utratíte propisku na přehod.", "Přehod zvýší mediální tlak.", "Bez spotřeby akce"],
-    companion: ["Sestavte první družinu", "Vyberte Marii nebo Bohumila.", "Společník může měnit bonus i počet hozených kostek.", "Bez spotřeby akce"],
-    registration: ["Zaregistrujte kandidaturu", "Zvolte způsob, jak obejít neexistující potvrzení.", "Volba může vytvořit politický dluh, výhodu nebo nevýhodu.", "1 akce"],
+    firstCheck: ["Najděte cestu do obce", "Vyberte způsob a proveďte první hod.", "U každé volby je napsáno, kolik kostek hodíte a která se započítá.", "Bez spotřeby akce"],
+    firstResult: ["Přijměte výsledek", "Podívejte se, která kostka se započítala.", "Přehod propiskou zvýší mediální tlak.", "Bez spotřeby akce"],
+    companion: ["Sestavte první družinu", "Vyberte Marii nebo Bohumila.", "Společník může změnit bonus i dát výhodu či nevýhodu.", "Bez spotřeby akce"],
+    registration: ["Zaregistrujte kandidaturu", "Zvolte způsob, jak obejít neexistující potvrzení.", "Každá volba předem ukazuje pravidlo hodu i jeho důvod.", "1 akce"],
     registrationResult: ["Přežijte první politický účet", "Přijměte důsledky registrace.", "Věčný už o vás ví.", "1 akce"],
     chapterOpen: ["Krysy v JZD", "Zjistěte, kdo rozprodává obecní majetek.", "Všichni vědí kdo. Každý uvádí jiné jméno.", "Kapitola 1"]
   };
@@ -127,6 +127,41 @@ function partyPanel(state) {
   </aside>`;
 }
 
+function rollLesson() {
+  return `<section class="roll-lesson" aria-label="Jak fungují kostky">
+    <article class="mode-normal"><b>1× d20</b><strong>Běžný hod</strong><span>Hodíte jednu kostku. Počítá se její výsledek.</span></article>
+    <article class="mode-advantage"><b>2× d20</b><strong>Výhoda</strong><span>Hodíte dvě kostky. Počítá se <em>vyšší</em> číslo.</span></article>
+    <article class="mode-disadvantage"><b>2× d20</b><strong>Nevýhoda</strong><span>Hodíte dvě kostky. Počítá se <em>nižší</em> číslo.</span></article>
+  </section>`;
+}
+
+function modeDetails(rollMode) {
+  if (rollMode.mode === "advantage") return {
+    title: "VÝHODA",
+    dice: "HODÍTE 2 KOSTKY",
+    rule: "POČÍTÁ SE VYŠŠÍ ČÍSLO",
+    explanation: "Po dopadu zůstane vyšší kostka barevná. Nižší se vyřadí."
+  };
+  if (rollMode.mode === "disadvantage") return {
+    title: "NEVÝHODA",
+    dice: "HODÍTE 2 KOSTKY",
+    rule: "POČÍTÁ SE NIŽŠÍ ČÍSLO",
+    explanation: "Po dopadu zůstane nižší kostka barevná. Vyšší se vyřadí."
+  };
+  if (rollMode.cancelled) return {
+    title: "BĚŽNÝ HOD",
+    dice: "HODÍTE 1 KOSTKU",
+    rule: "VÝHODA A NEVÝHODA SE ZRUŠILY",
+    explanation: "Protikladné vlivy se vyrovnaly. Počítá se jediný hod."
+  };
+  return {
+    title: "BĚŽNÝ HOD",
+    dice: "HODÍTE 1 KOSTKU",
+    rule: "POČÍTÁ SE TATO KOSTKA",
+    explanation: "Žádná výhoda ani nevýhoda tento hod nemění."
+  };
+}
+
 function choiceButton(choice, state) {
   const base = state.hero.attributes[choice.attribute] || 0;
   const classBonus = choice.classBonus?.[state.hero.classId] || 0;
@@ -135,20 +170,35 @@ function choiceButton(choice, state) {
   const visible = base + classBonus + companionBonus;
   const dirtyBlocked = choice.dirty && state.hero.classId === "paladin";
   const rollMode = resolveRollMode(state, choice);
-  const modeCopy = rollMode.mode === "advantage"
-    ? "VÝHODA · 2d20, vyšší"
+  const details = modeDetails(rollMode);
+  const modeSources = rollMode.mode === "advantage"
+    ? rollMode.advantageSources
     : rollMode.mode === "disadvantage"
-      ? "NEVÝHODA · 2d20, nižší"
+      ? rollMode.disadvantageSources
       : rollMode.cancelled
-        ? "VÝHODA + NEVÝHODA SE RUŠÍ"
-        : "BĚŽNÝ HOD · 1d20";
-  const modeSources = rollMode.mode === "advantage" ? rollMode.advantageSources : rollMode.mode === "disadvantage" ? rollMode.disadvantageSources : [];
+        ? [...rollMode.advantageSources, ...rollMode.disadvantageSources]
+        : [];
   return `<button class="action-card ${choice.dirty ? "dirty" : ""} roll-${rollMode.mode}" data-check="${choice.id}" ${dirtyBlocked ? "disabled" : ""}>
     <strong>${choice.label}</strong><span>${choice.detail}</span>
-    <em class="roll-mode-pill mode-${rollMode.mode}">${modeCopy}</em>
-    ${modeSources.length ? `<small class="roll-source-preview">${esc(modeSources[0])}</small>` : ""}
-    <small>${rollMode.notation} + ${visible} proti ${choice.dc}${dirtyBlocked ? " · Třída tuto volbu odmítá" : ""}</small>
+    <div class="plain-roll-rule mode-${rollMode.mode}">
+      <small>${details.title}</small>
+      <b>${details.dice}</b>
+      <strong>${details.rule}</strong>
+      <span>${details.explanation}</span>
+    </div>
+    ${modeSources.length ? `<small class="roll-source-preview"><b>Důvod:</b> ${esc(modeSources.join(" · "))}</small>` : `<small class="roll-source-preview"><b>Důvod:</b> žádný zvláštní vliv</small>`}
+    <small class="technical-roll">Technicky: ${rollMode.notation} + ${visible} proti obtížnosti ${choice.dc}${dirtyBlocked ? " · Třída tuto volbu odmítá" : ""}</small>
   </button>`;
+}
+
+function humanRollSummary(result) {
+  const rolls = result.rolls || [result.roll];
+  if (rolls.length === 1) return `Padlo ${result.roll}. Tento jediný výsledek se započítává.`;
+  const discarded = rolls.find((_, index) => index !== result.keptIndex);
+  if (result.rollMode === "advantage") {
+    return `Výhoda: padlo ${rolls.join(" a ")} → započítává se vyšší ${result.roll}. Nižší ${discarded} se vyřazuje.`;
+  }
+  return `Nevýhoda: padlo ${rolls.join(" a ")} → započítává se nižší ${result.roll}. Vyšší ${discarded} se vyřazuje.`;
 }
 
 function resultCard(state, context) {
@@ -158,16 +208,17 @@ function resultCard(state, context) {
   const modifiers = (result.modifierBreakdown || []).map(item => `<span>${esc(item.label)} <b>+${item.value}</b></span>`).join("");
   const rolls = result.rolls || [result.roll];
   const rollDisplay = rolls.length > 1
-    ? `<div class="result-roll-pair">${rolls.map((roll, index) => `<span class="${index === result.keptIndex ? "kept" : "discarded"}"><b>${roll}</b><small>${index === result.keptIndex ? "ponecháno" : "vyřazeno"}</small></span>`).join("")}</div>`
+    ? `<div class="result-roll-pair">${rolls.map((roll, index) => `<span class="${index === result.keptIndex ? "kept" : "discarded"}"><b>${roll}</b><small>${index === result.keptIndex ? "POČÍTÁ SE" : "NEPOČÍTÁ SE"}</small></span>`).join("")}</div>`
     : `<div class="d20">${result.roll}</div>`;
   return `<section class="result-card tone-${result.outcome.tone}">
     ${rollDisplay}
+    <div class="human-roll-summary"><small>CO SE STALO S KOSTKAMI</small><strong>${esc(humanRollSummary(result))}</strong></div>
     <p class="eyebrow">${result.rollModeLabel || "Běžný hod"} · ${result.outcome.label}</p>
     <h1>${result.outcome.title}</h1>
     <p class="result-impact">${esc(result.impactLine || result.outcome.description)}</p>
     <p>${result.outcome.description}</p>
     ${modifiers ? `<div class="result-modifiers">${modifiers}</div>` : ""}
-    <div class="formula">${esc(formatRollExpression(result))}</div>
+    <details class="technical-result"><summary>Zobrazit technický výpočet</summary><div class="formula">${esc(formatRollExpression(result))}</div></details>
     ${result.reaction ? `<blockquote class="result-reaction"><b>${result.reactionIcon || "💬"}</b><div><strong>${esc(result.reactionSpeaker || "Družina")}</strong><span>${esc(result.reaction)}</span></div></blockquote>` : ""}
     <div class="result-actions">
       ${canReroll ? `<button class="secondary-action" data-action="reroll-first">Přehodit propiskou za +2 tlak</button>` : ""}
@@ -181,14 +232,15 @@ function sceneView(state) {
     <p class="eyebrow">PROLOG · ŠPATNÁ ZASTÁVKA</p>
     <h1>Autobus vás vysadil správně. Jen v jiné obci.</h1>
     <p>Cedule ukazuje ke hřbitovu, sběrnému dvoru a úřadu zavřenému od roku 2007. Řidič vám podá obecní propisku na řetízku. Řetízek je delší než místní transparentnost.</p>
-    <div class="rule-card"><strong>První pravidlo</strong><span>Volba → d20 + atribut → úspěch, cena nebo komplikace. Výhoda a nevýhoda mění počet kostek.</span></div>
+    <div class="rule-card"><strong>První pravidlo</strong><span>Volba → hod kostkou → přičtení atributu → výsledek. Hra vždy předem řekne, kolik kostek hodíte a která se započítá.</span></div>
     <button class="primary-action" data-action="take-pen">Vzít propisku a rozhlédnout se</button>
   </section>`;
 
   if (state.scene === "firstCheck") return `<section class="scene-card">
     <p class="eyebrow">PRVNÍ ZKOUŠKA</p>
     <h1>Najděte obec, než začne kampaň bez vás</h1>
-    <p>Obtížnost, známé bonusy i výhoda nebo nevýhoda jsou viditelné před kliknutím. Skryté vlivy mohou existovat jen tehdy, když po sobě zanechaly stopu.</p>
+    <p>Nejdřív se podívejte na jednoduché pravidlo. Technický zápis je jen detail pro hráče, kteří ho chtějí vidět.</p>
+    ${rollLesson()}
     <div class="action-list">${FIRST_CHECKS.map(choice => choiceButton(choice, state)).join("")}</div>
   </section>`;
 
@@ -205,6 +257,7 @@ function sceneView(state) {
     <p class="eyebrow">OBECNÍ ÚŘAD</p>
     <h1>Vaše kandidatura neexistuje, protože chybí potvrzení, které úřad nevydává</h1>
     <p>Za přepážkou sedí referentka, která má před sebou prázdný formulář a za sebou fotografii Vladimíra Věčného z doby, kdy měl ještě jen jednu funkci.</p>
+    <div class="compact-roll-reminder"><b>Rychlá připomínka:</b> výhoda = dvě kostky a vyšší výsledek; nevýhoda = dvě kostky a nižší výsledek.</div>
     <div class="action-list">${REGISTRATION_CHECKS.map(choice => choiceButton(choice, state)).join("")}</div>
   </section>`;
 
@@ -232,7 +285,7 @@ export function gameView(state) {
       <section class="world-stage">${sceneView(state)}</section>
       ${partyPanel(state)}
     </main>
-    <footer>Čistý runtime v0.20 · skutečná výhoda/nevýhoda · jediný renderer · nový save schema 1</footer>
+    <footer>Čistý runtime v0.20 · srozumitelná výhoda/nevýhoda · jediný renderer · nový save schema 1</footer>
   </div>`;
 }
 
