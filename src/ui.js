@@ -186,6 +186,7 @@ function choiceButton(choice, state) {
       <small>${details.title}</small><b>${details.dice}</b><strong>${details.rule}</strong><span>${details.explanation}</span>
     </div>
     ${modeSources.length ? `<small class="roll-source-preview"><b>Důvod:</b> ${esc(modeSources.join(" · "))}</small>` : `<small class="roll-source-preview"><b>Důvod:</b> žádný zvláštní vliv</small>`}
+    ${choice.pressurePenalty ? `<small class="roll-source-preview"><b>Tlak Věčného:</b> +${choice.pressurePenalty} k obtížnosti za nasbíraný tlak ${choice.rivalPressure}</small>` : ""}
     <small class="technical-roll">Technicky: ${rollMode.notation} + ${modifiers.visibleModifier} proti obtížnosti ${choice.dc}${dirtyBlocked ? " · Třída tuto volbu odmítá" : ""}</small>
   </button>`;
 }
@@ -318,7 +319,7 @@ function sceneView(state) {
   if (state.scene === "jzdSearch") return questCheckScene(state, "search", "KRYsy V JZD · DŮKAZY", "Uvnitř musíte vybrat jednu stopu, než se areál probudí", "Nemůžete prohledat všechno. Účetní kniha, pracovníci a noční kamion vedou k odlišným důkazům a spojencům.");
   if (state.scene === "jzdSearchResult") return resultCard(state, "jzd-search");
   if (state.scene === "jzdRival") return rivalView(state);
-  if (state.scene === "jzdFinal") return questCheckScene(state, "final", "KRYsy V JZD · FINÁLE", "Důkaz nemá politickou hodnotu, dokud ho někdo nepoužije", "Nasbírané důkazy snižují obtížnost. Vaše vědomá reakce na Věčného zvýhodnila jednu z cest.");
+  if (state.scene === "jzdFinal") return questCheckScene(state, "final", "KRYsy V JZD · FINÁLE", "Důkaz nemá politickou hodnotu, dokud ho někdo nepoužije", "Nasbírané důkazy snižují obtížnost. Vaše reakce zvýhodnila jednu cestu, ale každé dva body tlaku Věčného vracejí bod obtížnosti.");
   if (state.scene === "jzdFinalResult") return resultCard(state, "jzd-final");
   if (state.scene === "jzdComplete") return completeView(state);
 

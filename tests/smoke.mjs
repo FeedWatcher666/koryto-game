@@ -94,6 +94,22 @@ assert.equal(resolveRollMode(paladinQuest, honestOathCheck).mode, "advantage", "
 paladinQuest = applyJzdRivalChoice(paladinQuest, "play-along");
 assert.equal(resolveRollMode(paladinQuest, honestOathCheck).mode, "normal", "accepting debt in JZD must suppress the oath for later checks");
 
+const lowPressureQuest = startJzdQuest(createInitialState());
+lowPressureQuest.quest.evidence = 2;
+const highPressureQuest = structuredClone(lowPressureQuest);
+highPressureQuest.quest.rivalPressure = 6;
+const lowPressureFinals = choicesForJzd(lowPressureQuest, "final");
+const highPressureFinals = choicesForJzd(highPressureQuest, "final");
+for (const lowChoice of lowPressureFinals) {
+  const highChoice = highPressureFinals.find(choice => choice.id === lowChoice.id);
+  assert.equal(highChoice.pressurePenalty, 3);
+  assert.equal(
+    highChoice.dc,
+    lowChoice.dc + 3,
+    `${lowChoice.id} must become harder when Věčný has accumulated pressure`
+  );
+}
+
 const approachChoice = choicesForJzd(questState, "approach").find(choice => choice.id === "archive-door");
 const approachMode = resolveRollMode(questState, approachChoice);
 assert.equal(approachMode.mode, "advantage");

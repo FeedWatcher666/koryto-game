@@ -47,6 +47,19 @@ Record only observed defects or clear human feedback. Do not use this file as a 
 
 Human feel testing of agency, pacing, and humor is still pending.
 
+### P2 — Věčný's pressure was displayed but did not affect the finale
+
+- Build and commit: `0.20.0-clean-test.7`, `44100ebad10aafa88f8b392d3a6098cbced00916`
+- Device and viewport: rules and packaged UI review
+- Starting state: JZD finale after costly or complication outcomes
+- Reproduction: compare final choices at equal evidence with low and high `quest.rivalPressure`
+- Expected: accumulated rival pressure changes Věčný's counteraction or final difficulty
+- Actual: pressure was only displayed; final choices were identical
+- Evidence: exact-SHA Codex review requested after CI run `30490033781`
+- Smallest fix: add one final DC for every two pressure, capped at +3, and show the source on each affected choice
+- Regression test: all three final choices are exactly three DC harder at pressure 6 than at pressure 0
+- Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
+
 ### P1 — TEST.7 rejected a valid TEST.6 save
 
 - Build and commit: `0.20.0-clean-test.7`, `abbb525844c64b5c31bc93172f56f7d1cb46cb42`
