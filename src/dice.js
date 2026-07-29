@@ -46,6 +46,7 @@ export function createDicePresentation(state, choice, result) {
     checkLabel: choice.label,
     attributeLabel: attributeLabel(choice.attribute),
     formula: `d20 + ${result.visibleModifier} proti ${result.dc}`,
+    modifiers: result.modifierBreakdown || [],
     impactLine: impactLine(result),
     reaction: companionReaction(state, result),
     companionName: state.party.active ? COMPANIONS[state.party.active]?.name : "Dolní Vejprnice",
@@ -103,6 +104,7 @@ function playLandingSound(result) {
 }
 
 function overlayMarkup(presentation) {
+  const modifiers = presentation.modifiers.map(item => `<span>${item.label} <b>+${item.value}</b></span>`).join("");
   return `<section class="dice-overlay is-rolling" role="dialog" aria-modal="true" aria-label="Hod kostkou">
     <div class="dice-backdrop-sigil" aria-hidden="true">K</div>
     <div class="dice-stage">
@@ -112,6 +114,7 @@ function overlayMarkup(presentation) {
         <span>${presentation.attributeLabel}</span>
         <strong>${presentation.formula}</strong>
       </div>
+      <div class="dice-modifiers" aria-label="Známé bonusy">${modifiers}</div>
       <div class="dice-perspective" aria-hidden="true">
         <div class="dice-polyhedron">
           <div class="dice-facets"></div>
