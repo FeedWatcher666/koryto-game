@@ -51,6 +51,19 @@ async function reachChapter(page, firstChoice, companion, registrationChoice) {
   await page.click('[data-action="jzd-briefing-next"]');
 }
 
+async function saveReloadCheckpoint(page, expectedScene, visibleSelector, verify = null) {
+  await page.click('.hud-actions [data-action="save"]');
+  await expectText(page.locator('.hud-actions [data-action="save"]'), /Uloženo/);
+  await page.reload({waitUntil: "load"});
+  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.6");
+  await page.waitForFunction(scene => globalThis.KorytoClean.getState().scene === scene, expectedScene);
+  await page.waitForSelector(visibleSelector, {state: "visible"});
+  const restored = await page.evaluate(() => globalThis.KorytoClean.getState());
+  assert.equal(restored.scene, expectedScene, `${expectedScene}: saved scene is restored`);
+  if (verify) await verify(restored);
+  return restored;
+}
+
 const browser = await chromium.launch({headless: true});
 try {
   {
@@ -193,8 +206,67 @@ try {
     assert.deepEqual(errors, [], "saved reroll reload: no browser errors");
     await context.close();
   }
+
+  {
+    const {context, page, errors} = await openGame(browser, {
+      rolls: [18],
+      viewport: {width: 1000, height: 720}
+    });
+    await reachChapter(page, "ask-local", "marie", "find-paragraph");
+
+    await page.click('[data-quest-companion="radek"]');
+    await page.click('[data-quest-item="archiveKey"]');
+    await saveReloadCheckpoint(page, "jzdPrep", '[data-action="confirm-jzd-prep"]', restored => {
+      assert.deepEqual(restored.quest.party, ["marie", "radek"], "prep party survives reload");
+      assert.equal(restored.quest.itemId, "archiveKey", "prep item survives reload");
+    });
+    assert.equal(await page.locator('[data-action="confirm-jzd-prep"]').isEnabled(), true, "restored preparation can continue");
+    await page.click('[data-action="confirm-jzd-prep"]');
+
+    await saveReloadCheckpoint(page, "jzdApproach", '[data-check="archive-door"]', restored => {
+      assert.deepEqual(restored.party.members, ["marie", "radek"], "confirmed party survives reload");
+    });
+    await performCheck(page, '[data-check="archive-door"]');
+    await saveReloadCheckpoint(page, "jzdApproachResult", '[data-action="accept-jzd-approach"]', restored => {
+      assert.equal(restored.quest.approach, "archive-door", "approach result survives reload");
+      assert.ok(restored.quest.evidence >= 1, "approach evidence survives reload");
+    });
+    await page.click('[data-action="accept-jzd-approach"]');
+
+    await saveReloadCheckpoint(page, "jzdSearch", '[data-check="ledger-trail"]');
+    await performCheck(page, '[data-check="ledger-trail"]');
+    await saveReloadCheckpoint(page, "jzdSearchResult", '[data-action="accept-jzd-search"]', restored => {
+      assert.equal(restored.quest.discovery, "ledger-trail", "search result survives reload");
+      assert.ok(restored.quest.evidence >= 3, "search evidence survives reload");
+    });
+    await page.click('[data-action="accept-jzd-search"]');
+
+    await saveReloadCheckpoint(page, "jzdRival", '[data-rival-choice="protect-workers"]', restored => {
+      assert.equal(restored.quest.rivalChoice, null, "rival choice remains pending after reload");
+    });
+    await page.click('[data-rival-choice="protect-workers"]');
+
+    await saveReloadCheckpoint(page, "jzdFinal", '[data-check="council-ambush"]', restored => {
+      assert.equal(restored.quest.rivalChoice, "protect-workers", "rival choice survives reload into final");
+    });
+    await performCheck(page, '[data-check="council-ambush"]');
+    await saveReloadCheckpoint(page, "jzdFinalResult", '[data-action="accept-jzd-final"]', restored => {
+      assert.equal(restored.quest.ending, "council-ambush", "final ending survives reload");
+      assert.ok(restored.quest.consequences.length >= 1, "durable consequences survive final-result reload");
+    });
+    await page.click('[data-action="accept-jzd-final"]');
+
+    await saveReloadCheckpoint(page, "jzdComplete", ".quest-complete", restored => {
+      assert.equal(restored.quest.status, "completed", "completed quest status survives reload");
+      assert.equal(restored.quest.ending, "council-ambush", "completed ending survives reload");
+      assert.deepEqual(restored.party.members, ["marie", "radek"], "completed party survives reload");
+    });
+    await expectText(page.locator(".quest-complete h1"), /Pracovníci|Zastupitelstvo/);
+    assert.deepEqual(errors, [], "JZD checkpoint reloads: no browser errors");
+    await context.close();
+  }
 } finally {
   await browser.close();
 }
 
-console.log("Koryto CLEAN TEST.6 full JZD quest and save reload browser gate passed.");
+console.log("Koryto CLEAN TEST.6 full JZD quest, every checkpoint reload, and save reroll browser gate passed.");
