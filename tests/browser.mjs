@@ -4,12 +4,12 @@ import path from "node:path";
 import {pathToFileURL} from "node:url";
 import {chromium} from "playwright";
 
-const dist = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.3");
+const dist = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.4");
 const index = path.join(dist, "index.html");
 assert.ok(fs.existsSync(index), `Missing offline index: ${index}`);
 fs.mkdirSync("browser-artifacts", {recursive: true});
 
-async function openGame(browser, roll, viewport) {
+async function openGame(browser, rolls, viewport) {
   const context = await browser.newContext({viewport});
   const page = await context.newPage();
   const errors = [];
@@ -17,81 +17,68 @@ async function openGame(browser, roll, viewport) {
   page.on("console", message => {
     if (message.type() === "error") errors.push(`console: ${message.text()}`);
   });
-  await page.goto(`${pathToFileURL(index).href}?roll=${roll}`, {waitUntil: "load"});
-  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.3");
-  await page.fill("#heroName", `Tester ${roll}`);
+  await page.goto(`${pathToFileURL(index).href}?rolls=${rolls.join(",")}`, {waitUntil: "load"});
+  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.4");
+  await page.fill("#heroName", `Tester ${rolls.join("-")}`);
   await page.click('button[type="submit"]');
   await page.click('[data-action="take-pen"]');
   return {context, page, errors};
 }
 
-async function canvasSignature(page) {
-  return page.locator('.dice-canvas[data-d20-renderer="icosahedron"]').evaluate(canvas => {
-    const context = canvas.getContext("2d");
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    let opaque = 0;
-    let variation = 0;
-    let previous = -1;
-    const stride = 64;
-    for (let index = 0; index + 3 < pixels.length; index += stride) {
-      const alpha = pixels[index + 3];
-      if (alpha > 10) opaque += 1;
-      const luminance = pixels[index] + pixels[index + 1] + pixels[index + 2];
-      if (previous >= 0 && Math.abs(luminance - previous) > 30) variation += 1;
-      previous = luminance;
-    }
-    return {data: canvas.toDataURL(), opaque, variation};
-  });
+async function expectText(locator, pattern) {
+  assert.match(await locator.innerText(), pattern);
 }
 
 const browser = await chromium.launch({headless: true});
 try {
   {
-    const {context, page, errors} = await openGame(browser, 20, {width: 390, height: 844});
-    await page.locator("[data-check]").first().click();
-    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible"});
-    assert.equal(await page.locator('.dice-canvas[data-d20-renderer="icosahedron"]').count(), 1, "critical: true 3D canvas exists");
-    assert.ok(await page.locator(".dice-modifiers span").count() >= 1, "critical: known modifiers are visible");
-    await page.waitForTimeout(90);
-    const firstFrame = await canvasSignature(page);
+    const {context, page, errors} = await openGame(browser, [4, 17], {width: 390, height: 844});
+    const advantageChoice = page.locator('[data-check="ask-local"]');
+    await expectText(advantageChoice, /VÝHODA/);
+    await advantageChoice.click();
+    await page.waitForSelector(".dice-overlay.is-rolling.mode-advantage", {state: "visible"});
+    assert.equal(await page.locator('.dice-canvas[data-d20-renderer="icosahedron"]').count(), 2, "advantage: two physical d20 canvases");
+    const firstCanvas = page.locator(".dice-canvas").first();
+    await page.waitForFunction(() => document.querySelector(".dice-canvas")?.dataset.frameSignature);
+    const signatureA = await firstCanvas.getAttribute("data-frame-signature");
     await page.waitForTimeout(150);
-    const secondFrame = await canvasSignature(page);
-    assert.ok(firstFrame.opaque > 100, "critical: icosahedron has rendered faces");
-    assert.ok(firstFrame.variation > 20, "critical: faces have varied lighting");
-    assert.notEqual(firstFrame.data, secondFrame.data, "critical: icosahedron rotates between frames");
-    await page.waitForSelector(".dice-overlay.is-landed.is-critical", {state: "visible", timeout: 5000});
-    assert.equal(await page.locator(".dice-number").textContent(), "20");
-    assert.match(await page.locator(".dice-status").innerText(), /Obec nečekaně spolupracuje/);
-    await page.screenshot({path: "browser-artifacts/d20-3d-critical-mobile.png", fullPage: false});
-    await page.waitForSelector(".dice-overlay", {state: "detached", timeout: 4000});
-    await page.waitForSelector(".result-card", {state: "visible"});
-    assert.equal(await page.locator(".result-card .d20").textContent(), "20");
-    assert.match(await page.locator(".result-impact").textContent(), /Obec nečekaně spolupracuje/);
+    const signatureB = await firstCanvas.getAttribute("data-frame-signature");
+    assert.notEqual(signatureA, signatureB, "advantage: geometry changes between frames");
+    assert.equal(await firstCanvas.getAttribute("data-face-labels"), "20");
+    assert.ok(Number(await firstCanvas.getAttribute("data-lighting-range")) > 0.15, "advantage: faces use varied lighting");
+    await page.waitForSelector(".dice-overlay.is-landed", {state: "visible", timeout: 5000});
+    assert.equal(await page.locator(".dice-unit.is-kept .dice-readout").textContent(), "17");
+    assert.equal(await page.locator(".dice-unit.is-discarded .dice-readout").textContent(), "4");
+    assert.match(await page.locator(".dice-status").innerText(), /vyšší výsledek 17/);
+    await page.screenshot({path: "browser-artifacts/d20-advantage-mobile.png", fullPage: false});
+    await page.waitForSelector(".result-card", {state: "visible", timeout: 5000});
+    assert.match(await page.locator(".formula").textContent(), /2d20kh1/);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
-    assert.equal(overflow, false, "critical mobile: no horizontal overflow");
-    assert.deepEqual(errors, [], "critical mobile: no browser errors");
+    assert.equal(overflow, false, "advantage mobile: no horizontal overflow");
+    assert.deepEqual(errors, [], "advantage mobile: no browser errors");
     await context.close();
   }
 
   {
-    const {context, page, errors} = await openGame(browser, 1, {width: 1024, height: 650});
-    await page.locator("[data-check]").first().click();
-    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible"});
-    await page.waitForTimeout(90);
-    const rollingFrame = await canvasSignature(page);
-    assert.ok(rollingFrame.opaque > 100, "fumble: volumetric die is visible");
+    const {context, page, errors} = await openGame(browser, [18, 3], {width: 1024, height: 650});
+    const disadvantageChoice = page.locator('[data-check="follow-folders"]');
+    await expectText(disadvantageChoice, /NEVÝHODA/);
+    await disadvantageChoice.click();
+    await page.waitForSelector(".dice-overlay.is-rolling.mode-disadvantage", {state: "visible"});
+    assert.equal(await page.locator(".dice-canvas").count(), 2, "disadvantage: two physical d20 canvases");
     await page.click("[data-dice-skip]");
-    await page.waitForSelector(".dice-overlay.is-landed.is-fumble", {state: "visible", timeout: 2500});
-    assert.equal(await page.locator(".dice-number").textContent(), "1");
-    assert.match(await page.locator(".dice-status").innerText(), /Tohle už někdo nahlásil/);
-    await page.screenshot({path: "browser-artifacts/d20-3d-fumble-desktop.png", fullPage: false});
-    await page.waitForSelector(".result-card", {state: "visible", timeout: 3000});
-    assert.match(await page.locator(".result-impact").textContent(), /Tohle už někdo nahlásil/);
-    assert.deepEqual(errors, [], "fumble desktop: no browser errors");
+    await page.waitForSelector(".dice-overlay.is-landed", {state: "visible", timeout: 2500});
+    assert.equal(await page.locator(".dice-unit.is-kept .dice-readout").textContent(), "3");
+    assert.equal(await page.locator(".dice-unit.is-discarded .dice-readout").textContent(), "18");
+    assert.match(await page.locator(".dice-status").innerText(), /nižší výsledek 3/);
+    await page.screenshot({path: "browser-artifacts/d20-disadvantage-desktop.png", fullPage: false});
+    await page.waitForSelector(".result-card", {state: "visible", timeout: 3500});
+    assert.match(await page.locator(".formula").textContent(), /2d20kl1/);
+    assert.deepEqual(errors, [], "disadvantage desktop: no browser errors");
     await context.close();
   }
 } finally {
   await browser.close();
 }
 
-console.log("Koryto CLEAN TEST.3 volumetric d20 browser gate passed.");
+console.log("Koryto CLEAN TEST.4 polished D20 advantage/disadvantage browser gate passed.");
