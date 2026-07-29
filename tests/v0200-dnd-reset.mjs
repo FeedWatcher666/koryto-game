@@ -21,7 +21,7 @@ assert.match(js, /app\(\)\.showEvent\("intro"\)/);
 assert.match(css, /v0200-focus-mode/);
 assert.match(css, /v0200-tutorial/);
 
-for (const preserved of ['function startDebate', 'function finalizeElection', 'function startCoalition', 'function newGame']) {
+for (const preserved of ['function startDebate', 'function finalizeElection', 'function initCoalition', 'function newGame']) {
   assert.ok(legacy.includes(preserved), `legacy campaign system removed: ${preserved}`);
 }
 for (const script of ['src/app.js','src/v0174-style-stabilization.js']) {
