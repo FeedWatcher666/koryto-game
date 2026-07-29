@@ -18,18 +18,30 @@
     return null;
   }
 
+  function placeObjective(objective, target) {
+    const correctlyPlaced = objective.parentElement === target.host &&
+      (!target.anchor || objective.previousElementSibling === target.anchor);
+    if (correctlyPlaced) return;
+    if (target.anchor) target.anchor.insertAdjacentElement("afterend", objective);
+    else target.host.prepend(objective);
+  }
+
+  function placeDetailsToggle(objective) {
+    const toggle = document.getElementById("v0200DetailsToggle");
+    if (!toggle) return false;
+    if (toggle.parentElement !== objective) objective.append(toggle);
+    toggle.hidden = false;
+    toggle.dataset.v0200ActiveControl = "details";
+    return true;
+  }
+
   function sync() {
     const objective = document.getElementById("v0200Objective");
     const target = activeHost();
     if (!objective || !target) return false;
 
-    const correctlyPlaced = objective.parentElement === target.host &&
-      (!target.anchor || objective.previousElementSibling === target.anchor);
-    if (!correctlyPlaced) {
-      if (target.anchor) target.anchor.insertAdjacentElement("afterend", objective);
-      else target.host.prepend(objective);
-    }
-
+    placeObjective(objective, target);
+    placeDetailsToggle(objective);
     objective.hidden = false;
     objective.dataset.v0200Host = target.name;
     return true;
