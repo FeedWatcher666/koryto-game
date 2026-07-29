@@ -1,4 +1,4 @@
-# Koryto v0.20.0 CLEAN TEST.4
+# Koryto v0.20.0 CLEAN TEST.5
 
 Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
 
@@ -10,18 +10,26 @@ Hratelný offline balík vzniká příkazem:
 node scripts/build-offline.mjs
 ```
 
-Potom otevřete `dist/koryto-v0.20.0-clean-test.4/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.5/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
 
-## TEST.4
+## Kostky v TEST.5
 
-- skutečná výhoda `2d20kh1` a nevýhoda `2d20kl1`,
-- dva samostatné fyzické hody d20,
-- jasně označená ponechaná a vyřazená kostka,
-- čísla vykreslená přímo na trojúhelníkových stěnách,
-- let přes stůl, první náraz, menší odskok a dojezd,
-- opotřebený bakelitový materiál, dynamické světlo a pohyblivý stín,
-- oddělený zvuk hodu, nárazů a výsledku,
-- viditelné zdroje výhody nebo nevýhody před hodem.
+Fyzický model D20 a systém výhody/nevýhody zůstávají z TEST.4. TEST.5 opravuje jejich vysvětlení.
+
+Hráč nyní ještě před kliknutím vidí:
+
+- kolik kostek hodí,
+- která kostka se započítá,
+- proč má výhodu nebo nevýhodu,
+- technický zápis až jako vedlejší detail.
+
+Pravidla jsou formulována přímo:
+
+- běžný hod: jedna d20, započítá se její výsledek,
+- výhoda: dvě d20, započítá se vyšší výsledek,
+- nevýhoda: dvě d20, započítá se nižší výsledek.
+
+Po dopadu je ponechaná kostka výrazně označena `POČÍTÁ SE`; druhá ztmavne, přeškrtne se a dostane označení `NEPOČÍTÁ SE`. Výsledková karta následně lidskou větou vysvětlí oba hody a vybraný výsledek. Syntaxe `2d20kh1` a `2d20kl1` zůstává skrytá v rozbalitelném technickém výpočtu.
 
 Implementace je inspirována běžnou D&D syntaxí a chováním dice enginů, ale nepřidává Python ani externí runtime závislost.
 
