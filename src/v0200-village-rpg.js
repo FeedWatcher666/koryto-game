@@ -272,7 +272,6 @@
       addLog('Srážka s Věčným skončila fotografií, na které vypadáte vinně oba.');
     }
 
-    moveRival();
     afterAction();
     render();
     return true;
