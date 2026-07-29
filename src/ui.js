@@ -7,7 +7,7 @@ import {
   REGISTRATION_CHECKS,
   VERSION
 } from "./data.js";
-import {deriveAttributes} from "./rules.js";
+import {deriveAttributes, formatRollExpression, resolveRollMode} from "./rules.js";
 
 const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
@@ -71,10 +71,10 @@ export function creationView(state) {
 function objectiveFor(state) {
   const objectives = {
     arrival: ["Najděte Dolní Vejprnice", "Rozhlédněte se po špatné zastávce.", "Ztracenost postavy je záměrná. Ztracenost hráče ne.", "Bez spotřeby akce"],
-    firstCheck: ["Najděte cestu do obce", "Vyberte atribut a proveďte první hod d20.", "Neúspěch vytvoří komplikaci, nikoli konec.", "Bez spotřeby akce"],
+    firstCheck: ["Najděte cestu do obce", "Vyberte atribut a proveďte první hod d20.", "Výhoda hází dvakrát a ponechá vyšší výsledek. Nevýhoda nižší.", "Bez spotřeby akce"],
     firstResult: ["Přijměte výsledek", "Rozhodněte, zda utratíte propisku na přehod.", "Přehod zvýší mediální tlak.", "Bez spotřeby akce"],
-    companion: ["Sestavte první družinu", "Vyberte Marii nebo Bohumila.", "Společník pomáhá, ale má vlastní hranice.", "Bez spotřeby akce"],
-    registration: ["Zaregistrujte kandidaturu", "Zvolte způsob, jak obejít neexistující potvrzení.", "Volba může vytvořit politický dluh.", "1 akce"],
+    companion: ["Sestavte první družinu", "Vyberte Marii nebo Bohumila.", "Společník může měnit bonus i počet hozených kostek.", "Bez spotřeby akce"],
+    registration: ["Zaregistrujte kandidaturu", "Zvolte způsob, jak obejít neexistující potvrzení.", "Volba může vytvořit politický dluh, výhodu nebo nevýhodu.", "1 akce"],
     registrationResult: ["Přežijte první politický účet", "Přijměte důsledky registrace.", "Věčný už o vás ví.", "1 akce"],
     chapterOpen: ["Krysy v JZD", "Zjistěte, kdo rozprodává obecní majetek.", "Všichni vědí kdo. Každý uvádí jiné jméno.", "Kapitola 1"]
   };
@@ -134,9 +134,20 @@ function choiceButton(choice, state) {
   const companionBonus = (choice.companionBonus?.[state.party.active] || 0) + (companion?.bonus?.[choice.attribute] || 0);
   const visible = base + classBonus + companionBonus;
   const dirtyBlocked = choice.dirty && state.hero.classId === "paladin";
-  return `<button class="action-card ${choice.dirty ? "dirty" : ""}" data-check="${choice.id}" ${dirtyBlocked ? "disabled" : ""}>
+  const rollMode = resolveRollMode(state, choice);
+  const modeCopy = rollMode.mode === "advantage"
+    ? "VÝHODA · 2d20, vyšší"
+    : rollMode.mode === "disadvantage"
+      ? "NEVÝHODA · 2d20, nižší"
+      : rollMode.cancelled
+        ? "VÝHODA + NEVÝHODA SE RUŠÍ"
+        : "BĚŽNÝ HOD · 1d20";
+  const modeSources = rollMode.mode === "advantage" ? rollMode.advantageSources : rollMode.mode === "disadvantage" ? rollMode.disadvantageSources : [];
+  return `<button class="action-card ${choice.dirty ? "dirty" : ""} roll-${rollMode.mode}" data-check="${choice.id}" ${dirtyBlocked ? "disabled" : ""}>
     <strong>${choice.label}</strong><span>${choice.detail}</span>
-    <small>d20 + ${visible} proti ${choice.dc}${dirtyBlocked ? " · Třída tuto volbu odmítá" : ""}</small>
+    <em class="roll-mode-pill mode-${rollMode.mode}">${modeCopy}</em>
+    ${modeSources.length ? `<small class="roll-source-preview">${esc(modeSources[0])}</small>` : ""}
+    <small>${rollMode.notation} + ${visible} proti ${choice.dc}${dirtyBlocked ? " · Třída tuto volbu odmítá" : ""}</small>
   </button>`;
 }
 
@@ -145,14 +156,18 @@ function resultCard(state, context) {
   if (!result) return "";
   const canReroll = context === "first" && result.level === "complication" && state.flags.chainedPenAvailable && !state.flags.chainedPenSpent;
   const modifiers = (result.modifierBreakdown || []).map(item => `<span>${esc(item.label)} <b>+${item.value}</b></span>`).join("");
+  const rolls = result.rolls || [result.roll];
+  const rollDisplay = rolls.length > 1
+    ? `<div class="result-roll-pair">${rolls.map((roll, index) => `<span class="${index === result.keptIndex ? "kept" : "discarded"}"><b>${roll}</b><small>${index === result.keptIndex ? "ponecháno" : "vyřazeno"}</small></span>`).join("")}</div>`
+    : `<div class="d20">${result.roll}</div>`;
   return `<section class="result-card tone-${result.outcome.tone}">
-    <div class="d20">${result.roll}</div>
-    <p class="eyebrow">${result.outcome.label}</p>
+    ${rollDisplay}
+    <p class="eyebrow">${result.rollModeLabel || "Běžný hod"} · ${result.outcome.label}</p>
     <h1>${result.outcome.title}</h1>
     <p class="result-impact">${esc(result.impactLine || result.outcome.description)}</p>
     <p>${result.outcome.description}</p>
     ${modifiers ? `<div class="result-modifiers">${modifiers}</div>` : ""}
-    <div class="formula">${result.roll} + ${result.visibleModifier}${result.hiddenModifier ? ` ${result.hiddenModifier}` : ""} = ${result.total} proti ${result.dc}</div>
+    <div class="formula">${esc(formatRollExpression(result))}</div>
     ${result.reaction ? `<blockquote class="result-reaction"><b>${result.reactionIcon || "💬"}</b><div><strong>${esc(result.reactionSpeaker || "Družina")}</strong><span>${esc(result.reaction)}</span></div></blockquote>` : ""}
     <div class="result-actions">
       ${canReroll ? `<button class="secondary-action" data-action="reroll-first">Přehodit propiskou za +2 tlak</button>` : ""}
@@ -166,14 +181,14 @@ function sceneView(state) {
     <p class="eyebrow">PROLOG · ŠPATNÁ ZASTÁVKA</p>
     <h1>Autobus vás vysadil správně. Jen v jiné obci.</h1>
     <p>Cedule ukazuje ke hřbitovu, sběrnému dvoru a úřadu zavřenému od roku 2007. Řidič vám podá obecní propisku na řetízku. Řetízek je delší než místní transparentnost.</p>
-    <div class="rule-card"><strong>První pravidlo</strong><span>Volba → d20 + atribut → úspěch, cena nebo komplikace.</span></div>
+    <div class="rule-card"><strong>První pravidlo</strong><span>Volba → d20 + atribut → úspěch, cena nebo komplikace. Výhoda a nevýhoda mění počet kostek.</span></div>
     <button class="primary-action" data-action="take-pen">Vzít propisku a rozhlédnout se</button>
   </section>`;
 
   if (state.scene === "firstCheck") return `<section class="scene-card">
     <p class="eyebrow">PRVNÍ ZKOUŠKA</p>
     <h1>Najděte obec, než začne kampaň bez vás</h1>
-    <p>Obtížnost i známé bonusy jsou viditelné. Skryté vlivy mohou existovat, ale hra je nikdy nepoužije bez stopy.</p>
+    <p>Obtížnost, známé bonusy i výhoda nebo nevýhoda jsou viditelné před kliknutím. Skryté vlivy mohou existovat jen tehdy, když po sobě zanechaly stopu.</p>
     <div class="action-list">${FIRST_CHECKS.map(choice => choiceButton(choice, state)).join("")}</div>
   </section>`;
 
@@ -182,7 +197,7 @@ function sceneView(state) {
   if (state.scene === "companion") return `<section class="scene-card">
     <p class="eyebrow">DRUŽINA</p>
     <h1>Na úřad se nechodí sám</h1>
-    <p>Vyberte prvního společníka. Není to bonusová karta. Je to člověk, který vám může pomoci, odporovat nebo vás později zradit.</p>
+    <p>Vyberte prvního společníka. Není to bonusová karta. Může přidat číslo, dát výhodu, odporovat nebo vás později zradit.</p>
     <div class="companion-grid">${Object.entries(COMPANIONS).map(([id, companion]) => `<button class="companion-card" data-companion="${id}"><b>${companion.icon}</b><strong>${companion.name}</strong><span>${companion.role}</span><p>${companion.description}</p><small>${companion.demand}</small></button>`).join("")}</div>
   </section>`;
 
@@ -217,7 +232,7 @@ export function gameView(state) {
       <section class="world-stage">${sceneView(state)}</section>
       ${partyPanel(state)}
     </main>
-    <footer>Čistý runtime v0.20 · jediný renderer · nový save schema 1</footer>
+    <footer>Čistý runtime v0.20 · skutečná výhoda/nevýhoda · jediný renderer · nový save schema 1</footer>
   </div>`;
 }
 
