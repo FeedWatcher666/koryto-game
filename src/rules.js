@@ -18,6 +18,12 @@ export function rollD20(random = Math.random) {
   return 1 + Math.floor(random() * 20);
 }
 
+export function activePartyIds(state) {
+  const questParty = state.quest?.status === "active" ? state.quest.party : null;
+  const source = questParty?.length ? questParty : state.party?.members?.length ? state.party.members : state.party?.active ? [state.party.active] : [];
+  return [...new Set(source)].filter(id => COMPANIONS[id]);
+}
+
 function matchedSource(choice, type, group, id) {
   if (!id || !choice[type]?.[group]?.includes(id)) return null;
   const fallback = `${type === "advantage" ? "Výhoda" : "Nevýhoda"}: ${group}`;
@@ -25,15 +31,19 @@ function matchedSource(choice, type, group, id) {
 }
 
 export function resolveRollMode(state, choice) {
+  const partyIds = activePartyIds(state);
+  const itemId = state.quest?.itemId || null;
   const advantageSources = [
     matchedSource(choice, "advantage", "classes", state.hero.classId),
     matchedSource(choice, "advantage", "origins", state.hero.originId),
-    matchedSource(choice, "advantage", "companions", state.party.active)
+    matchedSource(choice, "advantage", "items", itemId),
+    ...partyIds.map(id => matchedSource(choice, "advantage", "companions", id))
   ].filter(Boolean);
   const disadvantageSources = [
     matchedSource(choice, "disadvantage", "classes", state.hero.classId),
     matchedSource(choice, "disadvantage", "origins", state.hero.originId),
-    matchedSource(choice, "disadvantage", "companions", state.party.active)
+    matchedSource(choice, "disadvantage", "items", itemId),
+    ...partyIds.map(id => matchedSource(choice, "disadvantage", "companions", id))
   ].filter(Boolean);
 
   if (choice.honest && state.hero.classId === "paladin" && state.resources.debt === 0) {
@@ -48,6 +58,31 @@ export function resolveRollMode(state, choice) {
   return {mode, notation, label, advantageSources, disadvantageSources, cancelled};
 }
 
+function bestContribution(entries) {
+  return entries.filter(entry => entry.value !== 0).sort((a, b) => Math.abs(b.value) - Math.abs(a.value))[0] || null;
+}
+
+export function checkModifiers(state, choice) {
+  const attributeValue = state.hero.attributes[choice.attribute] || 0;
+  const classBonus = choice.classBonus?.[state.hero.classId] || 0;
+  const partyIds = activePartyIds(state);
+  const companionChoice = bestContribution(partyIds.map(id => ({id, label: COMPANIONS[id].name, value: choice.companionBonus?.[id] || 0})));
+  const companionPassive = bestContribution(partyIds.map(id => ({id, label: COMPANIONS[id].name, value: COMPANIONS[id]?.bonus?.[choice.attribute] || 0})));
+  const itemId = state.quest?.itemId || null;
+  const itemBonus = itemId ? choice.itemBonus?.[itemId] || 0 : 0;
+  const itemLabel = choice.itemBonusLabels?.[itemId] || "Vybavení";
+  const visibleModifier = attributeValue + classBonus + (companionChoice?.value || 0) + (companionPassive?.value || 0) + itemBonus;
+  const hiddenModifier = choice.dirty && state.hero.classId !== "rogue" ? -1 : 0;
+  const modifierBreakdown = [
+    {id: "attribute", label: "Atribut", value: attributeValue},
+    {id: "class", label: "Třída", value: classBonus},
+    companionChoice ? {id: `companion-choice-${companionChoice.id}`, label: `${companionChoice.label} · příprava`, value: companionChoice.value} : null,
+    companionPassive ? {id: `companion-passive-${companionPassive.id}`, label: companionPassive.label, value: companionPassive.value} : null,
+    itemBonus ? {id: `item-${itemId}`, label: itemLabel, value: itemBonus} : null
+  ].filter(item => item && item.value !== 0);
+  return {attributeValue, classBonus, companionChoice, companionPassive, itemBonus, visibleModifier, hiddenModifier, modifierBreakdown};
+}
+
 export function outcomeLevel(roll, total, dc) {
   if (roll === 20) return "critical";
   if (roll === 1) return "complication";
@@ -57,13 +92,7 @@ export function outcomeLevel(roll, total, dc) {
 }
 
 export function resolveCheck(state, choice, random = Math.random) {
-  const attributeValue = state.hero.attributes[choice.attribute] || 0;
-  const classBonus = choice.classBonus?.[state.hero.classId] || 0;
-  const companionBonus = choice.companionBonus?.[state.party.active] || 0;
-  const companion = COMPANIONS[state.party.active];
-  const passiveBonus = companion?.bonus?.[choice.attribute] || 0;
-  const visibleModifier = attributeValue + classBonus + companionBonus + passiveBonus;
-  const hiddenModifier = choice.dirty && state.hero.classId !== "rogue" ? -1 : 0;
+  const modifiers = checkModifiers(state, choice);
   const rollMode = resolveRollMode(state, choice);
   const rolls = rollMode.mode === "normal" ? [rollD20(random)] : [rollD20(random), rollD20(random)];
   const keptIndex = rollMode.mode === "advantage"
@@ -72,14 +101,8 @@ export function resolveCheck(state, choice, random = Math.random) {
       ? (rolls[1] < rolls[0] ? 1 : 0)
       : 0;
   const roll = rolls[keptIndex];
-  const total = roll + visibleModifier + hiddenModifier;
+  const total = roll + modifiers.visibleModifier + modifiers.hiddenModifier;
   const level = outcomeLevel(roll, total, choice.dc);
-  const modifierBreakdown = [
-    {id: "attribute", label: "Atribut", value: attributeValue},
-    {id: "class", label: "Třída", value: classBonus},
-    {id: "companion-choice", label: "Příprava družiny", value: companionBonus},
-    {id: "companion-passive", label: companion?.name || "Společník", value: passiveBonus}
-  ].filter(item => item.value !== 0);
 
   return {
     choiceId: choice.id,
@@ -95,9 +118,9 @@ export function resolveCheck(state, choice, random = Math.random) {
     disadvantageSources: rollMode.disadvantageSources,
     cancelledRollModes: rollMode.cancelled,
     dc: choice.dc,
-    visibleModifier,
-    hiddenModifier,
-    modifierBreakdown,
+    visibleModifier: modifiers.visibleModifier,
+    hiddenModifier: modifiers.hiddenModifier,
+    modifierBreakdown: modifiers.modifierBreakdown,
     total,
     level,
     outcome: OUTCOMES[level]
