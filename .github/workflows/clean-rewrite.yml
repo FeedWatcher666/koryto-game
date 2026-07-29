@@ -182,6 +182,7 @@ jobs:
         env:
           TEST_SCOPE: ${{ steps.scope.outputs.full }}
           PLAYABLE_ID: ${{ steps.playable.outputs.artifact-id }}
+          PLAYABLE_DIGEST: ${{ steps.playable.outputs.artifact-digest }}
           SCREENSHOT_ID: ${{ steps.screenshots.outputs.artifact-id }}
           LIGHTHOUSE_ID: ${{ steps.lighthouse.outputs.artifact-id }}
         with:
@@ -199,6 +200,7 @@ jobs:
               line('Run', `[${context.runId}](${runUrl})`),
               line('Scope', process.env.TEST_SCOPE === 'true' ? 'full packaged browser + accessibility + Lighthouse' : 'fast source/build checks'),
               line('Playable artifact ID', process.env.PLAYABLE_ID),
+              line('Playable artifact digest', process.env.PLAYABLE_DIGEST ? `\`${process.env.PLAYABLE_DIGEST}\`` : null),
               line('Screenshot artifact ID', process.env.SCREENSHOT_ID),
               line('Lighthouse artifact ID', process.env.LIGHTHOUSE_ID),
               '',

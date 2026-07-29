@@ -119,6 +119,7 @@ const ui = fs.readFileSync(new URL("../src/ui.js", import.meta.url), "utf8");
 const quest = fs.readFileSync(new URL("../src/quest-jzd.js", import.meta.url), "utf8");
 const questCss = fs.readFileSync(new URL("../styles/quest-jzd.css", import.meta.url), "utf8");
 const pagesWorkflow = fs.readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
+const cleanWorkflow = fs.readFileSync(new URL("../.github/workflows/clean-rewrite.yml", import.meta.url), "utf8");
 const gitignore = fs.readFileSync(new URL("../.gitignore", import.meta.url), "utf8");
 assert.match(dice, /dice-rack/);
 assert.match(dice, /finally\s*{/);
@@ -128,6 +129,8 @@ assert.match(physics, /FACE_NUMBERS/);
 assert.match(physics, /worn-bakelite/);
 assert.match(main, /state\.flags\.lastResult\?\.choiceId/);
 assert.match(main, /next\.party\.members = \[\.\.\.next\.quest\.party\]/);
+assert.match(main, /data-quest-companion/);
+assert.match(main, /data-quest-item/);
 assert.match(main, /aria-pressed/);
 assert.match(ui, /Zahájit výpravu do JZD/);
 assert.match(ui, /Vyberte přesně dva společníky/);
@@ -140,6 +143,8 @@ assert.match(questCss, /rival-choice-grid/);
 assert.doesNotMatch(pagesWorkflow, /workflow_dispatch/, "manual Pages deployment must not bypass the green-run gate");
 assert.match(pagesWorkflow, /github\.event\.workflow_run\.head_sha/);
 assert.match(pagesWorkflow, /github\.event\.workflow_run\.id/);
+assert.match(cleanWorkflow, /steps\.playable\.outputs\.artifact-digest/);
+assert.match(cleanWorkflow, /Playable artifact digest/);
 for (const generated of ["node_modules/", "dist/", "browser-artifacts/", "lighthouse-artifacts/"]) {
   assert.match(gitignore, new RegExp(`^${generated.replace("/", "\\/")}$`, "m"), `${generated} must stay ignored`);
 }

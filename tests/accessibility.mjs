@@ -73,12 +73,6 @@ async function audit(label) {
   assert(report.overflow <= 1, `${label}: horizontal overflow ${report.overflow}px`);
 }
 
-async function assertSinglePressed(groupSelector, expectedId) {
-  assert.equal(await page.locator(`${groupSelector}[aria-pressed]`).count(), 3, `${groupSelector}: every choice must expose aria-pressed`);
-  assert.equal(await page.locator(`${groupSelector}[aria-pressed="true"]`).count(), 1, `${groupSelector}: exactly one choice must be selected`);
-  assert.equal(await page.locator(`${groupSelector}[aria-pressed="true"]`).getAttribute(expectedId.startsWith("data-origin") ? "data-origin" : "data-class"), expectedId.split("=")[1]);
-}
-
 try {
   await page.goto(`http://127.0.0.1:${port}/`, {waitUntil: "networkidle"});
   await audit("creation screen");
@@ -147,6 +141,23 @@ try {
   assert.equal(await page.locator(".dice-overlay").count(), 0, "failed presentation must remove the modal");
   assert.equal(await page.evaluate(() => document.documentElement.classList.contains("dice-lock")), false, "failed presentation must release dice-lock");
   assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "failed presentation must restore background interaction");
+
+  await page.locator("[data-action='accept-registration']").click();
+  await page.locator("[data-action='start-jzd']").click();
+  await page.locator("[data-action='jzd-briefing-next']").click();
+  await page.locator("[data-quest-companion]").first().waitFor();
+  assert.equal(await page.locator("[data-quest-companion][aria-pressed]").count(), 3, "every companion choice must expose selected state");
+  assert.equal(await page.locator("[data-quest-companion][aria-pressed='true']").count(), 1, "the recruited companion starts selected");
+  await page.locator("[data-quest-companion='bohumil']").click();
+  assert.equal(await page.locator("[data-quest-companion][aria-pressed='true']").count(), 2, "two selected companions must be programmatically visible");
+  assert.equal(await page.locator("[data-quest-item][aria-pressed]").count(), 3, "every item choice must expose selected state");
+  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").count(), 0, "no item starts selected");
+  await page.locator("[data-quest-item='recorder']").click();
+  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").getAttribute("data-quest-item"), "recorder");
+  await page.locator("[data-quest-item='archiveKey']").click();
+  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").count(), 1, "item selection remains exclusive");
+  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").getAttribute("data-quest-item"), "archiveKey");
+  await audit("JZD preparation selected states");
 
   assert.deepEqual(browserErrors, [], `browser errors: ${browserErrors.join(" | ")}`);
   console.log("Accessibility, selected-state semantics, focus containment, and dice-failure cleanup passed in the packaged build.");

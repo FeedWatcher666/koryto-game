@@ -25,18 +25,25 @@ const forcedRolls = (() => {
 })();
 let forcedRollIndex = 0;
 
-function syncCreationSelectionState() {
+function syncSelectionState() {
   app.querySelectorAll("[data-origin]").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.origin === state.hero.originId));
   });
   app.querySelectorAll("[data-class]").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.class === state.hero.classId));
   });
+  const questParty = new Set(state.quest?.party || []);
+  app.querySelectorAll("[data-quest-companion]").forEach(button => {
+    button.setAttribute("aria-pressed", String(questParty.has(button.dataset.questCompanion)));
+  });
+  app.querySelectorAll("[data-quest-item]").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.questItem === state.quest?.itemId));
+  });
 }
 
 function renderCurrentState() {
   render(app, state);
-  syncCreationSelectionState();
+  syncSelectionState();
 }
 
 function commit(nextState, persist = false) {
