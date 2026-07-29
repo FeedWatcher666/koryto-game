@@ -22,13 +22,14 @@
 .v0200-class-identity span { opacity:.78; }
 .v0200-class-note { display:block; margin-top:.35rem; font-size:.68rem; font-weight:850; letter-spacing:.025em; text-transform:uppercase; opacity:.7; }
 
-.v0200-objective { position:relative; z-index:3; display:grid; grid-template-columns:minmax(190px,.8fr) minmax(0,1.8fr); gap:12px; margin:0 0 10px; padding:10px 12px; border:2px solid rgba(50,34,15,.62); border-radius:12px; color:var(--v20-ink); background:linear-gradient(135deg,var(--v20-paper),#ead5a7); box-shadow:0 5px 0 rgba(45,29,12,.24); }
+.v0200-objective { position:relative; z-index:81; display:grid; grid-template-columns:minmax(190px,.8fr) minmax(0,1.8fr); gap:12px; margin:10px 12px; padding:10px 12px; border:2px solid rgba(50,34,15,.62); border-radius:12px; color:var(--v20-ink); background:linear-gradient(135deg,var(--v20-paper),#ead5a7); box-shadow:0 5px 0 rgba(45,29,12,.24); }
 .v0200-objective-main span { display:block; font-size:.66rem; font-weight:900; letter-spacing:.13em; color:var(--v20-red); }
 .v0200-objective-main strong { display:block; margin-top:.18rem; font-size:1.05rem; line-height:1.15; }
 .v0200-objective-meta { display:grid; grid-template-columns:1.25fr 1fr .75fr; gap:9px; font-size:.72rem; line-height:1.25; }
 .v0200-objective-meta span { padding:.42rem .5rem; border-left:2px solid rgba(70,47,20,.22); }
 .v0200-objective-meta b, .v0200-objective-meta i { display:block; font-style:normal; }
 .v0200-objective-meta i { margin-top:.1rem; opacity:.82; }
+.v0200-objective > #v0200DetailsToggle { grid-column:1 / -1; justify-self:end; min-height:34px; margin:0; border-color:rgba(50,34,15,.55); background:#3c2a19; color:#fff0c5; box-shadow:none; white-space:nowrap; }
 
 .v0200-focus-mode:not(.v0200-details-open) [data-v0200-panel="advanced"] { display:none !important; }
 .v0200-focus-mode #gameScreen .game { grid-template-columns:minmax(205px,250px) minmax(0,1fr) minmax(230px,290px); }
@@ -68,8 +69,10 @@
   .v0200-rule-chip { display:inline-block; margin-top:.5rem; }
   .v0200-focus-mode #gameScreen .game { display:block; }
   .v0200-focus-mode #gameScreen .game > .side:last-child { display:block; }
+  .v0200-objective { margin:8px; }
   .v0200-objective-meta { grid-template-columns:1fr; }
   .v0200-objective-meta span { border-left:0; border-top:1px solid rgba(70,47,20,.2); }
+  .v0200-objective > #v0200DetailsToggle { justify-self:stretch; width:100%; }
   .v0200-tutorial { padding:8px; }
   .v0200-tutorial-card { max-height:96vh; border-width:3px; border-radius:10px; }
   .v0200-tutorial-actions .btn { width:100%; }
