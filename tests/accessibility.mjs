@@ -167,6 +167,25 @@ try {
     "chapterOpen",
     "a denied save must not block the persisted scene transition"
   );
+  await page.locator(".hud-actions [data-action='save']").click();
+  assert.match(await page.locator(".hud-actions [data-action='save']").innerText(), /Uloženo/);
+  await page.evaluate(() => {
+    globalThis.__korytoOriginalStorageRemoveItem = Storage.prototype.removeItem;
+    Storage.prototype.removeItem = function forcedStorageRemovalFailure() {
+      throw new DOMException("Storage removal denied", "SecurityError");
+    };
+  });
+  await page.locator("[data-action='restart']").click();
+  assert.equal(
+    await page.evaluate(() => globalThis.KorytoClean.getState().scene),
+    "chapterOpen",
+    "a failed save deletion must keep the current campaign active"
+  );
+  assert.match(await page.locator("[data-action='restart']").innerText(), /Smazání selhalo/);
+  await page.evaluate(() => {
+    Storage.prototype.removeItem = globalThis.__korytoOriginalStorageRemoveItem;
+    delete globalThis.__korytoOriginalStorageRemoveItem;
+  });
   await page.locator("[data-action='start-jzd']").click();
   await page.locator("[data-action='jzd-briefing-next']").click();
   await page.locator("[data-quest-companion]").first().waitFor();

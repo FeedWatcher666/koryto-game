@@ -18,6 +18,7 @@ let lastFirstChoice = state.scene === "firstResult"
   : null;
 let creationNameDraft = "";
 let rolling = false;
+let transitionLocked = false;
 
 const forcedRolls = (() => {
   const params = new URLSearchParams(location.search);
@@ -133,6 +134,9 @@ app.addEventListener("input", event => {
 
 app.addEventListener("click", async event => {
   if (rolling && !event.target.closest("[data-dice-skip]")) return;
+  if (transitionLocked) return;
+  transitionLocked = true;
+  queueMicrotask(() => { transitionLocked = false; });
 
   const originButton = event.target.closest("[data-origin]");
   if (originButton) {
@@ -259,7 +263,10 @@ app.addEventListener("click", async event => {
   } else if (action === "save") {
     actionButton.textContent = saveGame(state) ? "Uloženo" : "Uložení selhalo";
   } else if (action === "restart") {
-    clearSave();
+    if (!clearSave()) {
+      actionButton.textContent = "Smazání selhalo";
+      return;
+    }
     state = createInitialState();
     lastFirstChoice = null;
     creationNameDraft = "";

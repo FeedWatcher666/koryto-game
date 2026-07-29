@@ -163,11 +163,32 @@ try {
     await page.click('[data-action="accept-jzd-approach"]');
     await performCheck(page, '[data-check="truck-footage"]');
     await page.click('[data-action="accept-jzd-search"]');
-    await page.click('[data-rival-choice="play-along"]');
+    const debtBeforeRival = await page.evaluate(() => globalThis.KorytoClean.getState().resources.debt);
+    await page.locator('[data-rival-choice="play-along"]').evaluate(button => {
+      button.click();
+      button.click();
+    });
+    await page.waitForFunction(() => globalThis.KorytoClean.getState().scene === "jzdFinal");
+    assert.equal(
+      await page.evaluate(() => globalThis.KorytoClean.getState().resources.debt),
+      debtBeforeRival + 1,
+      "rapid rival activation must apply political debt exactly once"
+    );
 
     const tradeChoice = page.locator('[data-check="trade-evidence"]');
     await expectText(tradeChoice, /VÝHODA A NEVÝHODA SE ZRUŠILY/);
-    await performCheck(page, '[data-check="trade-evidence"]');
+    await tradeChoice.evaluate(button => {
+      button.click();
+      button.click();
+    });
+    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
+    await page.click("[data-dice-skip]");
+    await page.waitForSelector(".result-card", {state: "visible", timeout: 4000});
+    assert.equal(
+      await page.evaluate(() => globalThis.KorytoClean.getState().history.filter(item => item.context === "jzd-final").length),
+      1,
+      "rapid final-check activation must apply durable consequences exactly once"
+    );
     await page.click('[data-action="accept-jzd-final"]');
     await expectPlayableHierarchy(page);
 

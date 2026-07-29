@@ -99,6 +99,32 @@ Human feel testing of agency, pacing, and humor is still pending.
 - Regression test: all three rival choices keep their advertised favored ending at every reachable starting pressure 0–5
 - Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
 
+### P1 — Packaged gate did not prove duplicate-click protection
+
+- Build and commit: `0.20.0-clean-test.7`, `f90350683d5ccfd9c7dd99ed00a66e6ce1fa899b`
+- Device and viewport: packaged Chromium build
+- Starting state: rival decision and final JZD check
+- Reproduction: activate the same control twice synchronously
+- Expected: political debt, history, rewards, and consequences apply once
+- Actual: runtime intent existed for dice rolls, but the release gate did not cover rapid rival and durable-result activation
+- Evidence: exact-SHA Codex review on PR #37
+- Smallest fix: add a synchronous transition lock and exercise rapid rival plus final-check activations in the packaged gate
+- Regression test: `play-along` adds exactly one debt and `jzd-final` creates exactly one history entry
+- Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
+
+### P2 — Failed save deletion made a reset look successful
+
+- Build and commit: `0.20.0-clean-test.7`, `f90350683d5ccfd9c7dd99ed00a66e6ce1fa899b`
+- Device and viewport: offline build with `Storage.removeItem()` denied
+- Starting state: an active campaign with a stored save
+- Reproduction: click **Nová hra** while save deletion throws
+- Expected: keep the current campaign and report that deletion failed
+- Actual: the UI showed a fresh campaign even though reload could resurrect the old save
+- Evidence: exact-SHA Codex review on PR #37
+- Smallest fix: reset only after `clearSave()` succeeds and otherwise show `Smazání selhalo`
+- Regression test: packaged accessibility gate denies removal, keeps `chapterOpen`, and verifies the failure label
+- Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
+
 ### P1 — TEST.7 rejected a valid TEST.6 save
 
 - Build and commit: `0.20.0-clean-test.7`, `abbb525844c64b5c31bc93172f56f7d1cb46cb42`
