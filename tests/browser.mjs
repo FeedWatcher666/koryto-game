@@ -228,7 +228,7 @@ try {
     });
     await performCheck(page, '[data-check="archive-door"]');
     await saveReloadCheckpoint(page, "jzdApproachResult", '[data-action="accept-jzd-approach"]', restored => {
-      assert.equal(restored.quest.approach, "archive-door", "approach result survives reload");
+      assert.equal(restored.quest.route, "archive-door", "approach route survives reload");
       assert.ok(restored.quest.evidence >= 1, "approach evidence survives reload");
     });
     await page.click('[data-action="accept-jzd-approach"]');
@@ -236,7 +236,7 @@ try {
     await saveReloadCheckpoint(page, "jzdSearch", '[data-check="ledger-trail"]');
     await performCheck(page, '[data-check="ledger-trail"]');
     await saveReloadCheckpoint(page, "jzdSearchResult", '[data-action="accept-jzd-search"]', restored => {
-      assert.equal(restored.quest.discovery, "ledger-trail", "search result survives reload");
+      assert.ok(restored.quest.results.some(item => item.context === "jzd-search" && item.choiceId === "ledger-trail"), "search result survives reload");
       assert.ok(restored.quest.evidence >= 3, "search evidence survives reload");
     });
     await page.click('[data-action="accept-jzd-search"]');
