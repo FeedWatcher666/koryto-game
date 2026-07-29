@@ -40,7 +40,15 @@
     if (!document.querySelector('script[data-v0200-dnd-reset]')) {
       const script = document.createElement("script");
       script.src = "src/v0200-dnd-rpg-reset.js";
+      script.async = false;
       script.dataset.v0200DndReset = "1";
+      document.body.append(script);
+    }
+    if (!document.querySelector('script[data-v0200-objective-host-fix]')) {
+      const script = document.createElement("script");
+      script.src = "src/v0200-objective-host-fix.js";
+      script.async = false;
+      script.dataset.v0200ObjectiveHostFix = "1";
       document.body.append(script);
     }
     return true;
