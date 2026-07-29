@@ -32,7 +32,8 @@ async function canvasSignature(page) {
     let opaque = 0;
     let variation = 0;
     let previous = -1;
-    for (let index = 0; index < pixels.length; index += 64) {
+    const stride = 64;
+    for (let index = 0; index + 3 < pixels.length; index += stride) {
       const alpha = pixels[index + 3];
       if (alpha > 10) opaque += 1;
       const luminance = pixels[index] + pixels[index + 1] + pixels[index + 2];
@@ -51,6 +52,7 @@ try {
     await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible"});
     assert.equal(await page.locator('.dice-canvas[data-d20-renderer="icosahedron"]').count(), 1, "critical: true 3D canvas exists");
     assert.ok(await page.locator(".dice-modifiers span").count() >= 1, "critical: known modifiers are visible");
+    await page.waitForTimeout(90);
     const firstFrame = await canvasSignature(page);
     await page.waitForTimeout(150);
     const secondFrame = await canvasSignature(page);
@@ -75,6 +77,7 @@ try {
     const {context, page, errors} = await openGame(browser, 1, {width: 1024, height: 650});
     await page.locator("[data-check]").first().click();
     await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible"});
+    await page.waitForTimeout(90);
     const rollingFrame = await canvasSignature(page);
     assert.ok(rollingFrame.opaque > 100, "fumble: volumetric die is visible");
     await page.click("[data-dice-skip]");
