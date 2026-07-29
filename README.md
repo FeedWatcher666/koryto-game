@@ -1,4 +1,4 @@
-# Koryto v0.20.0 CLEAN TEST.5
+# Koryto v0.20.0 CLEAN TEST.6
 
 Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
 
@@ -10,28 +10,50 @@ Hratelný offline balík vzniká příkazem:
 node scripts/build-offline.mjs
 ```
 
-Potom otevřete `dist/koryto-v0.20.0-clean-test.5/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.6/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
 
-## Kostky v TEST.5
+## První plnohodnotný quest
 
-Fyzický model D20 a systém výhody/nevýhody zůstávají z TEST.4. TEST.5 opravuje jejich vysvětlení.
+TEST.6 přidává kapitolu **Krysy v JZD** jako první vícefázovou politickou D&D výpravu:
 
-Hráč nyní ještě před kliknutím vidí:
+1. briefing a vysvětlení kauzy,
+2. výběr přesně dvou členů aktivní družiny,
+3. výběr jednoho předmětu,
+4. tři rozdílné cesty do areálu,
+5. tři způsoby získání důkazů,
+6. vědomá reakce na protiakci Vladimíra Věčného,
+7. tři finální způsoby použití důkazů,
+8. trvalý následek zaznamenaný do kampaně.
 
-- kolik kostek hodí,
-- která kostka se započítá,
-- proč má výhodu nebo nevýhodu,
-- technický zápis až jako vedlejší detail.
+Hody nemění pouze reputaci. Průběžně upravují:
 
-Pravidla jsou formulována přímo:
+- množství důkazů,
+- důvěru pracovníků,
+- tlak Věčného,
+- vztahy se společníky,
+- politické dluhy a páku,
+- obtížnost finální zkoušky,
+- pozdější návrat důsledku.
 
-- běžný hod: jedna d20, započítá se její výsledek,
-- výhoda: dvě d20, započítá se vyšší výsledek,
-- nevýhoda: dvě d20, započítá se nižší výsledek.
+## Družina a vybavení
 
-Po dopadu je ponechaná kostka výrazně označena `POČÍTÁ SE`; druhá ztmavne, přeškrtne se a dostane označení `NEPOČÍTÁ SE`. Výsledková karta následně lidskou větou vysvětlí oba hody a vybraný výsledek. Syntaxe `2d20kh1` a `2d20kl1` zůstává skrytá v rozbalitelném technickém výpočtu.
+K Marii Čisté a Bohumilu Tichému přibyl Radek Šroub, údržbář bývalého JZD. Do výpravy lze vzít dva ze tří společníků a jeden předmět:
 
-Implementace je inspirována běžnou D&D syntaxí a chováním dice enginů, ale nepřidává Python ani externí runtime závislost.
+- kazetový diktafon,
+- klíč od archivu,
+- termosku odborového čaje.
+
+Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se číselné bonusy nekumulují bez omezení; použije se nejsilnější relevantní pomoc.
+
+## Kostky
+
+Fyzický model D20 a srozumitelná výhoda/nevýhoda zůstávají uzamčené:
+
+- běžný hod: jedna d20,
+- výhoda: dvě d20 a vyšší výsledek,
+- nevýhoda: dvě d20 a nižší výsledek,
+- ponechaná a vyřazená kostka jsou jasně označené,
+- technický výpočet je dostupný až v detailu.
 
 ## Ověření
 
@@ -41,10 +63,12 @@ npm run check
 node scripts/build-offline.mjs
 ```
 
+Browser gate prochází dvě odlišné verze celé kapitoly: veřejnou cestu se svědky a špinavou výměnu důkazů za politickou páku.
+
 ## Zásady
 
 - Staré buildy jsou pouze obsahová a designová reference.
 - Žádný import legacy skriptů.
-- Nový save klíč `koryto.clean.v0200`.
+- Save schema 2 a klíč `koryto.clean.v0200`.
 - Offline runtime se generuje z kanonických modulů, ručně se neudržuje.
-- První vertikální řez: tvorba postavy, tutorial, d20, předmět, družina, registrace kandidatury a otevření kapitoly Krysy v JZD.
+- Každý významný quest musí mít přípravu, několik scén, aktivní družinu, protiakci soupeře a trvalý následek.
