@@ -32,7 +32,7 @@ TEST.2 byla vizuálně plochá: CSS otáčelo jediný mnohoúhelník, takže vý
 - samostatná fáze letu, dopadu a ustálení,
 - kritická 20, kritická 1, zvuk, vibrace a reakce družiny.
 
-Číslo je překryvné pouze kvůli čitelnosti. Samotné těleso pod ním se prostorově přepočítává v každém snímku.
+Číslo je překryvné pouze kvůli čitelnosti. Samotné těleso pod ním se prostorově přepočítává v každém snímku. Detail je v `docs/v0.20/d20-test3-note.md`.
 
 ## Zásady
 
