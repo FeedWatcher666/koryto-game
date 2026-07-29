@@ -1,10 +1,11 @@
 {
   "name": "koryto-clean-rewrite",
-  "version": "0.20.0-clean-test.1",
+  "version": "0.20.0-clean-test.2",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node tests/smoke.mjs",
-    "check": "node --check src/data.js && node --check src/rules.js && node --check src/state.js && node --check src/ui.js && node --check src/main.js && node --check src/runtime.js"
+    "check": "node --check src/data.js && node --check src/rules.js && node --check src/state.js && node --check src/dice.js && node --check src/ui.js && node --check src/main.js && node --check scripts/build-offline.mjs && node --check tests/browser.mjs",
+    "build:offline": "node scripts/build-offline.mjs"
   }
 }
