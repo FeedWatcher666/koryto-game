@@ -185,7 +185,8 @@ try {
     await page.click('[data-action="reroll-first"]');
     await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
     await page.click("[data-dice-skip]");
-    await page.waitForSelector(".result-card", {state: "visible", timeout: 4000});
+    await page.waitForSelector(".dice-overlay", {state: "detached", timeout: 4000});
+    await page.waitForFunction(() => globalThis.KorytoClean.getState().flags.chainedPenSpent === true);
     const reloaded = await page.evaluate(() => globalThis.KorytoClean.getState());
     assert.equal(reloaded.flags.chainedPenSpent, true, "saved first-check choice is restored for reroll");
     assert.ok(reloaded.resources.heat >= 6);
