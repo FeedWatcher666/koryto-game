@@ -1,4 +1,5 @@
 import {FIRST_CHECKS, REGISTRATION_CHECKS} from "./data.js";
+import {playD20Roll} from "./dice.js";
 import {applyCheckConsequences, deriveAttributes, resolveCheck} from "./rules.js";
 import {clearSave, createInitialState, loadGame, saveGame, startCampaign} from "./state.js";
 import {render} from "./ui.js";
@@ -6,6 +7,7 @@ import {render} from "./ui.js";
 const app = document.getElementById("app");
 let state = loadGame() || createInitialState();
 let lastFirstChoice = null;
+let rolling = false;
 
 function commit(nextState, persist = false) {
   state = nextState;
@@ -30,7 +32,35 @@ function testRandom() {
   return Math.random;
 }
 
-app.addEventListener("click", event => {
+async function performCheck(choice, context, sourceState = state, consequenceContext = context) {
+  if (rolling) return;
+  rolling = true;
+  const result = resolveCheck(sourceState, choice, testRandom());
+  let presentation = null;
+
+  try {
+    presentation = await playD20Roll({root: document.body, state: sourceState, choice, result});
+  } catch (error) {
+    console.error("D20 animation failed; resolving check without animation.", error);
+  }
+
+  const enrichedResult = {
+    ...result,
+    impactLine: presentation?.impactLine || result.outcome.description,
+    reaction: presentation?.reaction || null,
+    reactionSpeaker: presentation?.companionName || null,
+    reactionIcon: presentation?.companionIcon || null
+  };
+  const next = applyCheckConsequences(sourceState, enrichedResult, consequenceContext);
+  next.scene = context === "first" ? "firstResult" : "registrationResult";
+  if (context === "registration") next.actions = Math.max(0, next.actions - 1);
+  rolling = false;
+  commit(next);
+}
+
+app.addEventListener("click", async event => {
+  if (rolling && !event.target.closest("[data-dice-skip]")) return;
+
   const originButton = event.target.closest("[data-origin]");
   if (originButton) {
     patch(next => {
@@ -55,12 +85,8 @@ app.addEventListener("click", event => {
     const choice = selectedChoice(collection, checkButton.dataset.check);
     if (!choice) return;
     if (state.scene === "firstCheck") lastFirstChoice = choice;
-    const result = resolveCheck(state, choice, testRandom());
     const context = state.scene === "firstCheck" ? "first" : "registration";
-    const next = applyCheckConsequences(state, result, context);
-    next.scene = context === "first" ? "firstResult" : "registrationResult";
-    if (context === "registration") next.actions = Math.max(0, next.actions - 1);
-    commit(next);
+    await performCheck(choice, context);
     return;
   }
 
@@ -89,10 +115,7 @@ app.addEventListener("click", event => {
     const base = structuredClone(state);
     base.flags.chainedPenSpent = true;
     base.resources.heat += 2;
-    const result = resolveCheck(base, lastFirstChoice, testRandom());
-    const next = applyCheckConsequences(base, result, "first-reroll");
-    next.scene = "firstResult";
-    commit(next);
+    await performCheck(lastFirstChoice, "first", base, "first-reroll");
   } else if (action === "accept-first") {
     patch(next => { next.scene = "companion"; });
   } else if (action === "accept-registration") {
@@ -123,4 +146,8 @@ app.addEventListener("submit", event => {
 });
 
 render(app, state);
-globalThis.KorytoClean = Object.freeze({getState: () => structuredClone(state), version: state.version});
+globalThis.KorytoClean = Object.freeze({
+  getState: () => structuredClone(state),
+  get isRolling() { return rolling; },
+  version: state.version
+});
