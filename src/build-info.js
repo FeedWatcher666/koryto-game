@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const info = Object.freeze({
-    displayVersion: "0.17.4 TEST.1",
-    buildVersion: "0.17.4-test.1",
+    displayVersion: "0.20.0 TEST.1",
+    buildVersion: "0.20.0-test.1",
     saveVersion: "0.14.3-test.2",
     saveSchema: 1,
-    title: "Koryto 0.17.4 TEST.1 – Style Stabilization",
-    description: "Koryto 0.17.4 TEST.1: sjednocený vizuální systém mapy, kauz, štábu, kandidáta a rychlého ovládání."
+    title: "Koryto 0.20.0 TEST.1 – Village RPG Reboot",
+    description: "Koryto 0.20.0 TEST.1: nový satirický pohybový RPG prototyp s živou obcí, soupeřem a třemi dovednostními minihrami."
   });
 
   function applyLabels() {
@@ -23,6 +23,30 @@
       footer.textContent = `${base} · ${info.displayVersion}`;
     }
     if (document.documentElement?.dataset) document.documentElement.dataset.korytoBuild = info.buildVersion;
+    return true;
+  }
+
+  function installRebootAssets() {
+    if (typeof document === "undefined" || typeof location === "undefined") return false;
+    if (new URLSearchParams(location.search).get("legacy") === "1") return false;
+    const load = () => {
+      if (!document.querySelector('link[data-koryto-reboot="v0200"]')) {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "styles/v0200-village-rpg.css";
+        link.dataset.korytoReboot = "v0200";
+        document.head.appendChild(link);
+      }
+      if (!document.querySelector('script[data-koryto-reboot="v0200"]')) {
+        const script = document.createElement("script");
+        script.src = "src/v0200-village-rpg.js";
+        script.async = false;
+        script.dataset.korytoReboot = "v0200";
+        document.body.appendChild(script);
+      }
+    };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load, { once: true });
+    else load();
     return true;
   }
 
@@ -53,7 +77,8 @@
     }
   }
 
-  globalThis.KorytoBuildInfo = Object.freeze({...info, applyLabels, installLegacyReconciliation});
+  globalThis.KorytoBuildInfo = Object.freeze({...info, applyLabels, installLegacyReconciliation, installRebootAssets});
   installLegacyReconciliation();
   applyLabels();
+  installRebootAssets();
 })();
