@@ -1,41 +1,39 @@
-# Koryto v0.20.0 CLEAN TEST.2
+# Koryto v0.20.0 CLEAN TEST.3
 
 Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
 
-## Co přináší TEST.2
-
-- samostatnou vrstvu animované d20,
-- rotaci a průběžně se měnící čísla před dopadem,
-- viditelnou obtížnost a rozpad známých bonusů,
-- odlišný zlatý dopad kritické dvacítky,
-- červený otřes kritické jedničky,
-- syntetické zvuky bez externích souborů,
-- krátké reakce Marie, Bohumila nebo samotné obce,
-- respektování nastavení omezených animací,
-- možnost animaci přeskočit.
-
 ## Spuštění
 
-Zdrojový `index.html` používá ES moduly a je určený pro lokální server. Hratelný artefakt z GitHub Actions obsahuje vygenerovaný offline runtime a otevře se dvojklikem na `index.html`.
+Hratelný offline balík vzniká příkazem:
 
 ```bash
-npm run build:offline
+node scripts/build-offline.mjs
 ```
 
-Vytvoří složku `dist/koryto-v0.20.0-clean-test.2`.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.3/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
 
 ## Ověření
 
 ```bash
 npm test
 npm run check
-npm run build:offline
 ```
+
+## D20 v TEST.3
+
+- skutečný matematický model dvacetistěnu,
+- 12 prostorových vrcholů a 20 trojúhelníkových stěn,
+- perspektivní projekce na canvas,
+- rotace kolem tří os,
+- odlišné stínování každé stěny,
+- měnící se vržený stín a výška nad podložkou,
+- prostorové dosednutí místo ploché rotace jako mince,
+- kritická 20, kritická 1, zvuk, vibrace a reakce družiny.
 
 ## Zásady
 
 - Staré buildy jsou pouze obsahová a designová reference.
 - Žádný import legacy skriptů.
 - Nový save klíč `koryto.clean.v0200`.
-- Offline runtime se generuje z kanonických modulů; nesmí se ručně upravovat.
+- Offline runtime se generuje z kanonických modulů, ručně se neudržuje.
 - První vertikální řez: tvorba postavy, tutorial, d20, předmět, družina, registrace kandidatury a otevření kapitoly Krysy v JZD.
