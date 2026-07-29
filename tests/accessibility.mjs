@@ -32,9 +32,13 @@ const {port} = server.address();
 const browser = await chromium.launch({headless: true});
 const page = await browser.newPage({viewport: {width: 390, height: 844}});
 const browserErrors = [];
+let expectedDiceFailure = false;
 page.on("pageerror", error => browserErrors.push(error.message));
 page.on("console", message => {
-  if (message.type() === "error") browserErrors.push(message.text());
+  if (message.type() !== "error") return;
+  const text = message.text();
+  if (expectedDiceFailure && text.includes("D20 animation failed; resolving check without animation.")) return;
+  browserErrors.push(text);
 });
 
 async function audit(label) {
@@ -91,8 +95,42 @@ try {
   await page.locator("[data-check]").first().waitFor();
   await audit("first check screen with reduced motion");
 
+  await page.locator("[data-check]").first().click();
+  await page.locator(".dice-overlay").waitFor();
+  assert.equal(await page.evaluate(() => document.activeElement?.matches("[data-dice-skip]")), true, "focus must move into the dice dialog");
+  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), true, "background app must be inert while the dice dialog is open");
+  await page.keyboard.press("Tab");
+  assert.equal(await page.evaluate(() => document.querySelector(".dice-overlay")?.contains(document.activeElement)), true, "Tab must remain inside the dice dialog");
+  await page.locator("[data-dice-skip]").click();
+  await page.locator(".dice-overlay").waitFor({state: "detached"});
+  await page.locator(".result-card").waitFor();
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains("dice-lock")), false);
+  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "background inert state must be restored");
+
+  await page.locator("[data-action='accept-first']").click();
+  await page.locator("[data-companion]").first().click();
+  await page.locator("[data-check]").first().waitFor();
+  await page.evaluate(() => {
+    globalThis.__korytoOriginalCanvasContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function forcedDiceRendererFailure() {
+      throw new Error("forced dice renderer failure");
+    };
+  });
+  expectedDiceFailure = true;
+  await page.locator("[data-check]").first().click();
+  await page.locator(".result-card").waitFor();
+  await page.locator(".dice-overlay").waitFor({state: "detached"});
+  expectedDiceFailure = false;
+  await page.evaluate(() => {
+    HTMLCanvasElement.prototype.getContext = globalThis.__korytoOriginalCanvasContext;
+    delete globalThis.__korytoOriginalCanvasContext;
+  });
+  assert.equal(await page.locator(".dice-overlay").count(), 0, "failed presentation must remove the modal");
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains("dice-lock")), false, "failed presentation must release dice-lock");
+  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "failed presentation must restore background interaction");
+
   assert.deepEqual(browserErrors, [], `browser errors: ${browserErrors.join(" | ")}`);
-  console.log("Accessibility basics passed on creation, game, and reduced-motion check screens.");
+  console.log("Accessibility, focus containment, and dice-failure cleanup passed in the packaged build.");
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));

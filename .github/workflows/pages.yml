@@ -6,7 +6,6 @@ on:
       - Koryto clean rewrite
     types:
       - completed
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,16 +19,15 @@ concurrency:
 jobs:
   build:
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_branch == 'agent/v0200-clean-rewrite')
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'agent/v0200-clean-rewrite'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact green commit
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -40,6 +38,9 @@ jobs:
         run: node scripts/build-offline.mjs
       - name: Prepare Pages root
         shell: bash
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          TESTED_RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
           rm -rf _site
@@ -48,8 +49,8 @@ jobs:
           cat > _site/tester-build.json <<JSON
           {
             "version": "0.20.0-clean-test.6",
-            "commit": "${GITHUB_SHA}",
-            "workflowRun": "${GITHUB_RUN_ID}"
+            "commit": "${TESTED_SHA}",
+            "workflowRun": "${TESTED_RUN_ID}"
           }
           JSON
       - name: Configure Pages

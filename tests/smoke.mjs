@@ -32,6 +32,7 @@ assert.equal(SAVE_SCHEMA, 2);
 assert.equal(STORAGE_KEY, "koryto.clean.v0200");
 assert.deepEqual(Object.keys(CLASSES), ["bard", "paladin", "rogue"]);
 assert.deepEqual(Object.keys(COMPANIONS), ["marie", "bohumil", "radek"]);
+assert.doesNotMatch(CLASSES.bard.perk, /jednou za scénu|změnit komplikaci/i, "class card must not advertise an unimplemented conversion");
 assert.equal(FIRST_CHECKS.length, 3);
 assert.equal(REGISTRATION_CHECKS.length, 3);
 assert.equal(JZD_APPROACH_CHECKS.length, 3);
@@ -70,6 +71,15 @@ assert.equal(
   "only one strongest companion contribution may be applied"
 );
 
+const paladinState = createInitialState();
+paladinState.hero.classId = "paladin";
+paladinState.resources.debt = 2;
+let paladinQuest = startJzdQuest(paladinState);
+const honestOathCheck = {id: "oath-test", label: "Čestná zkouška", attribute: "morality", dc: 10, honest: true};
+assert.equal(resolveRollMode(paladinQuest, honestOathCheck).mode, "advantage", "debt from earlier scenes must not suppress the current chapter oath");
+paladinQuest = applyJzdRivalChoice(paladinQuest, "play-along");
+assert.equal(resolveRollMode(paladinQuest, honestOathCheck).mode, "normal", "accepting debt in JZD must suppress the oath for later checks");
+
 const approachChoice = choicesForJzd(questState, "approach").find(choice => choice.id === "archive-door");
 const approachMode = resolveRollMode(questState, approachChoice);
 assert.equal(approachMode.mode, "advantage");
@@ -105,7 +115,11 @@ const main = fs.readFileSync(new URL("../src/main.js", import.meta.url), "utf8")
 const ui = fs.readFileSync(new URL("../src/ui.js", import.meta.url), "utf8");
 const quest = fs.readFileSync(new URL("../src/quest-jzd.js", import.meta.url), "utf8");
 const questCss = fs.readFileSync(new URL("../styles/quest-jzd.css", import.meta.url), "utf8");
+const pagesWorkflow = fs.readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
 assert.match(dice, /dice-rack/);
+assert.match(dice, /finally\s*{/);
+assert.match(dice, /node\.inert = true/);
+assert.match(dice, /tabindex="-1"/);
 assert.match(physics, /FACE_NUMBERS/);
 assert.match(physics, /worn-bakelite/);
 assert.match(main, /state\.flags\.lastResult\?\.choiceId/);
@@ -118,5 +132,8 @@ assert.match(quest, /applyJzdRivalChoice/);
 assert.match(quest, /Krajský audit/);
 assert.match(questCss, /quest-companion-grid/);
 assert.match(questCss, /rival-choice-grid/);
+assert.doesNotMatch(pagesWorkflow, /workflow_dispatch/, "manual Pages deployment must not bypass the green-run gate");
+assert.match(pagesWorkflow, /github\.event\.workflow_run\.head_sha/);
+assert.match(pagesWorkflow, /github\.event\.workflow_run\.id/);
 
 console.log("Koryto CLEAN TEST.6 multi-scene JZD quest tests passed.");

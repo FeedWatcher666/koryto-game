@@ -164,7 +164,7 @@ function overlayMarkup(presentation, result) {
   const modifiers = presentation.modifiers.map(item => `<span>${item.label} <b>+${item.value}</b></span>`).join("");
   const sources = presentation.modeSources.map(source => `<li>${source}</li>`).join("");
   const multi = result.rolls.length > 1;
-  return `<section class="dice-overlay is-rolling mode-${result.rollMode}" role="dialog" aria-modal="true" aria-label="Hod kostkou">
+  return `<section class="dice-overlay is-rolling mode-${result.rollMode}" role="dialog" aria-modal="true" aria-label="Hod kostkou" tabindex="-1">
     <div class="dice-backdrop-sigil" aria-hidden="true">K</div>
     <div class="dice-stage">
       <p class="eyebrow dice-kicker">D20 ZKOUŠKA</p>
@@ -198,65 +198,129 @@ export async function playD20Roll({root = document.body, state, choice, result})
   const wrapper = document.createElement("div");
   wrapper.innerHTML = overlayMarkup(presentation, result).trim();
   const overlay = wrapper.firstElementChild;
-  root.append(overlay);
-  document.documentElement.classList.add("dice-lock");
-
-  const units = [...overlay.querySelectorAll(".dice-unit")];
-  const readouts = units.map(unit => unit.querySelector(".dice-readout"));
-  const statusTitle = overlay.querySelector(".dice-status strong");
-  const statusCopy = overlay.querySelector(".dice-status span");
-  const reaction = overlay.querySelector(".dice-reaction");
-  const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  const spinDuration = reducedMotion ? 180 : 1320;
-  const renderers = units.map((unit, index) => createIcosahedronRenderer(
-    unit.querySelector(".dice-canvas"),
-    {...result, roll: result.rolls[index]},
-    {reducedMotion, dieIndex: index, selected: true}
-  ));
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const renderers = [];
+  let ticker = null;
   let skipped = false;
-  let tickIndex = 0;
-  const tickValues = [3, 17, 8, 12, 2, 19, 6, 14, 4, 18, 9, 11, 5, 16, 7, 13];
-  const ticker = setInterval(() => {
-    readouts.forEach((readout, index) => {
-      readout.textContent = tickValues[(tickIndex + index * 5) % tickValues.length];
+  let backgroundStates = [];
+
+  const focusableControls = () => [...overlay.querySelectorAll(
+    "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
+  )].filter(node => !node.hidden && node.getAttribute("aria-hidden") !== "true" && node.getClientRects().length > 0);
+
+  const trapFocus = event => {
+    if (event.key !== "Tab") return;
+    const controls = focusableControls();
+    if (!controls.length) {
+      event.preventDefault();
+      overlay.focus({preventScroll: true});
+      return;
+    }
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (!overlay.contains(document.activeElement)) {
+      event.preventDefault();
+      first.focus({preventScroll: true});
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus({preventScroll: true});
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus({preventScroll: true});
+    }
+  };
+
+  try {
+    root.append(overlay);
+    document.documentElement.classList.add("dice-lock");
+    overlay.addEventListener("keydown", trapFocus);
+
+    const skipButton = overlay.querySelector("[data-dice-skip]");
+    skipButton?.focus({preventScroll: true});
+    backgroundStates = [...root.children]
+      .filter(node => node !== overlay)
+      .map(node => ({node, inert: node.inert, ariaHidden: node.getAttribute("aria-hidden")}));
+    backgroundStates.forEach(({node}) => {
+      node.inert = true;
+      node.setAttribute("aria-hidden", "true");
     });
-    tickIndex += 1;
-  }, reducedMotion ? 45 : 72);
 
-  const skip = () => { skipped = true; };
-  overlay.querySelector("[data-dice-skip]")?.addEventListener("click", skip, {once: true});
-  playThrowSequence(result.rolls.length, reducedMotion);
+    const units = [...overlay.querySelectorAll(".dice-unit")];
+    const readouts = units.map(unit => unit.querySelector(".dice-readout"));
+    const statusTitle = overlay.querySelector(".dice-status strong");
+    const statusCopy = overlay.querySelector(".dice-status span");
+    const reaction = overlay.querySelector(".dice-reaction");
+    const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const spinDuration = reducedMotion ? 180 : 1320;
 
-  const started = performance.now();
-  while (!skipped && performance.now() - started < spinDuration) await wait(32);
-  clearInterval(ticker);
-  const landingDurations = renderers.map(renderer => renderer.land({instant: skipped}));
-  await wait(Math.max(...landingDurations));
+    units.forEach((unit, index) => {
+      renderers.push(createIcosahedronRenderer(
+        unit.querySelector(".dice-canvas"),
+        {...result, roll: result.rolls[index]},
+        {reducedMotion, dieIndex: index, selected: true}
+      ));
+    });
 
-  units.forEach((unit, index) => {
-    const kept = index === result.keptIndex;
-    readouts[index].textContent = result.rolls[index];
-    unit.classList.add(kept ? "is-kept" : "is-discarded");
-    unit.querySelector(".dice-selection").textContent = result.rolls.length === 1 ? "Výsledek" : kept ? "Ponecháno" : "Vyřazeno";
-    renderers[index].setSelected(kept);
-  });
+    let tickIndex = 0;
+    const tickValues = [3, 17, 8, 12, 2, 19, 6, 14, 4, 18, 9, 11, 5, 16, 7, 13];
+    ticker = setInterval(() => {
+      readouts.forEach((readout, index) => {
+        readout.textContent = tickValues[(tickIndex + index * 5) % tickValues.length];
+      });
+      tickIndex += 1;
+    }, reducedMotion ? 45 : 72);
 
-  overlay.classList.remove("is-rolling");
-  overlay.classList.add("is-landed", `tone-${result.outcome.tone}`);
-  if (result.roll === 20) overlay.classList.add("is-critical");
-  if (result.roll === 1) overlay.classList.add("is-fumble");
-  statusTitle.textContent = result.outcome.label;
-  statusCopy.textContent = `${presentation.rollModeExplanation} ${presentation.impactLine}`;
-  reaction.hidden = false;
-  overlay.querySelector(".dice-skip")?.remove();
-  playResultSting(result);
-  globalThis.navigator?.vibrate?.(result.roll === 20 ? [20, 35, 45] : result.roll === 1 ? [80, 30, 80] : 25);
+    skipButton?.addEventListener("click", () => { skipped = true; }, {once: true});
+    playThrowSequence(result.rolls.length, reducedMotion);
 
-  await wait(reducedMotion || skipped ? 360 : 1180);
-  overlay.classList.add("is-exiting");
-  await wait(reducedMotion ? 80 : 240);
-  renderers.forEach(renderer => renderer.stop());
-  overlay.remove();
-  document.documentElement.classList.remove("dice-lock");
-  return presentation;
+    const started = performance.now();
+    while (!skipped && performance.now() - started < spinDuration) await wait(32);
+    clearInterval(ticker);
+    ticker = null;
+    const landingDurations = renderers.map(renderer => renderer.land({instant: skipped}));
+    await wait(Math.max(...landingDurations));
+
+    units.forEach((unit, index) => {
+      const kept = index === result.keptIndex;
+      readouts[index].textContent = result.rolls[index];
+      unit.classList.add(kept ? "is-kept" : "is-discarded");
+      unit.querySelector(".dice-selection").textContent = result.rolls.length === 1 ? "Výsledek" : kept ? "Ponecháno" : "Vyřazeno";
+      renderers[index].setSelected(kept);
+    });
+
+    overlay.classList.remove("is-rolling");
+    overlay.classList.add("is-landed", `tone-${result.outcome.tone}`);
+    if (result.roll === 20) overlay.classList.add("is-critical");
+    if (result.roll === 1) overlay.classList.add("is-fumble");
+    statusTitle.textContent = result.outcome.label;
+    statusCopy.textContent = `${presentation.rollModeExplanation} ${presentation.impactLine}`;
+    reaction.hidden = false;
+    skipButton?.remove();
+    overlay.focus({preventScroll: true});
+    playResultSting(result);
+    globalThis.navigator?.vibrate?.(result.roll === 20 ? [20, 35, 45] : result.roll === 1 ? [80, 30, 80] : 25);
+
+    await wait(reducedMotion || skipped ? 360 : 1180);
+    overlay.classList.add("is-exiting");
+    await wait(reducedMotion ? 80 : 240);
+    return presentation;
+  } finally {
+    if (ticker !== null) clearInterval(ticker);
+    renderers.forEach(renderer => {
+      try {
+        renderer.stop();
+      } catch (error) {
+        console.warn("D20 renderer cleanup failed.", error);
+      }
+    });
+    overlay.removeEventListener("keydown", trapFocus);
+    overlay.remove();
+    document.documentElement.classList.remove("dice-lock");
+    backgroundStates.forEach(({node, inert, ariaHidden}) => {
+      node.inert = inert;
+      if (ariaHidden === null) node.removeAttribute("aria-hidden");
+      else node.setAttribute("aria-hidden", ariaHidden);
+    });
+    if (previousFocus?.isConnected) previousFocus.focus({preventScroll: true});
+  }
 }

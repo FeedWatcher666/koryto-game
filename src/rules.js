@@ -46,8 +46,9 @@ export function resolveRollMode(state, choice) {
     ...partyIds.map(id => matchedSource(choice, "disadvantage", "companions", id))
   ].filter(Boolean);
 
-  if (choice.honest && state.hero.classId === "paladin" && state.resources.debt === 0) {
-    advantageSources.push("Přísaha paladina: čestné řešení bez předchozího politického dluhu.");
+  const chapterDebtAccepted = state.quest?.status === "active" && state.quest.rivalChoice === "play-along";
+  if (choice.honest && state.hero.classId === "paladin" && !chapterDebtAccepted) {
+    advantageSources.push("Přísaha paladina: čestné řešení bez dluhu přijatého v této kapitole.");
   }
 
   const cancelled = advantageSources.length > 0 && disadvantageSources.length > 0;
