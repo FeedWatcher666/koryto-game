@@ -44,11 +44,11 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf _site
-          cp -R dist/koryto-v0.20.0-clean-test.6 _site
+          cp -R dist/koryto-v0.20.0-clean-test.7 _site
           touch _site/.nojekyll
           cat > _site/tester-build.json <<JSON
           {
-            "version": "0.20.0-clean-test.6",
+            "version": "0.20.0-clean-test.7",
             "commit": "${TESTED_SHA}",
             "workflowRun": "${TESTED_RUN_ID}"
           }

@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BUILD_DIR: dist/koryto-v0.20.0-clean-test.6
+  BUILD_DIR: dist/koryto-v0.20.0-clean-test.7
   PLAYWRIGHT_VERSION: 1.54.2
   LHCI_VERSION: 0.15.1
   REVIEW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -152,7 +152,7 @@ jobs:
         id: screenshots
         uses: actions/upload-artifact@v7
         with:
-          name: koryto-v0.20.0-clean-test.6-jzd-screenshots
+          name: koryto-v0.20.0-clean-test.7-jzd-screenshots
           path: browser-artifacts
           if-no-files-found: warn
           retention-days: 30
@@ -162,7 +162,7 @@ jobs:
         id: lighthouse
         uses: actions/upload-artifact@v7
         with:
-          name: koryto-v0.20.0-clean-test.6-lighthouse
+          name: koryto-v0.20.0-clean-test.7-lighthouse
           path: lighthouse-artifacts
           if-no-files-found: warn
           retention-days: 30
@@ -171,7 +171,7 @@ jobs:
         id: playable
         uses: actions/upload-artifact@v7
         with:
-          name: koryto-v0.20.0-clean-test.6
+          name: koryto-v0.20.0-clean-test.7
           path: ${{ env.BUILD_DIR }}
           if-no-files-found: error
           retention-days: 90

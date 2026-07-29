@@ -1,6 +1,6 @@
 {
   "name": "koryto-clean-rewrite",
-  "version": "0.20.0-clean-test.6",
+  "version": "0.20.0-clean-test.7",
   "private": true,
   "type": "module",
   "scripts": {

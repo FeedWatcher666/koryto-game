@@ -4,7 +4,7 @@ import http from "node:http";
 import path from "node:path";
 import {chromium} from "playwright";
 
-const target = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.6");
+const target = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.7");
 assert(existsSync(path.join(target, "index.html")), `Missing packaged build at ${target}`);
 
 const types = new Map([

@@ -4,7 +4,7 @@ import path from "node:path";
 import {pathToFileURL} from "node:url";
 import {chromium} from "playwright";
 
-const dist = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.6");
+const dist = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.7");
 const index = path.join(dist, "index.html");
 assert.ok(fs.existsSync(index), `Missing offline index: ${index}`);
 fs.mkdirSync("browser-artifacts", {recursive: true});
@@ -18,7 +18,7 @@ async function openGame(browser, {rolls, viewport, classId = "bard", originId = 
     if (message.type() === "error") errors.push(`console: ${message.text()}`);
   });
   await page.goto(`${pathToFileURL(index).href}?rolls=${rolls.join(",")}`, {waitUntil: "load"});
-  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.6");
+  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.7");
   if (classId !== "bard") await page.click(`[data-class="${classId}"]`);
   if (originId !== "idealist") await page.click(`[data-origin="${originId}"]`);
   await page.fill("#heroName", `Tester ${classId}`);
@@ -29,6 +29,34 @@ async function openGame(browser, {rolls, viewport, classId = "bard", originId = 
 
 async function expectText(locator, pattern) {
   assert.match(await locator.innerText(), pattern);
+}
+
+async function expectPlayableHierarchy(page, {mobile = false} = {}) {
+  const hierarchy = await page.evaluate(() => {
+    const hud = document.querySelector(".game-hud");
+    const world = document.querySelector(".world-stage");
+    const hero = document.querySelector(".hero-panel");
+    const heading = world?.querySelector("h1");
+    return {
+      hudPosition: hud ? getComputedStyle(hud).position : null,
+      worldTop: world?.getBoundingClientRect().top ?? null,
+      heroTop: hero?.getBoundingClientRect().top ?? null,
+      headingTop: heading?.getBoundingClientRect().top ?? null,
+      viewportHeight: innerHeight
+    };
+  });
+  assert.notEqual(hierarchy.hudPosition, "sticky", "HUD must not cover scenes while scrolling");
+  assert.notEqual(hierarchy.hudPosition, "fixed", "HUD must not cover scenes while scrolling");
+  assert.ok(
+    hierarchy.headingTop >= -1 && hierarchy.headingTop < hierarchy.viewportHeight,
+    `new scene heading must be visible after transition, got top ${hierarchy.headingTop}`
+  );
+  if (mobile) {
+    assert.ok(
+      hierarchy.worldTop < hierarchy.heroTop,
+      `mobile scene must appear before character sheet (${hierarchy.worldTop} !< ${hierarchy.heroTop})`
+    );
+  }
 }
 
 async function performCheck(page, selector) {
@@ -55,7 +83,7 @@ async function saveReloadCheckpoint(page, expectedScene, visibleSelector, verify
   await page.click('.hud-actions [data-action="save"]');
   await expectText(page.locator('.hud-actions [data-action="save"]'), /Uloženo/);
   await page.reload({waitUntil: "load"});
-  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.6");
+  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.7");
   await page.waitForFunction(scene => globalThis.KorytoClean.getState().scene === scene, expectedScene);
   await page.waitForSelector(visibleSelector, {state: "visible"});
   const restored = await page.evaluate(() => globalThis.KorytoClean.getState());
@@ -72,6 +100,7 @@ try {
       viewport: {width: 390, height: 844}
     });
     await reachChapter(page, "ask-local", "marie", "find-paragraph");
+    await expectPlayableHierarchy(page, {mobile: true});
 
     assert.equal(await page.locator(".quest-companion-card").count(), 3, "prep offers three companions");
     await expectText(page.locator(".selection-counter"), /1\/2/);
@@ -96,6 +125,7 @@ try {
     await page.click('[data-action="accept-jzd-final"]');
 
     await page.waitForSelector(".quest-complete", {state: "visible"});
+    await expectPlayableHierarchy(page, {mobile: true});
     await expectText(page.locator(".quest-complete h1"), /Pracovníci|Zastupitelstvo/);
     await expectText(page.locator(".consequence-list"), /vrátí později|očekávají ochranu/i);
     const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
@@ -120,6 +150,7 @@ try {
       originId: "ambitious"
     });
     await reachChapter(page, "follow-folders", "bohumil", "back-door");
+    await expectPlayableHierarchy(page);
     await page.click('[data-quest-companion="bohumil"]');
     await page.click('[data-quest-companion="marie"]');
     await page.click('[data-quest-companion="radek"]');
@@ -136,6 +167,7 @@ try {
     await expectText(tradeChoice, /VÝHODA A NEVÝHODA SE ZRUŠILY/);
     await performCheck(page, '[data-check="trade-evidence"]');
     await page.click('[data-action="accept-jzd-final"]');
+    await expectPlayableHierarchy(page);
 
     const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
     assert.equal(completed.quest.status, "completed");
@@ -193,7 +225,7 @@ try {
     await expectText(page.locator(".result-card"), /Komplikace/);
     await page.click('.hud-actions [data-action="save"]');
     await page.reload({waitUntil: "load"});
-    await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.6");
+    await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.7");
     await page.waitForSelector('[data-action="reroll-first"]', {state: "visible"});
     await page.click('[data-action="reroll-first"]');
     await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
@@ -269,4 +301,4 @@ try {
   await browser.close();
 }
 
-console.log("Koryto CLEAN TEST.6 full JZD quest, every checkpoint reload, and save reroll browser gate passed.");
+console.log("Koryto CLEAN TEST.7 hierarchy, full JZD quest, every checkpoint reload, and save reroll browser gate passed.");

@@ -11,7 +11,7 @@
 ## Current handoff
 
 - Continue from branch `agent/v0200-clean-rewrite` and draft PR #37.
-- TEST.6 is the current human-test candidate.
+- TEST.7 is the current human-test candidate after the scene-priority repair.
 - Do not revive legacy v0.17 layers.
 - Do not merge without explicit instruction.
 - For a quest change, use `.agents/skills/koryto-quest-designer/`.
@@ -20,7 +20,7 @@
 
 ## Next likely task
 
-Collect human feedback from a full **Krysy v JZD** playthrough, classify it by agency, pacing, clarity, humor, and technical stability, then perform a focused TEST.7 polish iteration.
+Collect human feedback from a full **Krysy v JZD** TEST.7 playthrough and classify it by agency, pacing, clarity, humor, and technical stability. The next iteration must be driven by those observations rather than another speculative system.
 
 ## End-of-session maintenance
 

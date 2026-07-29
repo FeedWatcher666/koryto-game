@@ -51,9 +51,18 @@ function renderCurrentState(focusSelector = null) {
 }
 
 function commit(nextState, persist = false, focusSelector = null) {
+  const previousSurface = `${state.screen}:${state.scene}`;
   state = nextState;
   if (persist) saveGame(state);
   renderCurrentState(focusSelector);
+  const currentSurface = `${state.screen}:${state.scene}`;
+  if (!focusSelector && currentSurface !== previousSurface) {
+    const stage = app.querySelector(".world-stage");
+    if (stage) {
+      stage.focus({preventScroll: true});
+      stage.scrollIntoView({block: "start"});
+    }
+  }
 }
 
 function patch(mutator, persist = false, focusSelector = null) {

@@ -55,7 +55,7 @@ legend { padding: 0 8px; color: #f2c858; font-weight: 900; }
 .primary-action, .secondary-action, .hud-actions button { min-height: 48px; padding: 0 18px; border: 4px solid #13370f; color: white; background: linear-gradient(#68b84b, #276b26); font-weight: 900; box-shadow: inset 0 0 0 2px #a8e681, 0 4px #0a2808; }
 .secondary-action { border-color: #5b3514; background: linear-gradient(#c1812b, #704216); box-shadow: inset 0 0 0 2px #efbd65, 0 4px #351b08; }
 
-.game-hud { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: auto 1fr auto; border-bottom: 5px solid #0b0502; background: #181008f5; box-shadow: 0 6px 24px #0009; }
+.game-hud { position: relative; z-index: 20; display: grid; grid-template-columns: auto 1fr auto; border-bottom: 5px solid #0b0502; background: #181008f5; box-shadow: 0 6px 24px #0009; }
 .brand { display: flex; gap: 9px; align-items: center; padding: 10px 14px; border-right: 2px solid #4e351c; }
 .brand > span { display: grid; place-items: center; width: 36px; height: 36px; color: #241607; background: var(--gold); font-size: 1.4rem; font-weight: 900; }
 .brand small, .brand strong { display: block; }
@@ -98,6 +98,8 @@ legend { padding: 0 8px; color: #f2c858; font-weight: 900; }
 .companion-summary small, .item-card span { margin-top: 5px; color: #a99570; line-height: 1.35; }
 
 .world-stage { min-width: 0; }
+.world-stage:focus { outline: none; }
+.world-stage:focus-visible { outline: 4px solid #ffd45f; outline-offset: 5px; }
 .scene-card, .result-card { min-height: 520px; padding: clamp(22px, 4vw, 44px); color: var(--ink); background: linear-gradient(145deg, var(--paper-light), #c99e5e); }
 .scene-card h1, .result-card h1 { margin: 8px 0 14px; font-size: clamp(2rem, 5vw, 3.7rem); line-height: .98; }
 .scene-card > p:not(.eyebrow), .result-card > p:not(.eyebrow) { max-width: 780px; font-size: 1.05rem; line-height: 1.55; }
@@ -212,7 +214,10 @@ footer { padding: 10px; color: #6f6048; text-align: center; font: .7rem Arial, s
   .objective-card { order: 4; margin: 0 8px 8px; }
   .objective-card dl { grid-template-columns: 1fr; }
   .objective-card dl > div { border-left: 0; border-top: 1px solid #9b7440; }
-  .game-layout { display: block; width: calc(100% - 16px); }
+  .game-layout { display: flex; flex-direction: column; width: calc(100% - 16px); }
+  .world-stage { order: 1; }
+  .hero-panel { order: 2; }
+  .support-stack { order: 3; }
   .hero-panel, .support-stack { margin-bottom: 12px; }
   .support-stack { display: grid; grid-template-columns: 1fr; margin-top: 12px; }
   .scene-card, .result-card { min-height: auto; }

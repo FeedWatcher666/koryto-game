@@ -1,4 +1,4 @@
-# Koryto v0.20.0 CLEAN TEST.6
+# Koryto v0.20.0 CLEAN TEST.7
 
 Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
 
@@ -10,11 +10,11 @@ Hratelný offline balík vzniká příkazem:
 node scripts/build-offline.mjs
 ```
 
-Potom otevřete `dist/koryto-v0.20.0-clean-test.6/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.7/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
 
 ## První plnohodnotný quest
 
-TEST.6 přidává kapitolu **Krysy v JZD** jako první vícefázovou politickou D&D výpravu. Obsahuje briefing, přesně dva aktivní společníky, jeden předmět, tři přístupy, tři způsoby získání důkazů, protiakci Vladimíra Věčného, tři finální použití důkazů a trvalý následek.
+TEST.7 drží obsah kapitoly **Krysy v JZD** beze změny a opravuje hierarchii hraní podle ručního vizuálního auditu TEST.6. Nová scéna se po každém přechodu dostane do zorného pole, vysoký HUD už nepřekrývá obsah a na mobilu se rozhodnutí i závěr kapitoly zobrazují před listem postavy a podpůrnými statistikami.
 
 Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se použije jediná nejsilnější relevantní pomoc; bonusy různých společníků se nesčítají do jednoho hodu.
 

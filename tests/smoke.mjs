@@ -27,7 +27,7 @@ function sequence(values) {
   return () => (values[Math.min(index++, values.length - 1)] - 0.01) / 20;
 }
 
-assert.equal(VERSION, "0.20.0-clean-test.6");
+assert.equal(VERSION, "0.20.0-clean-test.7");
 assert.equal(SAVE_SCHEMA, 2);
 assert.equal(STORAGE_KEY, "koryto.clean.v0200");
 assert.deepEqual(Object.keys(CLASSES), ["bard", "paladin", "rogue"]);
@@ -151,4 +151,4 @@ for (const generated of ["node_modules/", "dist/", "browser-artifacts/", "lighth
   assert.match(gitignore, new RegExp(`^${generated.replace("/", "\\/")}$`, "m"), `${generated} must stay ignored`);
 }
 
-console.log("Koryto CLEAN TEST.6 multi-scene JZD quest tests passed.");
+console.log("Koryto CLEAN TEST.7 playability hierarchy and multi-scene JZD quest tests passed.");
