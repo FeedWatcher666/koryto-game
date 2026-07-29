@@ -53,7 +53,7 @@ if (syntax.status !== 0) {
 if (/\bKorytoApp\b|village-rpg|legacy=1|v017/i.test(runtime)) {
   throw new Error("Generated runtime contains a forbidden legacy reference");
 }
-if (!runtime.includes("playD20Roll") || !runtime.includes("dice-overlay")) {
-  throw new Error("Generated runtime is missing the D20 animation layer");
+for (const required of ["playD20Roll", "dice-overlay", "ICOSAHEDRON_FACES", "data-d20-renderer=\\\"icosahedron\\\"", "getContext(\\\"2d\\\")"]) {
+  if (!runtime.includes(required)) throw new Error(`Generated runtime is missing ${required}`);
 }
 console.log(`Built ${path.relative(root, target)} from ${modules.length} canonical modules.`);
