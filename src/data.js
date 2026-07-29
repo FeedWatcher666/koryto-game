@@ -1,4 +1,4 @@
-export const VERSION = "0.20.0-clean-test.5";
+export const VERSION = "0.20.0-clean-test.6";
 
 export const ATTRIBUTES = [
   ["charisma", "Charisma", "Přesvědčit lidi, že váš nápad byl vždycky jejich."],
@@ -70,6 +70,14 @@ export const COMPANIONS = {
     description: "Ví, kdo s kým nemluví a kdo s kým nemluví jen před manželkou.",
     bonus: {charisma: 2, luck: 1},
     demand: "Nechce, aby hospoda přišla o obecní zakázky. Při veřejném projevu dává výhodu."
+  },
+  radek: {
+    name: "Radek Šroub",
+    icon: "🔧",
+    role: "Údržbář bývalého JZD",
+    description: "Opravuje stroje, které obec prodala, ale zapomněla odvézt. Zná haly, lidi i vypnuté kamery.",
+    bonus: {authority: 1, intellect: 1},
+    demand: "Nenechá pracovníky zaplatit za cizí tunel. Při pohybu v areálu JZD dává výhodu."
   }
 };
 
