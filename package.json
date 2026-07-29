@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "test": "node tests/smoke.mjs",
-    "check": "node --check src/data.js && node --check src/rules.js && node --check src/state.js && node --check src/ui.js && node --check src/main.js"
+    "check": "node --check src/data.js && node --check src/rules.js && node --check src/state.js && node --check src/ui.js && node --check src/main.js && node --check src/runtime.js"
   }
 }
