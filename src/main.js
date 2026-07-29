@@ -13,7 +13,9 @@ import {render} from "./ui.js";
 
 const app = document.getElementById("app");
 let state = loadGame() || createInitialState();
-let lastFirstChoice = null;
+let lastFirstChoice = state.scene === "firstResult"
+  ? FIRST_CHECKS.find(choice => choice.id === state.flags.lastResult?.choiceId) || null
+  : null;
 let rolling = false;
 
 const forcedRolls = (() => {
@@ -193,7 +195,7 @@ app.addEventListener("click", async event => {
     if (state.quest.party.length !== 2 || !state.quest.itemId) return;
     patch(next => {
       next.party.active = next.quest.party[0];
-      next.party.members = [...new Set([...next.party.members, ...next.quest.party])];
+      next.party.members = [...next.quest.party];
       next.quest.phase = "approach";
       next.scene = "jzdApproach";
     }, true);
