@@ -1,0 +1,61 @@
+name: One-time v0.20 rival tempo patch
+
+on:
+  push:
+    branches:
+      - agent/v0200-village-rpg-reboot
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout reboot branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v0200-village-rpg-reboot
+          fetch-depth: 0
+
+      - name: Remove rival action from ordinary movement
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('src/v0200-village-rpg.js')
+          source = path.read_text()
+          old = """    moveRival();
+              afterAction();
+              render();
+              return true;
+            }
+
+            function directionMove"""
+          new = """    afterAction();
+              render();
+              return true;
+            }
+
+            function directionMove"""
+          if old not in source:
+              print('Tempo patch already applied; nothing to do.')
+          else:
+              path.write_text(source.replace(old, new, 1))
+              print('Removed rival action from ordinary movement.')
+          PY
+          node --check src/v0200-village-rpg.js
+
+      - name: Commit focused patch
+        shell: bash
+        run: |
+          if git diff --quiet -- src/v0200-village-rpg.js; then
+            echo "No runtime change to commit."
+            exit 0
+          fi
+          git config user.name "Koryto CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/v0200-village-rpg.js
+          git commit -m "v0.20.0 slow rival opening tempo"
+          git push origin HEAD:agent/v0200-village-rpg-reboot
