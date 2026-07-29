@@ -37,6 +37,12 @@ export function resolveCheck(state, choice, random = Math.random) {
   const roll = rollD20(random);
   const total = roll + visibleModifier + hiddenModifier;
   const level = outcomeLevel(roll, total, choice.dc);
+  const modifierBreakdown = [
+    {id: "attribute", label: "Atribut", value: attributeValue},
+    {id: "class", label: "Třída", value: classBonus},
+    {id: "companion-choice", label: "Příprava družiny", value: companionBonus},
+    {id: "companion-passive", label: companion?.name || "Společník", value: passiveBonus}
+  ].filter(item => item.value !== 0);
 
   return {
     choiceId: choice.id,
@@ -45,6 +51,7 @@ export function resolveCheck(state, choice, random = Math.random) {
     dc: choice.dc,
     visibleModifier,
     hiddenModifier,
+    modifierBreakdown,
     total,
     level,
     outcome: OUTCOMES[level]
