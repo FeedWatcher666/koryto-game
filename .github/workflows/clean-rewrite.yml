@@ -26,6 +26,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -f AGENTS.md
           test ! -e src/app.js
           test ! -e src/v0174-style-stabilization.js
           test ! -e src/runtime.js
@@ -60,7 +61,7 @@ jobs:
           npm install --no-save playwright@1.54.2
           npx playwright install --with-deps chromium
 
-      - name: Play both JZD quest endings in packaged build
+      - name: Play all JZD endings and save reload in packaged build
         run: node tests/browser.mjs dist/koryto-v0.20.0-clean-test.6
 
       - name: Upload JZD quest screenshots
