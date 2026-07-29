@@ -129,6 +129,8 @@ assert.match(physics, /FACE_NUMBERS/);
 assert.match(physics, /worn-bakelite/);
 assert.match(main, /state\.flags\.lastResult\?\.choiceId/);
 assert.match(main, /next\.party\.members = \[\.\.\.next\.quest\.party\]/);
+assert.match(main, /creationNameDraft/);
+assert.match(main, /focusSelector/);
 assert.match(main, /data-quest-companion/);
 assert.match(main, /data-quest-item/);
 assert.match(main, /aria-pressed/);

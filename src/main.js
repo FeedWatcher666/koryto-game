@@ -16,6 +16,7 @@ let state = loadGame() || createInitialState();
 let lastFirstChoice = state.scene === "firstResult"
   ? FIRST_CHECKS.find(choice => choice.id === state.flags.lastResult?.choiceId) || null
   : null;
+let creationNameDraft = "";
 let rolling = false;
 
 const forcedRolls = (() => {
@@ -41,21 +42,24 @@ function syncSelectionState() {
   });
 }
 
-function renderCurrentState() {
+function renderCurrentState(focusSelector = null) {
   render(app, state);
+  const nameInput = app.querySelector("#heroName");
+  if (nameInput) nameInput.value = creationNameDraft;
   syncSelectionState();
+  if (focusSelector) app.querySelector(focusSelector)?.focus({preventScroll: true});
 }
 
-function commit(nextState, persist = false) {
+function commit(nextState, persist = false, focusSelector = null) {
   state = nextState;
   if (persist) saveGame(state);
-  renderCurrentState();
+  renderCurrentState(focusSelector);
 }
 
-function patch(mutator, persist = false) {
+function patch(mutator, persist = false, focusSelector = null) {
   const next = structuredClone(state);
   mutator(next);
-  commit(next, persist);
+  commit(next, persist, focusSelector);
 }
 
 function selectedChoice(collection, id) {
@@ -114,24 +118,30 @@ async function performCheck(choice, context, sourceState = state, consequenceCon
   }
 }
 
+app.addEventListener("input", event => {
+  if (event.target.id === "heroName") creationNameDraft = event.target.value;
+});
+
 app.addEventListener("click", async event => {
   if (rolling && !event.target.closest("[data-dice-skip]")) return;
 
   const originButton = event.target.closest("[data-origin]");
   if (originButton) {
+    const id = originButton.dataset.origin;
     patch(next => {
-      next.hero.originId = originButton.dataset.origin;
+      next.hero.originId = id;
       next.hero.attributes = deriveAttributes(next.hero.classId, next.hero.originId);
-    });
+    }, false, `[data-origin="${id}"]`);
     return;
   }
 
   const classButton = event.target.closest("[data-class]");
   if (classButton) {
+    const id = classButton.dataset.class;
     patch(next => {
-      next.hero.classId = classButton.dataset.class;
+      next.hero.classId = id;
       next.hero.attributes = deriveAttributes(next.hero.classId, next.hero.originId);
-    });
+    }, false, `[data-class="${id}"]`);
     return;
   }
 
@@ -159,19 +169,20 @@ app.addEventListener("click", async event => {
 
   const questCompanionButton = event.target.closest("[data-quest-companion]");
   if (questCompanionButton) {
+    const id = questCompanionButton.dataset.questCompanion;
     patch(next => {
-      const id = questCompanionButton.dataset.questCompanion;
       const selected = next.quest.party;
       const index = selected.indexOf(id);
       if (index >= 0) selected.splice(index, 1);
       else if (selected.length < 2) selected.push(id);
-    });
+    }, false, `[data-quest-companion="${id}"]`);
     return;
   }
 
   const questItemButton = event.target.closest("[data-quest-item]");
   if (questItemButton) {
-    patch(next => { next.quest.itemId = questItemButton.dataset.questItem; });
+    const id = questItemButton.dataset.questItem;
+    patch(next => { next.quest.itemId = id; }, false, `[data-quest-item="${id}"]`);
     return;
   }
 
@@ -243,6 +254,7 @@ app.addEventListener("click", async event => {
     clearSave();
     state = createInitialState();
     lastFirstChoice = null;
+    creationNameDraft = "";
     forcedRollIndex = 0;
     renderCurrentState();
   }

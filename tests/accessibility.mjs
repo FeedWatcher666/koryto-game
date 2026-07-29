@@ -80,13 +80,21 @@ try {
   assert.equal(await page.locator("[data-class][aria-pressed]").count(), 3);
   assert.equal(await page.locator("[data-origin][aria-pressed='true']").getAttribute("data-origin"), "idealist");
   assert.equal(await page.locator("[data-class][aria-pressed='true']").getAttribute("data-class"), "bard");
-  await page.locator("[data-origin='ambitious']").click();
+
+  await page.locator("#heroName").fill("Přístupný tester");
+  await page.locator("[data-origin='ambitious']").focus();
+  await page.keyboard.press("Enter");
+  assert.equal(await page.locator("#heroName").inputValue(), "Přístupný tester", "typed name must survive origin rerender");
   assert.equal(await page.locator("[data-origin][aria-pressed='true']").getAttribute("data-origin"), "ambitious");
   assert.equal(await page.locator("[data-origin][aria-pressed='true']").count(), 1);
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-origin")), "ambitious", "focus must return to the chosen origin");
   await page.locator("[data-origin='idealist']").click();
-  await page.locator("[data-class='paladin']").click();
+  await page.locator("[data-class='paladin']").focus();
+  await page.keyboard.press("Enter");
+  assert.equal(await page.locator("#heroName").inputValue(), "Přístupný tester", "typed name must survive class rerender");
   assert.equal(await page.locator("[data-class][aria-pressed='true']").getAttribute("data-class"), "paladin");
   assert.equal(await page.locator("[data-class][aria-pressed='true']").count(), 1);
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-class")), "paladin", "focus must return to the chosen class");
   await page.locator("[data-class='bard']").click();
 
   await page.keyboard.press("Tab");
@@ -98,9 +106,9 @@ try {
   });
   assert(focusVisible, "keyboard focus is not visibly indicated");
 
-  await page.locator("#heroName").fill("Přístupný tester");
   await page.locator("#creationForm button[type='submit']").click();
   await page.locator(".game-hud").waitFor();
+  assert.equal((await page.evaluate(() => globalThis.KorytoClean.getState().hero.name)), "Přístupný tester", "submitted campaign must keep the typed name");
   await audit("game screen");
 
   await page.emulateMedia({reducedMotion: "reduce"});
@@ -148,19 +156,25 @@ try {
   await page.locator("[data-quest-companion]").first().waitFor();
   assert.equal(await page.locator("[data-quest-companion][aria-pressed]").count(), 3, "every companion choice must expose selected state");
   assert.equal(await page.locator("[data-quest-companion][aria-pressed='true']").count(), 1, "the recruited companion starts selected");
-  await page.locator("[data-quest-companion='bohumil']").click();
+  await page.locator("[data-quest-companion='bohumil']").focus();
+  await page.keyboard.press("Enter");
   assert.equal(await page.locator("[data-quest-companion][aria-pressed='true']").count(), 2, "two selected companions must be programmatically visible");
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-quest-companion")), "bohumil", "focus must return to the selected companion");
   assert.equal(await page.locator("[data-quest-item][aria-pressed]").count(), 3, "every item choice must expose selected state");
   assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").count(), 0, "no item starts selected");
-  await page.locator("[data-quest-item='recorder']").click();
+  await page.locator("[data-quest-item='recorder']").focus();
+  await page.keyboard.press("Enter");
   assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").getAttribute("data-quest-item"), "recorder");
-  await page.locator("[data-quest-item='archiveKey']").click();
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-quest-item")), "recorder", "focus must return to the selected item");
+  await page.locator("[data-quest-item='archiveKey']").focus();
+  await page.keyboard.press("Enter");
   assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").count(), 1, "item selection remains exclusive");
   assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").getAttribute("data-quest-item"), "archiveKey");
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-quest-item")), "archiveKey", "focus must follow the replacement item control");
   await audit("JZD preparation selected states");
 
   assert.deepEqual(browserErrors, [], `browser errors: ${browserErrors.join(" | ")}`);
-  console.log("Accessibility, selected-state semantics, focus containment, and dice-failure cleanup passed in the packaged build.");
+  console.log("Accessibility, draft preservation, selection semantics, focus containment, and dice-failure cleanup passed in the packaged build.");
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));
