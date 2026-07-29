@@ -89,6 +89,7 @@ try {
     assert.equal(completed.quest.status, "completed");
     assert.equal(completed.quest.ending, "council-ambush");
     assert.deepEqual(completed.quest.party, ["marie", "radek"]);
+    assert.deepEqual(completed.party.members, ["marie", "radek"]);
     assert.ok(completed.quest.evidence >= 4);
     assert.ok(completed.quest.workerTrust >= 4);
     await page.screenshot({path: "browser-artifacts/jzd-public-ending-mobile.png", fullPage: true});
@@ -106,6 +107,8 @@ try {
       originId: "ambitious"
     });
     await reachChapter(page, "follow-folders", "bohumil", "back-door");
+    await page.click('[data-quest-companion="bohumil"]');
+    await page.click('[data-quest-companion="marie"]');
     await page.click('[data-quest-companion="radek"]');
     await page.click('[data-quest-item="recorder"]');
     await page.click('[data-action="confirm-jzd-prep"]');
@@ -124,6 +127,9 @@ try {
     const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
     assert.equal(completed.quest.status, "completed");
     assert.equal(completed.quest.ending, "trade-evidence");
+    assert.deepEqual(completed.quest.party, ["marie", "radek"]);
+    assert.deepEqual(completed.party.members, ["marie", "radek"]);
+    assert.equal(completed.party.members.includes("bohumil"), false, "deselected companion does not return after quest");
     assert.ok(completed.resources.leverage >= 2);
     assert.ok(completed.resources.debt >= 1);
     assert.ok(completed.relationships.radek < 0);
@@ -132,8 +138,62 @@ try {
     assert.deepEqual(errors, [], "dirty quest desktop: no browser errors");
     await context.close();
   }
+
+  {
+    const {context, page, errors} = await openGame(browser, {
+      rolls: [1, 1, 1, 1, 1, 1, 1, 1, 1],
+      viewport: {width: 1000, height: 720}
+    });
+    await reachChapter(page, "ask-local", "bohumil", "public-speech");
+    await page.click('[data-quest-companion="marie"]');
+    await page.click('[data-quest-item="recorder"]');
+    await page.click('[data-action="confirm-jzd-prep"]');
+
+    await performCheck(page, '[data-check="official-gate"]');
+    await expectText(page.locator(".result-card"), /Komplikace/);
+    await page.click('[data-action="accept-jzd-approach"]');
+    await performCheck(page, '[data-check="truck-footage"]');
+    await expectText(page.locator(".result-card"), /Komplikace/);
+    await page.click('[data-action="accept-jzd-search"]');
+    await page.click('[data-rival-choice="call-bluff"]');
+    await performCheck(page, '[data-check="publish-dossier"]');
+    await expectText(page.locator(".result-card"), /Komplikace/);
+    await page.click('[data-action="accept-jzd-final"]');
+
+    const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
+    assert.equal(completed.quest.status, "completed", "complication-only path still completes");
+    assert.equal(completed.quest.ending, "publish-dossier");
+    assert.equal(completed.actions, 0);
+    await expectText(page.locator(".quest-complete h1"), /Kauza venku|důkazy napůl/i);
+    await expectText(page.locator(".consequence-list"), /Krajský audit/i);
+    await page.screenshot({path: "browser-artifacts/jzd-publish-complication-ending.png", fullPage: true});
+    assert.deepEqual(errors, [], "publish complication path: no browser errors");
+    await context.close();
+  }
+
+  {
+    const {context, page, errors} = await openGame(browser, {
+      rolls: [1, 1],
+      viewport: {width: 900, height: 680}
+    });
+    await performCheck(page, '[data-check="ask-local"]');
+    await expectText(page.locator(".result-card"), /Komplikace/);
+    await page.click('.hud-actions [data-action="save"]');
+    await page.reload({waitUntil: "load"});
+    await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.6");
+    await page.waitForSelector('[data-action="reroll-first"]', {state: "visible"});
+    await page.click('[data-action="reroll-first"]');
+    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
+    await page.click("[data-dice-skip]");
+    await page.waitForSelector(".result-card", {state: "visible", timeout: 4000});
+    const reloaded = await page.evaluate(() => globalThis.KorytoClean.getState());
+    assert.equal(reloaded.flags.chainedPenSpent, true, "saved first-check choice is restored for reroll");
+    assert.ok(reloaded.resources.heat >= 6);
+    assert.deepEqual(errors, [], "saved reroll reload: no browser errors");
+    await context.close();
+  }
 } finally {
   await browser.close();
 }
 
-console.log("Koryto CLEAN TEST.6 full JZD quest browser gate passed.");
+console.log("Koryto CLEAN TEST.6 full JZD quest and save reload browser gate passed.");
