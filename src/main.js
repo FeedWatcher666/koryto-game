@@ -25,10 +25,24 @@ const forcedRolls = (() => {
 })();
 let forcedRollIndex = 0;
 
+function syncCreationSelectionState() {
+  app.querySelectorAll("[data-origin]").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.origin === state.hero.originId));
+  });
+  app.querySelectorAll("[data-class]").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.class === state.hero.classId));
+  });
+}
+
+function renderCurrentState() {
+  render(app, state);
+  syncCreationSelectionState();
+}
+
 function commit(nextState, persist = false) {
   state = nextState;
   if (persist) saveGame(state);
-  render(app, state);
+  renderCurrentState();
 }
 
 function patch(mutator, persist = false) {
@@ -223,7 +237,7 @@ app.addEventListener("click", async event => {
     state = createInitialState();
     lastFirstChoice = null;
     forcedRollIndex = 0;
-    render(app, state);
+    renderCurrentState();
   }
 });
 
@@ -238,7 +252,7 @@ app.addEventListener("submit", event => {
   }));
 });
 
-render(app, state);
+renderCurrentState();
 globalThis.KorytoClean = Object.freeze({
   getState: () => structuredClone(state),
   get isRolling() { return rolling; },

@@ -73,9 +73,28 @@ async function audit(label) {
   assert(report.overflow <= 1, `${label}: horizontal overflow ${report.overflow}px`);
 }
 
+async function assertSinglePressed(groupSelector, expectedId) {
+  assert.equal(await page.locator(`${groupSelector}[aria-pressed]`).count(), 3, `${groupSelector}: every choice must expose aria-pressed`);
+  assert.equal(await page.locator(`${groupSelector}[aria-pressed="true"]`).count(), 1, `${groupSelector}: exactly one choice must be selected`);
+  assert.equal(await page.locator(`${groupSelector}[aria-pressed="true"]`).getAttribute(expectedId.startsWith("data-origin") ? "data-origin" : "data-class"), expectedId.split("=")[1]);
+}
+
 try {
   await page.goto(`http://127.0.0.1:${port}/`, {waitUntil: "networkidle"});
   await audit("creation screen");
+  assert.equal(await page.locator("[data-origin][aria-pressed]").count(), 3);
+  assert.equal(await page.locator("[data-class][aria-pressed]").count(), 3);
+  assert.equal(await page.locator("[data-origin][aria-pressed='true']").getAttribute("data-origin"), "idealist");
+  assert.equal(await page.locator("[data-class][aria-pressed='true']").getAttribute("data-class"), "bard");
+  await page.locator("[data-origin='ambitious']").click();
+  assert.equal(await page.locator("[data-origin][aria-pressed='true']").getAttribute("data-origin"), "ambitious");
+  assert.equal(await page.locator("[data-origin][aria-pressed='true']").count(), 1);
+  await page.locator("[data-origin='idealist']").click();
+  await page.locator("[data-class='paladin']").click();
+  assert.equal(await page.locator("[data-class][aria-pressed='true']").getAttribute("data-class"), "paladin");
+  assert.equal(await page.locator("[data-class][aria-pressed='true']").count(), 1);
+  await page.locator("[data-class='bard']").click();
+
   await page.keyboard.press("Tab");
   const focusVisible = await page.evaluate(() => {
     const active = document.activeElement;
@@ -130,7 +149,7 @@ try {
   assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "failed presentation must restore background interaction");
 
   assert.deepEqual(browserErrors, [], `browser errors: ${browserErrors.join(" | ")}`);
-  console.log("Accessibility, focus containment, and dice-failure cleanup passed in the packaged build.");
+  console.log("Accessibility, selected-state semantics, focus containment, and dice-failure cleanup passed in the packaged build.");
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));

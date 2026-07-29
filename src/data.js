@@ -49,8 +49,8 @@ export const CLASSES = {
     icon: "🗝️",
     description: "Nezná správný vchod. Zná ale vchod, který se nezapisuje do knihy návštěv.",
     base: {charisma: 3, intellect: 4, authority: 2, media: 2, morality: 1, luck: 5},
-    perk: "Při sledování lidí a použití zadního vchodu získává výhodu. Před hodem může odhalit skrytý modifikátor.",
-    weakness: "Při kritické jedničce získá navíc vydíratelnost."
+    perk: "Při sledování lidí a použití zadního vchodu získává výhodu. Špinavá řešení ignorují obvyklý skrytý postih.",
+    weakness: "Nízká morálka ztěžuje čestné zkoušky, které ji používají jako hlavní atribut."
   }
 };
 
