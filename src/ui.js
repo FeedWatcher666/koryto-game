@@ -144,12 +144,16 @@ function resultCard(state, context) {
   const result = state.flags.lastResult;
   if (!result) return "";
   const canReroll = context === "first" && result.level === "complication" && state.flags.chainedPenAvailable && !state.flags.chainedPenSpent;
+  const modifiers = (result.modifierBreakdown || []).map(item => `<span>${esc(item.label)} <b>+${item.value}</b></span>`).join("");
   return `<section class="result-card tone-${result.outcome.tone}">
     <div class="d20">${result.roll}</div>
     <p class="eyebrow">${result.outcome.label}</p>
     <h1>${result.outcome.title}</h1>
+    <p class="result-impact">${esc(result.impactLine || result.outcome.description)}</p>
     <p>${result.outcome.description}</p>
+    ${modifiers ? `<div class="result-modifiers">${modifiers}</div>` : ""}
     <div class="formula">${result.roll} + ${result.visibleModifier}${result.hiddenModifier ? ` ${result.hiddenModifier}` : ""} = ${result.total} proti ${result.dc}</div>
+    ${result.reaction ? `<blockquote class="result-reaction"><b>${result.reactionIcon || "💬"}</b><div><strong>${esc(result.reactionSpeaker || "Družina")}</strong><span>${esc(result.reaction)}</span></div></blockquote>` : ""}
     <div class="result-actions">
       ${canReroll ? `<button class="secondary-action" data-action="reroll-first">Přehodit propiskou za +2 tlak</button>` : ""}
       <button class="primary-action" data-action="accept-${context}">Přijmout důsledek</button>
@@ -213,7 +217,7 @@ export function gameView(state) {
       <section class="world-stage">${sceneView(state)}</section>
       ${partyPanel(state)}
     </main>
-    <footer>Čistý runtime v0.20 · žádný import z v0.17 · nový save schema 1</footer>
+    <footer>Čistý runtime v0.20 · jediný renderer · nový save schema 1</footer>
   </div>`;
 }
 
