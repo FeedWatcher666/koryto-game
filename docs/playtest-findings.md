@@ -60,6 +60,19 @@ Human feel testing of agency, pacing, and humor is still pending.
 - Regression test: all three final choices are exactly three DC harder at pressure 6 than at pressure 0
 - Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
 
+### P2 — Call-bluff's own pressure erased its promised publishing advantage
+
+- Build and commit: `0.20.0-clean-test.7`, `fbf054882e285160a60e02c58b8d6e8764f1913b`
+- Device and viewport: rules review
+- Starting state: JZD rival choice at any reachable pressure
+- Reproduction: compare `publish-dossier` after `call-bluff` and `protect-workers` at equal evidence and starting pressure
+- Expected: `call-bluff` keeps the advertised easier publication after all costs are applied
+- Actual: its +2 pressure added +1 final difficulty and cancelled the former −1 route bonus
+- Evidence: exact-SHA Codex review on PR #37
+- Smallest fix: make the publication route reduction −2 so the net advantage remains −1 after the route's +2 pressure
+- Regression test: publication after `call-bluff` is exactly one DC easier than after `protect-workers`
+- Status: fixed in the PR candidate; release evidence is recorded by the exact-head CI and review on PR #37
+
 ### P1 — TEST.7 rejected a valid TEST.6 save
 
 - Build and commit: `0.20.0-clean-test.7`, `abbb525844c64b5c31bc93172f56f7d1cb46cb42`

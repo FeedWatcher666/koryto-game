@@ -110,6 +110,16 @@ for (const lowChoice of lowPressureFinals) {
   );
 }
 
+const protectedRoute = applyJzdRivalChoice(lowPressureQuest, "protect-workers");
+const bluffRoute = applyJzdRivalChoice(lowPressureQuest, "call-bluff");
+const protectedPublish = choicesForJzd(protectedRoute, "final").find(choice => choice.id === "publish-dossier");
+const bluffPublish = choicesForJzd(bluffRoute, "final").find(choice => choice.id === "publish-dossier");
+assert.equal(
+  bluffPublish.dc,
+  protectedPublish.dc - 1,
+  "call-bluff must keep its promised publishing advantage after its own pressure cost is applied"
+);
+
 const approachChoice = choicesForJzd(questState, "approach").find(choice => choice.id === "archive-door");
 const approachMode = resolveRollMode(questState, approachChoice);
 assert.equal(approachMode.mode, "advantage");
