@@ -6,7 +6,7 @@ import {spawnSync} from "node:child_process";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const version = fs.readFileSync(path.join(root, "VERSION"), "utf8").trim();
 const target = path.join(root, "dist", `koryto-v${version}`);
-const modules = ["data.js", "rules.js", "state.js", "dice-physics.js", "dice.js", "ui.js", "main.js"];
+const modules = ["data.js", "rules.js", "state.js", "quest-jzd.js", "dice-physics.js", "dice.js", "ui.js", "main.js"];
 
 function stripModuleSyntax(source, file) {
   const withoutImports = source.replace(/import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/g, "");
@@ -44,7 +44,7 @@ if (syntax.status !== 0) {
   process.exit(syntax.status || 1);
 }
 if (/\bKorytoApp\b|village-rpg|legacy=1|v017/i.test(runtime)) throw new Error("Generated runtime contains a forbidden legacy reference");
-for (const required of ["playD20Roll", "createIcosahedronRenderer", "resolveRollMode", "2d20kh1", "2d20kl1", 'data-d20-renderer="icosahedron"', "drawFaceNumber", "worn-bakelite"]) {
+for (const required of ["playD20Roll", "createIcosahedronRenderer", "resolveRollMode", "2d20kh1", "2d20kl1", 'data-d20-renderer="icosahedron"', "drawFaceNumber", "worn-bakelite", "startJzdQuest", "applyJzdCheck", "Krysy v JZD"]) {
   if (!runtime.includes(required)) throw new Error(`Generated runtime is missing ${required}`);
 }
 console.log(`Built ${path.relative(root, target)} from ${modules.length} canonical modules.`);
