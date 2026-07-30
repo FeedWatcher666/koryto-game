@@ -85,7 +85,7 @@ try {
     assert.equal(completed.playtests.length, 1);
     assert.equal(await page.locator('[data-system="export"]').count(), 1);
     await page.click('[data-system="export"]');
-    assert.match(await page.locator('[data-system="export"]').innerText(), /Playtest|Export/);
+    await page.waitForFunction(() => /Playtest zkopírován|Export je označen níže/.test(document.querySelector('[data-system="export"]')?.textContent || ""));
     await page.screenshot({path: "browser-artifacts/test8-strategic-win-desktop.png", fullPage: true});
     await noOverflow(page, "strategic win desktop");
     assert.deepEqual(errors, []);
