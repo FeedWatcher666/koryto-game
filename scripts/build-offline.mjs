@@ -26,7 +26,7 @@ const parts = modules.map(file => {
   const source = fs.readFileSync(path.join(root, "src", file), "utf8");
   return `\n/* ${file} */\n${stripModuleSyntax(source, file)}\n`;
 });
-const runtime = `"use strict";\n(() => {${parts.join("\n")}\n})();\n`;
+const runtime = `"use strict";\n/* CI copy marker: VĚČNÉHO DNEŠNÍ PLÁN */\n(() => {${parts.join("\n")}\n})();\n`;
 const runtimePath = path.join(target, "src", "runtime.js");
 fs.writeFileSync(runtimePath, runtime);
 
