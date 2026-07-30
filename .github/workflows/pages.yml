@@ -1,7 +1,6 @@
 name: Deploy green Koryto tester
 
 on:
-  workflow_dispatch:
   workflow_run:
     workflows:
       - Koryto clean rewrite
@@ -20,17 +19,16 @@ concurrency:
 jobs:
   build:
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.head_repository.full_name == github.repository)
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact green commit
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -42,16 +40,17 @@ jobs:
       - name: Prepare Pages root
         shell: bash
         env:
-          TESTED_SHA: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
-          TESTED_RUN_ID: ${{ github.event_name == 'workflow_dispatch' && github.run_id || github.event.workflow_run.id }}
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          TESTED_RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
           rm -rf _site
-          cp -R dist/koryto-v0.20.0-clean-test.7 _site
+          cp -R dist/koryto-v0.20.0-clean-test.8 _site
           touch _site/.nojekyll
+          sed -i "s/content=\"development\"/content=\"${TESTED_SHA}\"/" _site/index.html
           cat > _site/tester-build.json <<JSON
           {
-            "version": "0.20.0-clean-test.7",
+            "version": "0.20.0-clean-test.8",
             "commit": "${TESTED_SHA}",
             "workflowRun": "${TESTED_RUN_ID}"
           }
