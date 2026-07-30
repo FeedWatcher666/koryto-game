@@ -4,44 +4,65 @@
 
 - Repository: `FeedWatcher666/koryto-game`
 - Canonical release branch: `main`
-- Integration branch: `agent/v0200-clean-rewrite`
-- Integration pull request: `#37`
-- Current playable version: `0.20.0-clean-test.7`
-- Merge state: explicit human approval received; merge only after exact-head CI and Codex review
+- Current public release: `0.20.0-clean-test.7`
+- Active integration branch: `codex/v0.20.0-clean-test.8-nonlinear-core`
+- Active draft pull request: `#45`
+- Active tracking issue: `#44`
+- TEST.8 candidate version: `0.20.0-clean-test.8`
 - Stable archive reference: `archive/koryto-v0174-original`
+- Merge state: draft, no merge approval for the implementation candidate
 
-## What is implemented
+## Human playtest verdict
 
-- clean offline-first browser runtime independent of v0.17,
-- character creation with three origins and three classes,
-- six attributes,
-- physical 3D d20,
-- normal, advantage, and disadvantage rolls,
-- critical 1 and 20,
-- clear kept/discarded die explanation,
-- party and item preparation,
-- first multi-scene quest **Krysy v JZD**,
-- three quest endings,
-- fail-forward complication routes,
-- durable campaign consequences,
-- save/load schema 2,
-- deterministic generated offline package,
-- packaged-build browser tests,
-- mandatory Codex review workflow.
-- committed visual north stars for the map, debate, event, inventory, party, and election-night screens,
-- four validated repo-local skills for quests, UI direction, playtesting, and releases.
+TEST.7 was technically stable but failed the human fun and agency gate:
+
+> „Původní hra byla docela zábavná, ale moc složitá na pochopení. Tohle je nezábavné a lineární.“
+
+The product correction is not another story experiment. TEST.8 restores the strategic game underneath the original Koryto while presenting it gradually and clearly.
+
+## TEST.8 implementation candidate
+
+- clean offline-first runtime independent of v0.17,
+- character creation with three classes and three origins,
+- three-day campaign and two actions per day,
+- map as the home screen,
+- three active locations,
+- two simultaneous cases from day two,
+- visible rival intent and one Vladimír Věčný counteraction per day,
+- support, evidence, and pressure as the main strategic resources,
+- real pressure defeat and strategic final win or defeat,
+- staff choice that unlocks a unique action and changes a location roll,
+- three final strategies,
+- physical d20 for uncertain actions,
+- separate archived playtest records and one-click export,
+- save schema 3 under `koryto.clean.v0200.test8`,
+- deterministic generated offline package.
 
 ## Current quality gate
 
-A deliverable build must pass syntax, unit tests, deterministic offline build checks, all changed quest endings, complication-only progression, save/reload, mobile overflow, accessibility basics, Lighthouse thresholds, and Codex review on the exact final SHA.
+The candidate must pass:
+
+- campaign state and balance invariants,
+- syntax checks,
+- project-memory validation,
+- deterministic offline build,
+- packaged desktop strategic win,
+- packaged mobile pressure defeat,
+- save/reload during the campaign,
+- playtest export,
+- accessibility and reduced-motion checks,
+- mobile overflow checks,
+- Lighthouse thresholds,
+- Codex review on the exact final SHA,
+- two human playthroughs with mechanically different strategies.
 
 ## Current priority
 
-Merge the green TEST.7 integration line, verify the public `main` tester, then collect human feel-testing feedback. The next content iteration should improve agency, pacing, clarity, humor, or stability in **Krysy v JZD** based on actual play, not add another static quest chain.
+Make PR #45 green and reviewable without merging it. Then hand the TEST.8 artifact to the user for two human playthroughs. The acceptance question is whether it is more fun than TEST.7 while remaining easier to understand than archived v0.17.4.
 
 ## Known limitations
 
-- Automated tests establish stability, not fun.
-- GitHub Pages requires the repository Pages source to be enabled for GitHub Actions before the public tester URL can deploy.
-- The current class and companion roster is intentionally small.
-- Persistent consequences are recorded, but later chapters do not yet consume all of them.
+- The candidate uses a deliberately small three-day campaign, not the full election arc.
+- Debate, elections, coalition negotiation, inventory progression, and the wider staff roster remain target systems for later iterations.
+- Automated tests establish stability and reachability, not fun.
+- GitHub Pages continues to serve TEST.7 until TEST.8 is explicitly approved and merged into `main`.
