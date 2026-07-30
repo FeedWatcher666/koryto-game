@@ -49,6 +49,7 @@ try {
     assert.equal(await page.locator(".t8-location").count(), 3, "day 1 exposes three locations");
     assert.equal(await page.locator(".t8-case.is-active").count(), 1, "day 1 exposes one active case");
     assert.match(await page.locator(".t8-rival").innerText(), /VĚČNÉHO DNEŠNÍ PLÁN/);
+    await page.screenshot({path: "browser-artifacts/test8-day1-map-desktop.png", fullPage: true});
 
     await performAction(page, "pub-workers");
     await page.reload({waitUntil: "load"});
@@ -61,6 +62,7 @@ try {
     await page.click('[data-staff="marie"]');
     await page.waitForSelector('[data-campaign-action="staff-marie-annex"]');
     assert.equal(await page.locator(".t8-case.is-active").count(), 2, "day 2 exposes two simultaneous cases");
+    await page.screenshot({path: "browser-artifacts/test8-day2-map-desktop.png", fullPage: true});
     await performAction(page, "staff-marie-annex", {automatic: true});
     await performAction(page, "pub-road");
 
@@ -97,6 +99,7 @@ try {
       rolls: [1, 1, 1, 1, 1],
       viewport: {width: 390, height: 844}
     });
+    await page.screenshot({path: "browser-artifacts/test8-day1-map-mobile.png", fullPage: true});
     await performAction(page, "jzd-logbook");
     await performAction(page, "office-contract");
     await page.click('[data-staff="marie"]');
@@ -112,7 +115,7 @@ try {
     await context.close();
   }
 
-  console.log("TEST.8 packaged campaign win, defeat, save/reload, export, desktop, and mobile passed.");
+  console.log("TEST.8 packaged campaign win, defeat, save/reload, export, map evidence, desktop, and mobile passed.");
 } finally {
   await browser.close();
 }
