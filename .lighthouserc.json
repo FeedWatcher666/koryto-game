@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist/koryto-v0.20.0-clean-test.7",
+      "staticDistDir": "./dist/koryto-v0.20.0-clean-test.8",
       "numberOfRuns": 1,
       "settings": {
         "onlyCategories": ["performance", "accessibility", "best-practices"],
