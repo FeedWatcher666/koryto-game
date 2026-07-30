@@ -6,7 +6,7 @@ import {spawnSync} from "node:child_process";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const version = fs.readFileSync(path.join(root, "VERSION"), "utf8").trim();
 const target = path.join(root, "dist", `koryto-v${version}`);
-const modules = ["data.js", "rules.js", "state.js", "quest-jzd.js", "dice-physics.js", "dice.js", "ui.js", "main.js"];
+const modules = ["data.js", "rules.js", "test8-campaign.js", "dice-physics.js", "dice.js", "test8-main.js"];
 
 function stripModuleSyntax(source, file) {
   const withoutImports = source.replace(/import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/g, "");
@@ -30,8 +30,8 @@ const runtimePath = path.join(target, "src", "runtime.js");
 fs.writeFileSync(runtimePath, runtime);
 
 const sourceIndex = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const offlineIndex = sourceIndex.replace('<script type="module" src="src/main.js"></script>', '<script defer src="src/runtime.js"></script>');
-if (offlineIndex === sourceIndex) throw new Error("Source index does not contain the expected module entrypoint");
+const offlineIndex = sourceIndex.replace('<script type="module" src="src/test8-main.js"></script>', '<script defer src="src/runtime.js"></script>');
+if (offlineIndex === sourceIndex) throw new Error("Source index does not contain the expected TEST.8 module entrypoint");
 fs.writeFileSync(path.join(target, "index.html"), offlineIndex);
 
 for (const file of ["VERSION", "README.md"]) fs.copyFileSync(path.join(root, file), path.join(target, file));
@@ -44,7 +44,20 @@ if (syntax.status !== 0) {
   process.exit(syntax.status || 1);
 }
 if (/\bKorytoApp\b|village-rpg|legacy=1|v017/i.test(runtime)) throw new Error("Generated runtime contains a forbidden legacy reference");
-for (const required of ["playD20Roll", "createIcosahedronRenderer", "resolveRollMode", "2d20kh1", "2d20kl1", 'data-d20-renderer="icosahedron"', "drawFaceNumber", "worn-bakelite", "startJzdQuest", "applyJzdCheck", "Krysy v JZD"]) {
+for (const required of [
+  "playD20Roll",
+  "createIcosahedronRenderer",
+  "resolveRollMode",
+  "2d20kh1",
+  "2d20kl1",
+  'data-d20-renderer="icosahedron"',
+  "drawFaceNumber",
+  "worn-bakelite",
+  "currentRivalPlan",
+  "applyCampaignAction",
+  "VĚČNÉHO DNEŠNÍ PLÁN",
+  "Kopírovat playtest"
+]) {
   if (!runtime.includes(required)) throw new Error(`Generated runtime is missing ${required}`);
 }
 console.log(`Built ${path.relative(root, target)} from ${modules.length} canonical modules.`);
