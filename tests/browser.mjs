@@ -4,369 +4,115 @@ import path from "node:path";
 import {pathToFileURL} from "node:url";
 import {chromium} from "playwright";
 
-const dist = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.7");
+const dist = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.8");
 const index = path.join(dist, "index.html");
 assert.ok(fs.existsSync(index), `Missing offline index: ${index}`);
 fs.mkdirSync("browser-artifacts", {recursive: true});
 
-async function openGame(browser, {rolls, viewport, classId = "bard", originId = "idealist", takePen = true}) {
+async function openGame(browser, {rolls, viewport, classId = "bard", originId = "idealist"}) {
   const context = await browser.newContext({viewport});
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", error => errors.push(`pageerror: ${error.message}`));
-  page.on("console", message => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
+  page.on("console", message => { if (message.type() === "error") errors.push(`console: ${message.text()}`); });
   await page.goto(`${pathToFileURL(index).href}?rolls=${rolls.join(",")}`, {waitUntil: "load"});
-  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.7");
+  await page.waitForFunction(() => globalThis.KorytoTest8?.version === "0.20.0-clean-test.8");
   if (classId !== "bard") await page.click(`[data-class="${classId}"]`);
   if (originId !== "idealist") await page.click(`[data-origin="${originId}"]`);
   await page.fill("#heroName", `Tester ${classId}`);
   await page.click('button[type="submit"]');
-  if (takePen) await page.click('[data-action="take-pen"]');
+  await page.waitForSelector(".t8-village-map");
   return {context, page, errors};
 }
 
-async function expectText(locator, pattern) {
-  assert.match(await locator.innerText(), pattern);
-}
-
-async function expectPlayableHierarchy(page, {mobile = false} = {}) {
-  const hierarchy = await page.evaluate(() => {
-    const hud = document.querySelector(".game-hud");
-    const world = document.querySelector(".world-stage");
-    const hero = document.querySelector(".hero-panel");
-    const heading = world?.querySelector("h1");
-    return {
-      hudPosition: hud ? getComputedStyle(hud).position : null,
-      worldTop: world?.getBoundingClientRect().top ?? null,
-      heroTop: hero?.getBoundingClientRect().top ?? null,
-      headingTop: heading?.getBoundingClientRect().top ?? null,
-      worldBeforeHero: Boolean(world && hero && (world.compareDocumentPosition(hero) & Node.DOCUMENT_POSITION_FOLLOWING)),
-      viewportHeight: innerHeight
-    };
-  });
-  assert.notEqual(hierarchy.hudPosition, "sticky", "HUD must not cover scenes while scrolling");
-  assert.notEqual(hierarchy.hudPosition, "fixed", "HUD must not cover scenes while scrolling");
-  assert.ok(
-    hierarchy.headingTop >= -1 && hierarchy.headingTop < hierarchy.viewportHeight,
-    `new scene heading must be visible after transition, got top ${hierarchy.headingTop}`
-  );
-  if (mobile) {
-    assert.equal(hierarchy.worldBeforeHero, true, "mobile scene must precede the character sheet in DOM order");
-    assert.ok(
-      hierarchy.worldTop < hierarchy.heroTop,
-      `mobile scene must appear before character sheet (${hierarchy.worldTop} !< ${hierarchy.heroTop})`
-    );
-  }
-}
-
-async function performCheck(page, selector) {
-  await page.click(selector);
+async function performAction(page, actionId, {automatic = false} = {}) {
+  await page.click(`[data-campaign-action="${actionId}"]`);
+  if (automatic) return;
   await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
-  const canvases = await page.locator('.dice-canvas[data-d20-renderer="icosahedron"]').count();
-  assert.ok(canvases >= 1, "physical d20 is rendered");
+  assert.ok(await page.locator('.dice-canvas[data-d20-renderer="icosahedron"]').count() >= 1);
   await page.click("[data-dice-skip]");
-  await page.waitForSelector(".result-card", {state: "visible", timeout: 4000});
+  await page.waitForSelector(".dice-overlay", {state: "detached", timeout: 4000});
 }
 
-async function reachChapter(page, firstChoice, companion, registrationChoice) {
-  await performCheck(page, `[data-check="${firstChoice}"]`);
-  await page.click('[data-action="accept-first"]');
-  await page.click(`[data-companion="${companion}"]`);
-  await performCheck(page, `[data-check="${registrationChoice}"]`);
-  await page.click('[data-action="accept-registration"]');
-  await page.waitForSelector('[data-action="start-jzd"]', {state: "visible"});
-  await page.click('[data-action="start-jzd"]');
-  await page.click('[data-action="jzd-briefing-next"]');
-}
-
-async function saveReloadCheckpoint(page, expectedScene, visibleSelector, verify = null) {
-  await page.click('.hud-actions [data-action="save"]');
-  await expectText(page.locator('.hud-actions [data-action="save"]'), /Uloženo/);
-  await page.reload({waitUntil: "load"});
-  await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.7");
-  await page.waitForFunction(scene => globalThis.KorytoClean.getState().scene === scene, expectedScene);
-  await page.waitForSelector(visibleSelector, {state: "visible"});
-  const restored = await page.evaluate(() => globalThis.KorytoClean.getState());
-  assert.equal(restored.scene, expectedScene, `${expectedScene}: saved scene is restored`);
-  if (verify) await verify(restored);
-  return restored;
+async function noOverflow(page, label) {
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  assert.ok(overflow <= 1, `${label}: horizontal overflow ${overflow}px`);
 }
 
 const browser = await chromium.launch({headless: true});
 try {
   {
     const {context, page, errors} = await openGame(browser, {
-      rolls: [4, 17, 5, 16, 6, 18, 7, 17, 8, 16],
+      rolls: [16, 18, 17, 16, 14, 18, 16, 15, 19],
+      viewport: {width: 1200, height: 800}
+    });
+    assert.equal(await page.locator(".t8-location").count(), 3, "day 1 exposes three locations");
+    assert.equal(await page.locator(".t8-case.is-active").count(), 1, "day 1 exposes one active case");
+    assert.match(await page.locator(".t8-rival").innerText(), /VĚČNÉHO DNEŠNÍ PLÁN/);
+
+    await performAction(page, "pub-workers");
+    await page.reload({waitUntil: "load"});
+    await page.waitForFunction(() => globalThis.KorytoTest8?.getState().campaign.actionsLeft === 1);
+    assert.equal(await page.locator('[data-campaign-action="pub-workers"]').count(), 0, "used action stays unavailable after reload");
+    await performAction(page, "office-contract");
+
+    await page.waitForSelector("[data-staff]");
+    assert.equal(await page.locator("[data-staff]").count(), 3);
+    await page.click('[data-staff="marie"]');
+    await page.waitForSelector('[data-campaign-action="staff-marie-annex"]');
+    assert.equal(await page.locator(".t8-case.is-active").count(), 2, "day 2 exposes two simultaneous cases");
+    await performAction(page, "staff-marie-annex", {automatic: true});
+    await performAction(page, "pub-road");
+
+    await page.waitForSelector("[data-strategy]");
+    await page.click('[data-strategy="legal"]');
+    await performAction(page, "office-final-prep");
+    await performAction(page, "pub-final-prep");
+
+    await page.waitForSelector("[data-final-roll]");
+    assert.match(await page.locator(".t8-final-card").innerText(), /šest předchozích akcí/i);
+    await page.click("[data-final-roll]");
+    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
+    await page.click("[data-dice-skip]");
+    await page.waitForSelector(".t8-ending");
+
+    const completed = await page.evaluate(() => globalThis.KorytoTest8.getState());
+    assert.equal(completed.campaign.outcome.won, true);
+    assert.equal(completed.campaign.actionLog.length, 6);
+    assert.equal(completed.campaign.rivalLog.length, 3);
+    assert.equal(completed.campaign.staffId, "marie");
+    assert.equal(completed.campaign.finalStrategy, "legal");
+    assert.equal(completed.playtests.length, 1);
+    assert.equal(await page.locator('[data-system="export"]').count(), 1);
+    await page.click('[data-system="export"]');
+    assert.match(await page.locator('[data-system="export"]').innerText(), /Playtest|Export/);
+    await page.screenshot({path: "browser-artifacts/test8-strategic-win-desktop.png", fullPage: true});
+    await noOverflow(page, "strategic win desktop");
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+
+  {
+    const {context, page, errors} = await openGame(browser, {
+      rolls: [1, 1, 1, 1, 1],
       viewport: {width: 390, height: 844}
     });
-    await reachChapter(page, "ask-local", "marie", "find-paragraph");
-    await expectPlayableHierarchy(page, {mobile: true});
-
-    assert.equal(await page.locator(".quest-companion-card").count(), 3, "prep offers three companions");
-    await expectText(page.locator(".selection-counter"), /1\/2/);
-    await page.click('[data-quest-companion="radek"]');
-    await page.click('[data-quest-item="archiveKey"]');
-    await expectText(page.locator(".selection-counter"), /2\/2/);
-    assert.equal(await page.locator('[data-action="confirm-jzd-prep"]').isEnabled(), true);
-    await page.click('[data-action="confirm-jzd-prep"]');
-
-    await expectText(page.locator('[data-check="archive-door"]'), /Klíč od archivu|Marie|Radek/);
-    await performCheck(page, '[data-check="archive-door"]');
-    await page.click('[data-action="accept-jzd-approach"]');
-    await performCheck(page, '[data-check="ledger-trail"]');
-    await page.click('[data-action="accept-jzd-search"]');
-
-    await page.waitForSelector(".rival-choice-grid", {state: "visible"});
-    await expectText(page.locator(".rival-scene"), /rozhodnutí nemá hod kostkou/i);
-    await page.click('[data-rival-choice="protect-workers"]');
-    const councilChoice = page.locator('[data-check="council-ambush"]');
-    await expectText(councilChoice, /HODÍTE 2 KOSTKY/);
-    await performCheck(page, '[data-check="council-ambush"]');
-    await page.click('[data-action="accept-jzd-final"]');
-
-    await page.waitForSelector(".quest-complete", {state: "visible"});
-    await expectPlayableHierarchy(page, {mobile: true});
-    await expectText(page.locator(".quest-complete h1"), /Pracovníci|Zastupitelstvo/);
-    await expectText(page.locator(".consequence-list"), /vrátí později|očekávají ochranu/i);
-    const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
-    assert.equal(completed.quest.status, "completed");
-    assert.equal(completed.quest.ending, "council-ambush");
-    assert.deepEqual(completed.quest.party, ["marie", "radek"]);
-    assert.deepEqual(completed.party.members, ["marie", "radek"]);
-    assert.ok(completed.quest.evidence >= 4);
-    assert.ok(completed.quest.workerTrust >= 4);
-    await page.screenshot({path: "browser-artifacts/jzd-public-ending-mobile.png", fullPage: true});
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
-    assert.equal(overflow, false, "full quest mobile: no horizontal overflow");
-    assert.deepEqual(errors, [], "full quest mobile: no browser errors");
+    await performAction(page, "jzd-logbook");
+    await performAction(page, "office-contract");
+    await page.click('[data-staff="marie"]');
+    await performAction(page, "jzd-witness");
+    await performAction(page, "office-invoices");
+    await page.waitForSelector(".t8-ending.is-loss");
+    const defeated = await page.evaluate(() => globalThis.KorytoTest8.getState());
+    assert.equal(defeated.campaign.outcome.id, "pressure-defeat");
+    assert.equal(defeated.resources.pressure, 10);
+    await page.screenshot({path: "browser-artifacts/test8-pressure-defeat-mobile.png", fullPage: true});
+    await noOverflow(page, "pressure defeat mobile");
+    assert.deepEqual(errors, []);
     await context.close();
   }
 
-  {
-    const {context, page, errors} = await openGame(browser, {
-      rolls: [3, 15, 4, 16, 5, 17, 6, 18, 19],
-      viewport: {width: 1100, height: 720},
-      classId: "rogue",
-      originId: "ambitious"
-    });
-    await reachChapter(page, "follow-folders", "bohumil", "back-door");
-    await expectPlayableHierarchy(page);
-    await page.click('[data-quest-companion="bohumil"]');
-    await page.click('[data-quest-companion="marie"]');
-    await page.click('[data-quest-companion="radek"]');
-    await page.click('[data-quest-item="recorder"]');
-    await page.click('[data-action="confirm-jzd-prep"]');
-
-    await performCheck(page, '[data-check="canteen-route"]');
-    await page.click('[data-action="accept-jzd-approach"]');
-    await performCheck(page, '[data-check="truck-footage"]');
-    await page.click('[data-action="accept-jzd-search"]');
-    const debtBeforeRival = await page.evaluate(() => globalThis.KorytoClean.getState().resources.debt);
-    await page.locator('[data-rival-choice="play-along"]').evaluate(button => {
-      button.click();
-      button.click();
-    });
-    await page.waitForFunction(() => globalThis.KorytoClean.getState().scene === "jzdFinal");
-    assert.equal(
-      await page.evaluate(() => globalThis.KorytoClean.getState().resources.debt),
-      debtBeforeRival + 1,
-      "rapid rival activation must apply political debt exactly once"
-    );
-
-    const tradeChoice = page.locator('[data-check="trade-evidence"]');
-    await expectText(tradeChoice, /VÝHODA A NEVÝHODA SE ZRUŠILY/);
-    await tradeChoice.evaluate(button => {
-      button.click();
-      button.click();
-    });
-    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
-    await page.click("[data-dice-skip]");
-    await page.waitForSelector(".result-card", {state: "visible", timeout: 4000});
-    assert.equal(
-      await page.evaluate(() => globalThis.KorytoClean.getState().history.filter(item => item.context === "jzd-final").length),
-      1,
-      "rapid final-check activation must apply durable consequences exactly once"
-    );
-    await page.click('[data-action="accept-jzd-final"]');
-    await expectPlayableHierarchy(page);
-
-    const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
-    assert.equal(completed.quest.status, "completed");
-    assert.equal(completed.quest.ending, "trade-evidence");
-    assert.deepEqual(completed.quest.party, ["marie", "radek"]);
-    assert.deepEqual(completed.party.members, ["marie", "radek"]);
-    assert.equal(completed.party.members.includes("bohumil"), false, "deselected companion does not return after quest");
-    assert.ok(completed.resources.leverage >= 2);
-    assert.ok(completed.resources.debt >= 1);
-    assert.ok(completed.relationships.radek < 0);
-    await expectText(page.locator(".consequence-list"), /Vladimír Věčný má důkaz/);
-    await page.screenshot({path: "browser-artifacts/jzd-dirty-ending-desktop.png", fullPage: true});
-    assert.deepEqual(errors, [], "dirty quest desktop: no browser errors");
-    await context.close();
-  }
-
-  {
-    const {context, page, errors} = await openGame(browser, {
-      rolls: [1, 1, 1, 1, 1, 1, 1, 1, 1],
-      viewport: {width: 1000, height: 720}
-    });
-    await reachChapter(page, "ask-local", "bohumil", "public-speech");
-    await page.click('[data-quest-companion="marie"]');
-    await page.click('[data-quest-item="recorder"]');
-    await page.click('[data-action="confirm-jzd-prep"]');
-
-    await performCheck(page, '[data-check="official-gate"]');
-    await expectText(page.locator(".result-card"), /Komplikace/);
-    await page.click('[data-action="accept-jzd-approach"]');
-    await performCheck(page, '[data-check="truck-footage"]');
-    await expectText(page.locator(".result-card"), /Komplikace/);
-    await page.click('[data-action="accept-jzd-search"]');
-    await page.click('[data-rival-choice="call-bluff"]');
-    await performCheck(page, '[data-check="publish-dossier"]');
-    await expectText(page.locator(".result-card"), /Komplikace/);
-    await page.click('[data-action="accept-jzd-final"]');
-
-    const completed = await page.evaluate(() => globalThis.KorytoClean.getState());
-    assert.equal(completed.quest.status, "completed", "complication-only path still completes");
-    assert.equal(completed.quest.ending, "publish-dossier");
-    assert.equal(completed.actions, 0);
-    await expectText(page.locator(".quest-complete h1"), /Kauza venku|důkazy napůl/i);
-    await expectText(page.locator(".consequence-list"), /Krajský audit/i);
-    await page.screenshot({path: "browser-artifacts/jzd-publish-complication-ending.png", fullPage: true});
-    assert.deepEqual(errors, [], "publish complication path: no browser errors");
-    await context.close();
-  }
-
-  {
-    const {context, page, errors} = await openGame(browser, {
-      rolls: [18, 18],
-      viewport: {width: 900, height: 680},
-      takePen: false
-    });
-
-    await saveReloadCheckpoint(page, "arrival", '[data-action="take-pen"]');
-    await page.click('[data-action="take-pen"]');
-
-    await saveReloadCheckpoint(page, "firstCheck", '[data-check="ask-local"]');
-    await performCheck(page, '[data-check="ask-local"]');
-    await saveReloadCheckpoint(page, "firstResult", '[data-action="accept-first"]', restored => {
-      assert.equal(restored.flags.lastResult.choiceId, "ask-local", "first-check result survives reload");
-    });
-    await page.click('[data-action="accept-first"]');
-
-    await saveReloadCheckpoint(page, "companion", '[data-companion="marie"]');
-    await page.click('[data-companion="marie"]');
-
-    await saveReloadCheckpoint(page, "registration", '[data-check="find-paragraph"]', restored => {
-      assert.deepEqual(restored.party.members, ["marie"], "first companion survives reload");
-    });
-    await performCheck(page, '[data-check="find-paragraph"]');
-    await saveReloadCheckpoint(page, "registrationResult", '[data-action="accept-registration"]', restored => {
-      assert.ok(restored.flags.lastResult, "registration result survives reload");
-    });
-    await page.click('[data-action="accept-registration"]');
-
-    await saveReloadCheckpoint(page, "chapterOpen", '[data-action="start-jzd"]', restored => {
-      assert.equal(restored.flags.chapterOneUnlocked, true, "chapter unlock survives reload");
-    });
-    await page.click('[data-action="start-jzd"]');
-
-    await saveReloadCheckpoint(page, "jzdBriefing", '[data-action="jzd-briefing-next"]', restored => {
-      assert.equal(restored.quest.status, "active", "active quest briefing survives reload");
-      assert.equal(restored.quest.phase, "briefing", "briefing phase survives reload");
-    });
-    await page.click('[data-action="jzd-briefing-next"]');
-    await page.waitForFunction(() => globalThis.KorytoClean.getState().scene === "jzdPrep");
-
-    assert.deepEqual(errors, [], "pre-JZD checkpoint reloads: no browser errors");
-    await context.close();
-  }
-
-  {
-    const {context, page, errors} = await openGame(browser, {
-      rolls: [1, 1],
-      viewport: {width: 900, height: 680}
-    });
-    await performCheck(page, '[data-check="ask-local"]');
-    await expectText(page.locator(".result-card"), /Komplikace/);
-    await page.click('.hud-actions [data-action="save"]');
-    await page.reload({waitUntil: "load"});
-    await page.waitForFunction(() => globalThis.KorytoClean?.version === "0.20.0-clean-test.7");
-    await page.waitForSelector('[data-action="reroll-first"]', {state: "visible"});
-    await page.click('[data-action="reroll-first"]');
-    await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
-    await page.click("[data-dice-skip]");
-    await page.waitForSelector(".dice-overlay", {state: "detached", timeout: 4000});
-    await page.waitForFunction(() => globalThis.KorytoClean.getState().flags.chainedPenSpent === true);
-    const reloaded = await page.evaluate(() => globalThis.KorytoClean.getState());
-    assert.equal(reloaded.flags.chainedPenSpent, true, "saved first-check choice is restored for reroll");
-    assert.ok(reloaded.resources.heat >= 6);
-    assert.deepEqual(errors, [], "saved reroll reload: no browser errors");
-    await context.close();
-  }
-
-  {
-    const {context, page, errors} = await openGame(browser, {
-      rolls: [18],
-      viewport: {width: 1000, height: 720}
-    });
-    await reachChapter(page, "ask-local", "marie", "find-paragraph");
-
-    await page.click('[data-quest-companion="radek"]');
-    await page.click('[data-quest-item="archiveKey"]');
-    await saveReloadCheckpoint(page, "jzdPrep", '[data-action="confirm-jzd-prep"]', restored => {
-      assert.deepEqual(restored.quest.party, ["marie", "radek"], "prep party survives reload");
-      assert.equal(restored.quest.itemId, "archiveKey", "prep item survives reload");
-    });
-    assert.equal(await page.locator('[data-action="confirm-jzd-prep"]').isEnabled(), true, "restored preparation can continue");
-    await page.click('[data-action="confirm-jzd-prep"]');
-
-    await saveReloadCheckpoint(page, "jzdApproach", '[data-check="archive-door"]', restored => {
-      assert.deepEqual(restored.party.members, ["marie", "radek"], "confirmed party survives reload");
-    });
-    await performCheck(page, '[data-check="archive-door"]');
-    await saveReloadCheckpoint(page, "jzdApproachResult", '[data-action="accept-jzd-approach"]', restored => {
-      assert.equal(restored.quest.route, "archive-door", "approach route survives reload");
-      assert.ok(restored.quest.evidence >= 1, "approach evidence survives reload");
-    });
-    await page.click('[data-action="accept-jzd-approach"]');
-
-    await saveReloadCheckpoint(page, "jzdSearch", '[data-check="ledger-trail"]');
-    await performCheck(page, '[data-check="ledger-trail"]');
-    await saveReloadCheckpoint(page, "jzdSearchResult", '[data-action="accept-jzd-search"]', restored => {
-      assert.ok(restored.quest.results.some(item => item.context === "jzd-search" && item.choiceId === "ledger-trail"), "search result survives reload");
-      assert.ok(restored.quest.evidence >= 3, "search evidence survives reload");
-    });
-    await page.click('[data-action="accept-jzd-search"]');
-
-    await saveReloadCheckpoint(page, "jzdRival", '[data-rival-choice="protect-workers"]', restored => {
-      assert.equal(restored.quest.rivalChoice, null, "rival choice remains pending after reload");
-    });
-    await page.click('[data-rival-choice="protect-workers"]');
-
-    await saveReloadCheckpoint(page, "jzdFinal", '[data-check="council-ambush"]', restored => {
-      assert.equal(restored.quest.rivalChoice, "protect-workers", "rival choice survives reload into final");
-    });
-    await performCheck(page, '[data-check="council-ambush"]');
-    await saveReloadCheckpoint(page, "jzdFinalResult", '[data-action="accept-jzd-final"]', restored => {
-      assert.equal(restored.quest.ending, "council-ambush", "final ending survives reload");
-      assert.ok(restored.quest.consequences.length >= 1, "durable consequences survive final-result reload");
-    });
-    await page.click('[data-action="accept-jzd-final"]');
-
-    await saveReloadCheckpoint(page, "jzdComplete", ".quest-complete", restored => {
-      assert.equal(restored.quest.status, "completed", "completed quest status survives reload");
-      assert.equal(restored.quest.ending, "council-ambush", "completed ending survives reload");
-      assert.deepEqual(restored.party.members, ["marie", "radek"], "completed party survives reload");
-    });
-    await expectText(page.locator(".quest-complete h1"), /Pracovníci|Zastupitelstvo/);
-    assert.deepEqual(errors, [], "JZD checkpoint reloads: no browser errors");
-    await context.close();
-  }
+  console.log("TEST.8 packaged campaign win, defeat, save/reload, export, desktop, and mobile passed.");
 } finally {
   await browser.close();
 }
-
-console.log("Koryto CLEAN TEST.7 hierarchy, full JZD quest, every actionable checkpoint reload, and save reroll browser gate passed.");
