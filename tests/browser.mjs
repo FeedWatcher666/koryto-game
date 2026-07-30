@@ -43,36 +43,39 @@ const browser = await chromium.launch({headless: true});
 try {
   {
     const {context, page, errors} = await openGame(browser, {
-      rolls: [16, 18, 17, 16, 14, 18, 16, 15, 19],
+      rolls: [16, 18, 17, 16, 18, 19],
       viewport: {width: 1200, height: 800}
     });
-    assert.equal(await page.locator(".t8-location").count(), 3, "day 1 exposes three locations");
-    assert.equal(await page.locator(".t8-case.is-active").count(), 1, "day 1 exposes one active case");
-    assert.match(await page.locator(".t8-rival").innerText(), /VĚČNÉHO DNEŠNÍ PLÁN/);
-    await page.screenshot({path: "browser-artifacts/test8-day1-map-desktop.png", fullPage: true});
+    assert.equal(await page.locator(".t8-location").count(), 3);
+    assert.equal(await page.locator("[data-campaign-action]").count(), 3);
 
-    await performAction(page, "pub-workers");
+    await performAction(page, "jzd-logbook");
     await page.reload({waitUntil: "load"});
     await page.waitForFunction(() => globalThis.KorytoTest8?.getState().campaign.actionsLeft === 1);
-    assert.equal(await page.locator('[data-campaign-action="pub-workers"]').count(), 0, "used action stays unavailable after reload");
-    await performAction(page, "office-contract");
+    assert.equal(await page.locator('[data-campaign-action="jzd-logbook"]').count(), 0);
+    await performAction(page, "pub-workers");
 
     await page.waitForSelector("[data-staff]");
-    assert.equal(await page.locator("[data-staff]").count(), 3);
     await page.click('[data-staff="marie"]');
-    await page.waitForSelector('[data-campaign-action="staff-marie-annex"]');
-    assert.equal(await page.locator(".t8-case.is-active").count(), 2, "day 2 exposes two simultaneous cases");
-    await page.screenshot({path: "browser-artifacts/test8-day2-map-desktop.png", fullPage: true});
-    await performAction(page, "staff-marie-annex", {automatic: true});
-    await performAction(page, "pub-road");
-
     await page.waitForSelector("[data-strategy]");
     await page.click('[data-strategy="legal"]');
-    await performAction(page, "office-final-prep");
-    await performAction(page, "pub-final-prep");
+    await page.waitForSelector('[data-campaign-action="respond-archive-sealed"]');
+    assert.equal(await page.locator(".t8-location.is-blocked").count(), 1, "Věčný blocks the office on day 2");
+    await page.screenshot({path: "browser-artifacts/test8-day2-mutation-desktop.png", fullPage: true});
 
+    await performAction(page, "respond-archive-sealed", {automatic: true});
+    await performAction(page, "legal-audit");
+    await page.waitForSelector('[data-campaign-action="respond-sale-accelerated"]');
+    assert.equal(await page.locator(".t8-location.is-blocked").count(), 1, "day 2 sacrifice mutates day 3 board");
+    await page.screenshot({path: "browser-artifacts/test8-day3-mutation-desktop.png", fullPage: true});
+
+    await performAction(page, "respond-sale-accelerated", {automatic: true});
+    await performAction(page, "legal-affidavit");
+    await page.waitForSelector("[data-final-tactic]");
+    assert.equal(await page.locator("[data-final-tactic]").count(), 2);
+    await page.click('[data-final-tactic="injunction"]');
     await page.waitForSelector("[data-final-roll]");
-    assert.match(await page.locator(".t8-final-card").innerText(), /šest předchozích akcí/i);
+    assert.match(await page.locator(".t8-gate").innerText(), /DOKTRÍNA JE PŘIPRAVENA/);
     await page.click("[data-final-roll]");
     await page.waitForSelector(".dice-overlay.is-rolling", {state: "visible", timeout: 2500});
     await page.click("[data-dice-skip]");
@@ -80,16 +83,21 @@ try {
 
     const completed = await page.evaluate(() => globalThis.KorytoTest8.getState());
     assert.equal(completed.campaign.outcome.won, true);
-    assert.equal(completed.campaign.actionLog.length, 6);
+    assert.equal(completed.campaign.sacrificeLog.length, 3);
     assert.equal(completed.campaign.rivalLog.length, 3);
-    assert.equal(completed.campaign.staffId, "marie");
     assert.equal(completed.campaign.finalStrategy, "legal");
+    assert.equal(completed.campaign.finalTactic, "injunction");
+    assert.equal(completed.campaign.cases.jzd.status, "resolved");
+    assert.notEqual(completed.campaign.cases.road.status, "active");
     assert.equal(completed.playtests.length, 1);
     assert.equal(await page.locator('[data-system="export"]').count(), 1);
     await page.click('[data-system="export"]');
-    await page.waitForFunction(() => /Playtest zkopírován|Export je označen níže/.test(document.querySelector('[data-system="export"]')?.textContent || ""));
-    await page.screenshot({path: "browser-artifacts/test8-strategic-win-desktop.png", fullPage: true});
-    await noOverflow(page, "strategic win desktop");
+    await page.waitForFunction(() => {
+      const button = document.querySelector('[data-system="export"]');
+      return /zkopírován|označen/.test(button?.textContent || "");
+    });
+    await page.screenshot({path: "browser-artifacts/test8-doctrine-win-desktop.png", fullPage: true});
+    await noOverflow(page, "doctrine win desktop");
     assert.deepEqual(errors, []);
     await context.close();
   }
@@ -97,14 +105,17 @@ try {
   {
     const {context, page, errors} = await openGame(browser, {
       rolls: [1, 1, 1, 1, 1],
-      viewport: {width: 390, height: 844}
+      viewport: {width: 390, height: 844},
+      classId: "paladin"
     });
-    await page.screenshot({path: "browser-artifacts/test8-day1-map-mobile.png", fullPage: true});
-    await performAction(page, "jzd-logbook");
+    await performAction(page, "pub-workers");
     await performAction(page, "office-contract");
-    await page.click('[data-staff="marie"]');
-    await performAction(page, "jzd-witness");
-    await performAction(page, "office-invoices");
+    await page.click('[data-staff="radek"]');
+    await page.click('[data-strategy="workers"]');
+    await performAction(page, "respond-logbook-burned", {automatic: true});
+    await performAction(page, "workers-organize");
+    await page.waitForSelector(".t8-village-map");
+    await performAction(page, "road-last-chance");
     await page.waitForSelector(".t8-ending.is-loss");
     const defeated = await page.evaluate(() => globalThis.KorytoTest8.getState());
     assert.equal(defeated.campaign.outcome.id, "pressure-defeat");
@@ -115,7 +126,7 @@ try {
     await context.close();
   }
 
-  console.log("TEST.8 packaged campaign win, defeat, save/reload, export, map evidence, desktop, and mobile passed.");
+  console.log("TEST.8 sacrifice, mutation, doctrine, tactic, save/reload, export, desktop, and mobile passed.");
 } finally {
   await browser.close();
 }
