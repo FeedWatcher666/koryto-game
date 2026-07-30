@@ -8,10 +8,12 @@ import {
   applyCampaignAction,
   applyFinalCampaignResult,
   availableCampaignActions,
+  availableFinalTactics,
   campaignActionById,
   choiceForCampaignAction,
   chooseCampaignStaff,
   chooseFinalStrategy,
+  chooseFinalTactic,
   clearTest8Save,
   createTest8State,
   currentRivalPlan,
@@ -51,10 +53,10 @@ function randomSource() {
 function creationView() {
   return `<main class="t8-creation">
     <section class="t8-hero-copy">
-      <p class="t8-kicker">KORYTO · CLEAN TEST.8</p>
-      <h1>Vyhrajte obec. Ne návod k obci.</h1>
-      <p>Máte tři dny, šest akcí a soupeře, který nečeká, až dočtete pravidla.</p>
-      <div class="t8-promise"><strong>První minuta:</strong><span>cíl, dvě hrozby, dvě akce. Zbytek se odemkne až ve chvíli, kdy ho potřebujete.</span></div>
+      <p class="t8-kicker">KORYTO · CLEAN TEST.8 REDESIGN</p>
+      <h1>Každý den něco zachráníte. A něco ztratíte.</h1>
+      <p>Máte tři dny, šest akcí a soupeře, který fyzicky mění mapu podle toho, co necháte bez ochrany.</p>
+      <div class="t8-promise"><strong>Pravidlo kampaně:</strong><span>ze tří důležitých příležitostí stihnete dvě. Třetí Věčný trvale poškodí.</span></div>
     </section>
     <form id="creationForm" class="t8-creation-form">
       <label for="heroName">Jméno kandidáta</label>
@@ -78,14 +80,15 @@ function resource(label, value, note) {
 }
 
 function campaignHeader() {
+  const doctrine = state.campaign.finalStrategy ? TEST8_STRATEGIES[state.campaign.finalStrategy] : null;
   return `<header class="t8-hud">
     <div class="t8-brand"><span>K</span><div><small>SATIRICKÉ POLITICKÉ RPG</small><strong>KORYTO</strong></div></div>
-    <div class="t8-goal"><small>HLAVNÍ CÍL</small><strong>Zastavte prodej JZD a přežijte veřejné jednání</strong></div>
+    <div class="t8-goal"><small>HLAVNÍ CÍL</small><strong>${doctrine ? `${doctrine.name}: ${doctrine.failure}` : "Zastavte prodej JZD a přežijte veřejné jednání"}</strong></div>
     <div class="t8-resources">
       ${resource("DEN", `${state.campaign.day}/3`, "čas do jednání")}
       ${resource("AKCE", state.campaign.actionsLeft, "každá volba stojí 1")}
-      ${resource("PODPORA", state.resources.support, "lidé za vámi")}
-      ${resource("DŮKAZY", state.resources.evidence, "co unesete na stůl")}
+      ${resource("PODPORA", state.resources.support, doctrine?.primary === "Podpora" ? "hlavní zdroj doktríny" : "lidé za vámi")}
+      ${resource("DŮKAZY", state.resources.evidence, doctrine?.primary === "Důkazy" ? "hlavní zdroj doktríny" : "co unesete na stůl")}
       ${resource("TLAK", state.resources.pressure, "10 znamená prohru")}
     </div>
     <div class="t8-system-actions"><button data-system="save">Uložit</button><button data-system="restart">Nová kampaň</button></div>
@@ -95,8 +98,10 @@ function campaignHeader() {
 function caseCard(item) {
   const active = item.status === "active";
   const progress = Math.min(100, item.progress / 4 * 100);
+  const statusLabels = {locked: "ODEMKNE SE 2. DEN", resolved: "VYŘEŠENO", carried: "PŘENESENO DÁL", failed: "PROHRÁNO", unresolved: "NEUZAVŘENO"};
+  const status = active ? `TERMÍN: DEN ${item.deadline}` : statusLabels[item.status] || item.status.toUpperCase();
   return `<article class="t8-case ${active ? "is-active" : "is-locked"}">
-    <div><small>${active ? `TERMÍN: DEN ${item.deadline}` : "ODEMKNE SE 2. DEN"}</small><strong>${item.title}</strong></div>
+    <div><small>${status}</small><strong>${item.title}</strong></div>
     <p>${item.threat}</p>
     <div class="t8-meter" aria-label="Pokrok kauzy ${item.progress} ze 4"><i style="width:${progress}%"></i></div>
     <footer><span>Pokrok <b>${item.progress}/4</b></span><span>Zanedbání <b>${item.neglect}</b></span></footer>
@@ -105,52 +110,63 @@ function caseCard(item) {
 
 function actionCard(action) {
   const choice = choiceForCampaignAction(state, action);
-  const risk = action.automatic ? "Bez hodu · jistý politický účet" : `d20 · ${choice.attribute} · obtížnost ${choice.dc}`;
-  return `<button class="t8-action-card ${action.automatic ? "is-special" : ""}" data-campaign-action="${action.id}">
-    <span class="t8-action-top"><b>${action.automatic ? "ZVLÁŠTNÍ AKCE ŠTÁBU" : "1 AKCE"}</b><em>${risk}</em></span>
+  const risk = action.automatic ? "Bez hodu · jistá cena jedné akce" : `d20 · ${choice.attribute} · obtížnost ${choice.dc}`;
+  const kind = action.isResponse ? "REAKCE NA VĚČNÉHO" : action.requiresStrategy ? "AKCE DOKTRÍNY" : action.requiresStaff ? "AKCE ŠTÁBU" : "1 AKCE";
+  return `<button class="t8-action-card ${action.automatic || action.isResponse ? "is-special" : ""}" data-campaign-action="${action.id}">
+    <span class="t8-action-top"><b>${kind}</b><em>${risk}</em></span>
     <strong>${action.title}</strong>
     <span>${action.detail}</span>
     <dl><div><dt>Záměr</dt><dd>${action.intent}</dd></div><div><dt>Riziko</dt><dd>${action.risk}</dd></div></dl>
   </button>`;
 }
 
-function locationCard(locationId, actions) {
+function locationCard(locationId, actions, rival) {
   const location = TEST8_LOCATIONS[locationId];
-  return `<section class="t8-location t8-location-${locationId}">
+  const blocked = rival.blockedLocation === locationId;
+  return `<section class="t8-location t8-location-${locationId} ${blocked ? "is-blocked" : ""}">
     <header><span>${location.icon}</span><div><h2>${location.name}</h2><p>${location.description}</p></div></header>
-    <div class="t8-location-actions">${actions.length ? actions.map(actionCard).join("") : `<p class="t8-muted">Dnes už tady není další smysluplný tah.</p>`}</div>
+    ${blocked ? `<div class="t8-blocked"><strong>UZAVŘENO VĚČNÝM</strong><span>${esc(rival.title)}</span></div>` : ""}
+    <div class="t8-location-actions">${actions.length ? actions.map(actionCard).join("") : `<p class="t8-muted">${blocked ? "Nejdřív musíte použít reakční akci v jiné lokaci." : "Dnes už tady není další smysluplný tah."}</p>`}</div>
   </section>`;
 }
 
 function resultBanner() {
   const result = state.campaign.lastResult;
   if (!result) return "";
-  const tone = result.kind === "rival" ? "is-rival" : result.level ? `is-${result.level}` : "is-decision";
+  const tone = result.kind === "rival" ? "is-rival" : result.kind === "response" ? "is-costly" : result.level ? `is-${result.level}` : "is-decision";
+  const label = result.kind === "rival" ? "VĚČNÝ ZMĚNIL MAPU" : result.kind === "response" ? "REAKCE NA VĚČNÉHO" : result.kind === "decision" ? "VAŠE STRATEGICKÉ ROZHODNUTÍ" : "DŮSLEDEK POSLEDNÍ AKCE";
   return `<section class="t8-result ${tone}" aria-live="polite">
-    <small>${result.kind === "rival" ? "VĚČNÝ PROVEDL PROTIAKCI" : result.kind === "decision" ? "VAŠE STRATEGICKÉ ROZHODNUTÍ" : "DŮSLEDEK POSLEDNÍ AKCE"}</small>
-    <strong>${esc(result.title)}</strong><p>${esc(result.text)}</p>${Number.isInteger(result.roll) ? `<span>Hod d20: <b>${result.roll}</b></span>` : ""}
+    <small>${label}</small><strong>${esc(result.title)}</strong><p>${esc(result.text)}</p>${Number.isInteger(result.roll) ? `<span>Hod d20: <b>${result.roll}</b></span>` : ""}
   </section>`;
+}
+
+function sacrificeList() {
+  if (!state.campaign.sacrificeLog.length) return `<p class="t8-muted">První ztrátu určí konec dne.</p>`;
+  return state.campaign.sacrificeLog.map(item => `<article class="t8-sacrifice"><small>DEN ${item.day} · NEUDĚLALI JSTE</small><strong>${esc(item.title)}</strong><p>${esc(item.text)}</p></article>`).join("");
 }
 
 function mapView() {
   const actions = availableCampaignActions(state);
   const byLocation = id => actions.filter(action => action.locationId === id);
   const rival = currentRivalPlan(state);
+  const doctrine = state.campaign.finalStrategy ? TEST8_STRATEGIES[state.campaign.finalStrategy] : null;
   return `<main class="t8-campaign">
     ${campaignHeader()}
     <section class="t8-situation">
-      <div><small>CO SE ROZHODUJE</small><h1>Den ${state.campaign.day}: nemůžete zachránit všechno</h1><p>Vyberte, čemu dáte jednu ze zbývajících akcí. Neřešené problémy se neposunou samy — Věčný ano.</p></div>
-      <aside class="t8-rival"><span>V</span><div><small>VĚČNÉHO DNEŠNÍ PLÁN</small><strong>${rival.title}</strong><p>${rival.trigger}</p></div></aside>
+      <div><small>CO SE ROZHODUJE</small><h1>Den ${state.campaign.day}: ze tří důležitých věcí zachráníte dvě</h1><p>Po druhé akci se jedna neprovedená příprava změní v trvalou ztrátu. Věčný podle ní upraví další mapu.</p></div>
+      <aside class="t8-rival"><span>V</span><div><small>VĚČNÉHO AKTUÁLNÍ ZÁSAH</small><strong>${esc(rival.title)}</strong><p>${esc(rival.trigger)}</p></div></aside>
     </section>
     ${resultBanner()}
     <section class="t8-main-grid">
-      <div class="t8-village-map" aria-label="Mapa Dolních Vejprnic se třemi aktivními lokacemi">
+      <div class="t8-village-map" aria-label="Mapa Dolních Vejprnic se třemi lokacemi">
         <div class="t8-road" aria-hidden="true"></div>
-        ${Object.keys(TEST8_LOCATIONS).map(id => locationCard(id, byLocation(id))).join("")}
+        ${Object.keys(TEST8_LOCATIONS).map(id => locationCard(id, byLocation(id), rival)).join("")}
       </div>
       <aside class="t8-sidebar">
+        ${doctrine ? `<section class="t8-doctrine"><p class="t8-kicker">ZVOLENÁ DOKTRÍNA</p><strong>${doctrine.name}</strong><p>${doctrine.description}</p><small>Podmínka prohry: ${doctrine.failure}</small></section>` : ""}
         <section><p class="t8-kicker">AKTIVNÍ KAUZY</p>${Object.values(state.campaign.cases).map(caseCard).join("")}</section>
-        <section class="t8-rule"><strong>Jednoduché pravidlo tahu</strong><ol><li>Vyberte lokaci.</li><li>Utratte 1 akci.</li><li>Po druhé akci udeří Věčný.</li></ol></section>
+        <section><p class="t8-kicker">CO JSTE OBĚTOVALI</p>${sacrificeList()}</section>
+        <section class="t8-rule"><strong>Jednoduché pravidlo tahu</strong><ol><li>Vyberte dvě akce.</li><li>Třetí příležitost ztratíte.</li><li>Věčný podle ní zablokuje další mapu.</li></ol></section>
       </aside>
     </section>
   </main>`;
@@ -167,15 +183,24 @@ function dayDecisionIntro() {
 
 function staffView() {
   return `<main class="t8-decision-screen">${campaignHeader()}${dayDecisionIntro()}
-    <section class="t8-decision-copy"><p class="t8-kicker">DEN 2 · ŠTÁB A DRUHÁ KAUZA</p><h2>Koho vezmete do štábu?</h2><p>Každý člověk odemkne jinou silnou akci. Ostatní dvě dnes nezískáte.</p></section>
+    <section class="t8-decision-copy"><p class="t8-kicker">PŘED DRUHÝM DNEM · ŠTÁB</p><h2>Koho vezmete do štábu?</h2><p>Člen štábu odemkne jednu vlastní akci a dává výhodu ve své domácí lokaci. Hned potom zvolíte doktrínu pro oba zbývající dny.</p></section>
     <div class="t8-staff-grid">${Object.entries(TEST8_STAFF).map(([id, item]) => `<button data-staff="${id}"><span>${id === "marie" ? "M" : id === "bohumil" ? "B" : "R"}</span><strong>${item.name}</strong><p>${item.role}</p><small>Domácí lokace: ${TEST8_LOCATIONS[item.locationId].name}</small></button>`).join("")}</div>
   </main>`;
 }
 
 function strategyView() {
   return `<main class="t8-decision-screen">${campaignHeader()}${dayDecisionIntro()}
-    <section class="t8-decision-copy"><p class="t8-kicker">DEN 3 · POLITICKÝ STŘET</p><h2>Jak chcete Věčného porazit?</h2><p>Strategie určí finální atribut i to, která příprava bude mít největší cenu.</p></section>
-    <div class="t8-strategy-grid">${Object.entries(TEST8_STRATEGIES).map(([id, item]) => `<button data-strategy="${id}"><strong>${item.name}</strong><p>${item.description}</p><small>Finále používá: ${ATTRIBUTES.find(([key]) => key === item.attribute)?.[1]}</small></button>`).join("")}</div>
+    <section class="t8-decision-copy"><p class="t8-kicker">PŘED DRUHÝM DNEM · ZÁVAZNÁ DOKTRÍNA</p><h2>Jak budete hrát zbytek kampaně?</h2><p>Doktrína okamžitě změní akce druhého i třetího dne, hlavní zdroj, podmínku prohry a nabídku finálních taktik.</p></section>
+    <div class="t8-strategy-grid">${Object.entries(TEST8_STRATEGIES).map(([id, item]) => `<button data-strategy="${id}"><strong>${item.name}</strong><p>${item.description}</p><small>Hlavní zdroj: ${item.primary}</small><small>Prohra: ${item.failure}</small></button>`).join("")}</div>
+  </main>`;
+}
+
+function finalTacticView() {
+  const doctrine = TEST8_STRATEGIES[state.campaign.finalStrategy];
+  const tactics = availableFinalTactics(state);
+  return `<main class="t8-decision-screen">${campaignHeader()}${dayDecisionIntro()}
+    <section class="t8-decision-copy"><p class="t8-kicker">FINÁLE · ${doctrine.name.toUpperCase()}</p><h2>Jak přesně doktrínu provedete?</h2><p>Tohle není kosmetická volba. Taktiky používají jiný atribut a jinou základní obtížnost.</p></section>
+    <div class="t8-strategy-grid">${tactics.map(item => `<button data-final-tactic="${item.id}"><strong>${item.name}</strong><p>${item.detail}</p><small>Atribut: ${ATTRIBUTES.find(([key]) => key === item.attribute)?.[1]}</small><small>Základní obtížnost: ${item.baseDc}</small></button>`).join("")}</div>
   </main>`;
 }
 
@@ -184,11 +209,12 @@ function finalView() {
   return `<main class="t8-decision-screen">${campaignHeader()}${dayDecisionIntro()}
     <section class="t8-final-card">
       <p class="t8-kicker">VEŘEJNÉ JEDNÁNÍ · FINÁLE</p><h1>${choice.label}</h1><p>${choice.detail}</p>
+      <div class="t8-gate ${choice.gate.ok ? "is-open" : "is-closed"}"><strong>${choice.gate.ok ? "DOKTRÍNA JE PŘIPRAVENA" : "DOKTRÍNA UŽ SELHALA"}</strong><span>${choice.gate.reason}</span><small>${choice.gate.label}: ${choice.gate.actual}</small></div>
       <div class="t8-final-summary">
         <span>Podpora <b>${state.resources.support}</b></span><span>Důkazy <b>${state.resources.evidence}</b></span><span>Tlak <b>${state.resources.pressure}</b></span><span>Obtížnost <b>${choice.dc}</b></span>
       </div>
-      <p>Hod rozhodne riziko okamžiku. Obtížnost už ale vytvořilo vašich šest předchozích akcí.</p>
-      <button class="t8-primary" data-final-roll>Spustit finální střet</button>
+      <p>Hod rozhodne zvládnutí okamžiku. Neumí ale nahradit chybějící lidi, důkazy ani jednotnou směnu.</p>
+      <button class="t8-primary" data-final-roll>Spustit ${choice.label.toLowerCase()}</button>
     </section>
   </main>`;
 }
@@ -205,11 +231,12 @@ function endingView() {
       ${resource("PODPORA", state.resources.support, "konec kampaně")}
       ${resource("DŮKAZY", state.resources.evidence, "konec kampaně")}
       ${resource("TLAK", state.resources.pressure, "konec kampaně")}
-      ${resource("JZD", `${cases.jzd.progress}/4`, `zanedbání ${cases.jzd.neglect}`)}
-      ${resource("SILNICE", `${cases.road.progress}/4`, `zanedbání ${cases.road.neglect}`)}
-      ${resource("AKCE", state.campaign.actionLog.length, "skutečně odehrané")}
+      ${resource("JZD", `${cases.jzd.progress}/4`, cases.jzd.status)}
+      ${resource("SILNICE", `${cases.road.progress}/4`, cases.road.status)}
+      ${resource("OBĚTI", state.campaign.sacrificeLog.length, "jedna za každý den")}
     </section>
-    <div class="t8-ending-actions"><button class="t8-primary" data-system="export">Kopírovat playtest</button><button data-system="restart">Zahrát jinou strategii</button></div>
+    <section class="t8-ending-sacrifices"><p class="t8-kicker">CO JSTE NENECHALI ZACHRÁNIT</p>${sacrificeList()}</section>
+    <div class="t8-ending-actions"><button class="t8-primary" data-system="export">Kopírovat playtest</button><button data-system="restart">Zahrát jinou doktrínu</button></div>
     <textarea id="playtestFallback" class="t8-export-fallback" aria-label="Export playtestu" readonly hidden></textarea>
   </main>`;
 }
@@ -219,6 +246,7 @@ function render(focusSelector = null) {
   else if (state.screen === "ending") app.innerHTML = endingView();
   else if (state.campaign.phase === "staff") app.innerHTML = staffView();
   else if (state.campaign.phase === "strategy") app.innerHTML = strategyView();
+  else if (state.campaign.phase === "final-tactic") app.innerHTML = finalTacticView();
   else if (state.campaign.phase === "final") app.innerHTML = finalView();
   else app.innerHTML = mapView();
   const nameInput = app.querySelector("#heroName");
@@ -313,6 +341,8 @@ app.addEventListener("click", async event => {
   if (staff) { commit(chooseCampaignStaff(state, staff.dataset.staff)); return; }
   const strategy = event.target.closest("[data-strategy]");
   if (strategy) { commit(chooseFinalStrategy(state, strategy.dataset.strategy)); return; }
+  const tactic = event.target.closest("[data-final-tactic]");
+  if (tactic) { commit(chooseFinalTactic(state, tactic.dataset.finalTactic)); return; }
   if (event.target.closest("[data-final-roll]")) { await performFinalRoll(); return; }
   const system = event.target.closest("[data-system]");
   if (!system) return;
@@ -342,7 +372,7 @@ app.addEventListener("submit", event => {
 render();
 globalThis.KorytoTest8 = Object.freeze({
   getState: () => structuredClone(state),
-  exportPlaytest: () => exportPlaytest(state),
+  exportPlaytest: () => exportPlaytest(state, document.querySelector('meta[name="koryto-build-sha"]')?.content || "unknown"),
   get isRolling() { return rolling; },
   version: VERSION
 });
