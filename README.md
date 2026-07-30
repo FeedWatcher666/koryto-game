@@ -1,30 +1,42 @@
-# Koryto v0.20.0 CLEAN TEST.7
+# Koryto v0.20.0 CLEAN TEST.8
 
-Čistý rewrite politického D&D RPG. Tento strom neobsahuje ani nespouští runtime, CSS, ukládání nebo renderery z v0.17 a starších buildů.
+Čistý rewrite satirického politického D&D RPG. TEST.8 vrací strategické jádro původního Koryta v nové architektuře bez importu nebo spouštění runtime, CSS, rendererů a ukládání z v0.17.
 
 ## Spuštění
-
-Hratelný offline balík vzniká příkazem:
 
 ```bash
 node scripts/build-offline.mjs
 ```
 
-Potom otevřete `dist/koryto-v0.20.0-clean-test.7/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
+Potom otevřete `dist/koryto-v0.20.0-clean-test.8/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
 
-## První plnohodnotný quest
+## Strategická kampaň po prvním lidském playtestu
 
-TEST.7 drží obsah kapitoly **Krysy v JZD** beze změny a opravuje hierarchii hraní podle ručního vizuálního auditu TEST.6. Nová scéna se po každém přechodu dostane do zorného pole, vysoký HUD už nepřekrývá obsah a na mobilu se rozhodnutí i závěr kapitoly zobrazují před listem postavy a podpůrnými statistikami.
+První lidský průchod původního TEST.8 selhal: hráč necítil oběť, nedokázal určit dopad Věčného a strategie působily stejně. Aktuální redesign proto mění samotná pravidla kampaně:
 
-Družina i vybavení mění bonusy, výhodu nebo nevýhodu a dostupnou politickou cestu. Při dvojici společníků se použije jediná nejsilnější relevantní pomoc; bonusy různých společníků se nesčítají do jednoho hodu.
+- tři herní dny a dvě akce za den,
+- každý den nabízí nejméně tři důležité příležitosti,
+- po druhé akci se jedna neprovedená příležitost změní v pojmenovanou nevratnou oběť,
+- Věčný podle oběti fyzicky uzavře lokaci nebo poškodí následující herní stav,
+- reakce na Věčného stojí jednu z pouhých dvou akcí dalšího dne,
+- veřejná, právní nebo dělnická doktrína se volí už před druhým dnem,
+- každá doktrína odemyká vlastní akce, používá jiný hlavní zdroj a má vlastní podmínku selhání,
+- každá doktrína nabízí dvě rozdílné finální taktiky,
+- d20 rozhoduje riziko provedení, ale neumí nahradit chybějící strategickou přípravu,
+- kauzy po konci kampaně přecházejí do terminálního stavu místo chybného `active`.
 
-## Kostky
+## Playtest
 
-- běžný hod: jedna d20,
-- výhoda: dvě d20 a vyšší výsledek,
-- nevýhoda: dvě d20 a nižší výsledek,
-- ponechaná a vyřazená kostka jsou jasně označené,
-- technický výpočet je dostupný až v detailu.
+Každý dokončený průchod se archivuje samostatně. Závěr nabízí tlačítko **Kopírovat playtest**, které exportuje:
+
+- verzi a přesný build SHA,
+- délku průchodu,
+- všechny akce a navštívené lokace,
+- každodenní oběti,
+- změny mapy způsobené Věčným a reakce hráče,
+- stav obou kauz,
+- člena štábu, doktrínu a finální taktiku,
+- hody d20, zdroje, příznaky kampaně a důvod výhry nebo prohry.
 
 ## Ověření
 
@@ -35,25 +47,25 @@ npm run project:validate
 node scripts/build-offline.mjs
 ```
 
-Browser gate prochází všechny tři konce kapitoly, veřejnou a špinavou cestu, čistě komplikovaný průchod bez soft-locku, přesnou náhradu aktivní družiny a přehod první zkoušky po uložení a reloadu. CI navíc kontroluje základní přístupnost a Lighthouse skóre z hotového offline balíku.
-
-Každý významný build prochází Codex review podle pravidel v `AGENTS.md`. CI testuje a reportuje skutečný PR head SHA. Po zeleném gate musí být review vyžádáno z připojeného uživatelského účtu na stejném SHA; komentář vytvořený účtem GitHub Actions se za Codex review nepovažuje.
+Packaged browser gate musí odehrát doktrinální výhru na desktopu a skutečnou prohru tlakem na mobilu. Ověřuje také save/reload, uzavření lokace Věčným, reakční akci, každodenní oběti, terminální stavy kauz, export playtestu, přístupnost, horizontální overflow a Lighthouse.
 
 ## Projektová paměť a skilly
 
-Aktuální fakta, rozhodnutí a handoff jsou rozdělené do malých souborů v `docs/`. Repo obsahuje čtyři vlastní Codex/agent skilly v `.agents/skills/`: návrh questů, UI a art direction, playtest audit a release gate. Přesný aktivní seznam je v `.agents/koryto-skill-stack.json`. Vizuální severky a pravidla jejich převodu do živého rozhraní jsou v `docs/visual-direction.md`.
+Závazný směr TEST.8 je v `docs/v0.20/test8-core-loop.md`, implementační kontrakt v `docs/v0.20/test8-campaign-contract.md` a redesign po lidském neúspěchu v `docs/v0.20/test8-redesign-brief.md`. Repo obsahuje čtyři lokální skilly pro questy, UI, playtest a release gate.
 
 ## Veřejný tester
 
-Po aktivaci **Settings → Pages → Source: GitHub Actions** nasazuje `pages.yml` pouze poslední zelený build z `main` na:
+GitHub Pages nasazuje pouze zelený commit z `main` na:
 
 `https://feedwatcher666.github.io/koryto-game/`
+
+PR #45 zůstává draft. Veřejná stránka se na TEST.8 změní až po zeleném gate, Codex review, lidském schválení a výslovném merge pokynu.
 
 ## Zásady
 
 - Staré buildy jsou pouze obsahová a designová reference.
-- Žádný import legacy skriptů.
-- Save schema 2 a klíč `koryto.clean.v0200`.
-- Offline runtime se generuje z kanonických modulů, ručně se neudržuje.
-- Každý významný quest musí mít přípravu, několik scén, aktivní družinu, protiakci soupeře a trvalý následek.
-- Automatické testy dokazují stabilitu, ne zábavnost; merge vyžaduje výslovné lidské schválení.
+- Žádný import legacy runtime.
+- Save schema 4 a klíč `koryto.clean.v0200.test8`.
+- Offline runtime se generuje z kanonických modulů, ručně se neupravuje a obsahuje přesný SHA sestavení.
+- Automatické testy dokazují stabilitu, ne zábavnost.
+- TEST.8 lze přijmout pouze po lidském potvrzení, že hráč umí pojmenovat vlastní oběť, konkrétní zásah Věčného a mechanický rozdíl zvolené doktríny.

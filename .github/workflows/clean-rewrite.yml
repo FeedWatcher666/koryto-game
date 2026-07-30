@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BUILD_DIR: dist/koryto-v0.20.0-clean-test.7
+  BUILD_DIR: dist/koryto-v0.20.0-clean-test.8
   PLAYWRIGHT_VERSION: 1.54.2
   LHCI_VERSION: 0.15.1
   REVIEW_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -66,7 +66,7 @@ jobs:
           fi
           echo "full=${full}" >> "${GITHUB_OUTPUT}"
 
-      - name: Run clean runtime tests
+      - name: Run strategic campaign tests
         run: npm test
 
       - name: Check source syntax
@@ -106,17 +106,16 @@ jobs:
           target="${BUILD_DIR}"
           test -f "$target/index.html"
           test -f "$target/src/runtime.js"
-          test -f "$target/styles/game.css"
+          test -f "$target/styles/test8.css"
           test -f "$target/styles/dice3d.css"
-          test -f "$target/styles/quest-jzd.css"
           grep -q 'src/runtime.js' "$target/index.html"
           grep -q 'data-d20-renderer="icosahedron"' "$target/src/runtime.js"
           grep -q '2d20kh1' "$target/src/runtime.js"
           grep -q '2d20kl1' "$target/src/runtime.js"
-          grep -q 'startJzdQuest' "$target/src/runtime.js"
-          grep -q 'applyJzdRivalChoice' "$target/src/runtime.js"
-          grep -q 'Vyberte přesně dva společníky' "$target/src/runtime.js"
-          grep -q 'CO SE VRÁTÍ POZDĚJI' "$target/src/runtime.js"
+          grep -q 'currentRivalPlan' "$target/src/runtime.js"
+          grep -q 'applyCampaignAction' "$target/src/runtime.js"
+          grep -q 'VĚČNÉHO DNEŠNÍ PLÁN' "$target/src/runtime.js"
+          grep -q 'Kopírovat playtest' "$target/src/runtime.js"
           ! grep -R -E 'v017|KorytoApp|village-rpg|legacy=1' "$target/index.html" "$target/src" "$target/styles"
 
       - name: Restore Playwright browser cache
@@ -138,7 +137,7 @@ jobs:
             npx playwright install chromium
           fi
 
-      - name: Play all JZD endings and save reload in packaged build
+      - name: Play strategic win and pressure defeat in packaged build
         if: steps.scope.outputs.full == 'true'
         run: node tests/browser.mjs "${BUILD_DIR}"
 
@@ -155,12 +154,12 @@ jobs:
           test -x "${CHROME_PATH}"
           npx lhci autorun --config=.lighthouserc.json
 
-      - name: Upload JZD quest screenshots
+      - name: Upload TEST.8 campaign screenshots
         if: always() && steps.scope.outputs.full == 'true'
         id: screenshots
         uses: actions/upload-artifact@v7
         with:
-          name: koryto-v0.20.0-clean-test.7-jzd-screenshots
+          name: koryto-v0.20.0-clean-test.8-campaign-screenshots
           path: browser-artifacts
           if-no-files-found: warn
           retention-days: 30
@@ -170,7 +169,7 @@ jobs:
         id: lighthouse
         uses: actions/upload-artifact@v7
         with:
-          name: koryto-v0.20.0-clean-test.7-lighthouse
+          name: koryto-v0.20.0-clean-test.8-lighthouse
           path: lighthouse-artifacts
           if-no-files-found: warn
           retention-days: 30
@@ -179,7 +178,7 @@ jobs:
         id: playable
         uses: actions/upload-artifact@v7
         with:
-          name: koryto-v0.20.0-clean-test.7
+          name: koryto-v0.20.0-clean-test.8
           path: ${{ env.BUILD_DIR }}
           if-no-files-found: error
           retention-days: 90

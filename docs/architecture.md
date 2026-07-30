@@ -2,33 +2,47 @@
 
 ## Tvrdá hranice
 
-Nový runtime nesmí importovat, spouštět ani opravovat žádný soubor z v0.17 nebo starších verzí. Staré buildy slouží pouze jako referenční katalog nápadů, postav, questů a humoru.
+Nový runtime nesmí importovat, spouštět ani opravovat žádný soubor z v0.17 nebo starších verzí. Staré buildy slouží pouze jako referenční katalog nápadů, postav, questů, mechanik a humoru.
 
-## Moduly
+## Aktivní moduly TEST.8
 
-- `src/data.js` — čistá data tříd, původů, atributů, družiny a prvních scén.
-- `src/rules.js` — d20, obtížnost, stupně výsledků a následky.
-- `src/state.js` — nový stav hry a nový save kontrakt bez migrace legacy dat.
-- `src/ui.js` — jediný renderer celé hry.
-- `src/main.js` — orchestrace scén a vstupů.
-- `styles/game.css` — jediná stylová vrstva.
+- `src/data.js` — třídy, původy, atributy, postavy a sdílené výsledky d20.
+- `src/rules.js` — d20, výhoda, nevýhoda, modifikátory a stupně výsledků.
+- `src/test8-campaign.js` — kanonický stav třídenní kampaně, akce, kauzy, soupeř, štáb, výhra, prohra, save a export playtestu.
+- `src/dice-physics.js` — fyzika a vykreslení d20.
+- `src/dice.js` — přístupná prezentace hodu a fallback.
+- `src/test8-main.js` — jediný aktivní renderer a orchestrace TEST.8.
+- `styles/test8.css` — jediná aktivní herní stylová vrstva TEST.8.
+- `styles/dice3d.css` — izolovaná stylová vrstva fyzické kostky.
+
+`scripts/build-offline.mjs` skládá pouze tyto aktivní kanonické moduly do deterministického `src/runtime.js`. Generovaný runtime se nikdy neupravuje ručně.
+
+## Stavová hranice
+
+TEST.8 používá save schema 3 a klíč `koryto.clean.v0200.test8`. TEST.7 schema 2 se automaticky nemigruje, protože lineární questový stav nemá jednoznačný převod na strategickou kampaň. Dokončené TEST.8 průchody se v rámci nového schématu ukládají odděleně jako playtestové souhrny.
 
 ## Zakázané vzory
 
 - vrstvení oprav nad historickými renderery,
-- několik souběžných UI systémů,
+- několik souběžných aktivních UI systémů,
 - skryté legacy obrazovky,
-- staré save schema,
 - kompatibilní shim pro staré globální objekty,
-- mřížkový pohyb, deckbuilder a administrativní dashboard.
+- ručně udržovaný distribuční bundle,
+- administrativní dashboard bez RPG světa,
+- lineární řetězec situace → hod → tlačítko pokračovat,
+- mechanika, kterou musí hráč pochopit dřív, než ji poprvé použije.
 
-## První vertikální řez
+## Strategická smyčka TEST.8
 
-1. Tvorba postavy se třemi třídami a třemi původy.
-2. Šest skutečných atributů.
-3. Ztracení na špatné zastávce.
-4. První transparentní d20 zkouška.
-5. Propiska na řetízku jako přehod za cenu.
-6. Marie nebo Bohumil jako první člen družiny.
-7. Registrace kandidatury s několika řešeními.
-8. První politický dluh a otevření kapitoly Krysy v JZD.
+1. Mapa ukáže cíl, zbývající akce, dvě hrozby a Věčného plán.
+2. Hráč vybere jednu ze tří lokací a vidí cenu, záměr a riziko.
+3. Riziková akce použije d20; jistá štábní akce vytvoří politický účet bez hodu.
+4. Výsledek okamžitě změní zdroje, kauzu nebo zanedbání.
+5. Po druhé akci Věčný provede vlastní protiakci.
+6. Další den přidá pouze jeden nový systém: štáb, druhou kauzu nebo finální strategii.
+7. Finální d20 používá obtížnost vytvořenou předchozími šesti akcemi.
+8. Kampaň skončí skutečnou výhrou nebo prohrou a nabídne export playtestu.
+
+## Rozšíření po TEST.8
+
+Debata, volby, koalice, inventář, širší štáb a dlouhodobá progrese se mají přidávat jako samostatné, testovatelné systémy nad touto smyčkou. Nesmějí se vrátit všechny najednou do prvního dne kampaně.

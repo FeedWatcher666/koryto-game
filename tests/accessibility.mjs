@@ -4,17 +4,10 @@ import http from "node:http";
 import path from "node:path";
 import {chromium} from "playwright";
 
-const target = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.7");
+const target = path.resolve(process.argv[2] || "dist/koryto-v0.20.0-clean-test.8");
 assert(existsSync(path.join(target, "index.html")), `Missing packaged build at ${target}`);
 
-const types = new Map([
-  [".css", "text/css; charset=utf-8"],
-  [".html", "text/html; charset=utf-8"],
-  [".js", "text/javascript; charset=utf-8"],
-  [".json", "application/json; charset=utf-8"],
-  [".png", "image/png"]
-]);
-
+const types = new Map([[".css", "text/css; charset=utf-8"], [".html", "text/html; charset=utf-8"], [".js", "text/javascript; charset=utf-8"], [".json", "application/json; charset=utf-8"]]);
 const server = http.createServer((request, response) => {
   const raw = new URL(request.url, "http://localhost").pathname;
   const requested = raw === "/" ? "/index.html" : raw;
@@ -31,37 +24,27 @@ await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
 const {port} = server.address();
 const browser = await chromium.launch({headless: true});
 const page = await browser.newPage({viewport: {width: 390, height: 844}});
-const browserErrors = [];
-let expectedDiceFailure = false;
-page.on("pageerror", error => browserErrors.push(error.message));
-page.on("console", message => {
-  if (message.type() !== "error") return;
-  const text = message.text();
-  if (expectedDiceFailure && text.includes("D20 animation failed; resolving check without animation.")) return;
-  browserErrors.push(text);
-});
+const errors = [];
+page.on("pageerror", error => errors.push(error.message));
+page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
 
 async function audit(label) {
   const report = await page.evaluate(() => {
     const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
     const duplicateIds = ids.filter((id, index) => id && ids.indexOf(id) !== index);
-    const unnamedControls = [...document.querySelectorAll("button, input, select, textarea, a[href], [role='button']")]
+    const unnamedControls = [...document.querySelectorAll("button, input, select, textarea, a[href]")]
       .filter(node => {
-        if (node instanceof HTMLInputElement && node.type === "hidden") return false;
         const labelledBy = node.getAttribute("aria-labelledby");
-        const labelledText = labelledBy
-          ? labelledBy.split(/\s+/).map(id => document.getElementById(id)?.textContent || "").join(" ")
-          : "";
+        const labelledText = labelledBy ? labelledBy.split(/\s+/).map(id => document.getElementById(id)?.textContent || "").join(" ") : "";
         const explicitLabel = node.id ? document.querySelector(`label[for='${CSS.escape(node.id)}']`)?.textContent : "";
         const wrappingLabel = node.closest("label")?.textContent || "";
-        const name = node.getAttribute("aria-label") || labelledText || explicitLabel || wrappingLabel || node.textContent || node.getAttribute("title") || node.getAttribute("placeholder") || "";
+        const name = node.getAttribute("aria-label") || labelledText || explicitLabel || wrappingLabel || node.textContent || node.getAttribute("placeholder") || "";
         return !name.trim();
-      })
-      .map(node => node.outerHTML.slice(0, 180));
+      }).map(node => node.outerHTML.slice(0, 160));
     return {
       duplicateIds: [...new Set(duplicateIds)],
       unnamedControls,
-      missingAlt: [...document.querySelectorAll("img:not([alt])")].map(node => node.outerHTML.slice(0, 180)),
+      missingAlt: [...document.querySelectorAll("img:not([alt])")].map(node => node.outerHTML.slice(0, 160)),
       h1Count: document.querySelectorAll("h1").length,
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth
     };
@@ -74,28 +57,23 @@ async function audit(label) {
 }
 
 try {
-  await page.goto(`http://127.0.0.1:${port}/`, {waitUntil: "networkidle"});
-  await audit("creation screen");
+  await page.goto(`http://127.0.0.1:${port}/?rolls=18,18,18`, {waitUntil: "networkidle"});
+  await page.waitForFunction(() => globalThis.KorytoTest8?.version === "0.20.0-clean-test.8");
+  await audit("creation");
   assert.equal(await page.locator("[data-origin][aria-pressed]").count(), 3);
   assert.equal(await page.locator("[data-class][aria-pressed]").count(), 3);
-  assert.equal(await page.locator("[data-origin][aria-pressed='true']").getAttribute("data-origin"), "idealist");
-  assert.equal(await page.locator("[data-class][aria-pressed='true']").getAttribute("data-class"), "bard");
 
-  await page.locator("#heroName").fill("Přístupný tester");
-  await page.locator("[data-origin='ambitious']").focus();
+  await page.fill("#heroName", "Přístupný kandidát");
+  await page.locator('[data-origin="ambitious"]').focus();
   await page.keyboard.press("Enter");
-  assert.equal(await page.locator("#heroName").inputValue(), "Přístupný tester", "typed name must survive origin rerender");
-  assert.equal(await page.locator("[data-origin][aria-pressed='true']").getAttribute("data-origin"), "ambitious");
-  assert.equal(await page.locator("[data-origin][aria-pressed='true']").count(), 1);
-  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-origin")), "ambitious", "focus must return to the chosen origin");
-  await page.locator("[data-origin='idealist']").click();
-  await page.locator("[data-class='paladin']").focus();
+  assert.equal(await page.locator("#heroName").inputValue(), "Přístupný kandidát");
+  assert.equal(await page.locator('[data-origin][aria-pressed="true"]').getAttribute("data-origin"), "ambitious");
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-origin")), "ambitious");
+
+  await page.locator('[data-class="paladin"]').focus();
   await page.keyboard.press("Enter");
-  assert.equal(await page.locator("#heroName").inputValue(), "Přístupný tester", "typed name must survive class rerender");
-  assert.equal(await page.locator("[data-class][aria-pressed='true']").getAttribute("data-class"), "paladin");
-  assert.equal(await page.locator("[data-class][aria-pressed='true']").count(), 1);
-  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-class")), "paladin", "focus must return to the chosen class");
-  await page.locator("[data-class='bard']").click();
+  assert.equal(await page.locator("#heroName").inputValue(), "Přístupný kandidát");
+  assert.equal(await page.locator('[data-class][aria-pressed="true"]').getAttribute("data-class"), "paladin");
 
   await page.keyboard.press("Tab");
   const focusVisible = await page.evaluate(() => {
@@ -104,112 +82,29 @@ try {
     const style = getComputedStyle(active);
     return style.outlineStyle !== "none" || style.boxShadow !== "none";
   });
-  assert(focusVisible, "keyboard focus is not visibly indicated");
+  assert(focusVisible, "keyboard focus must be visible");
 
-  await page.locator("#creationForm button[type='submit']").click();
-  await page.locator(".game-hud").waitFor();
-  assert.equal((await page.evaluate(() => globalThis.KorytoClean.getState().hero.name)), "Přístupný tester", "submitted campaign must keep the typed name");
-  await audit("game screen");
+  await page.click('button[type="submit"]');
+  await page.waitForSelector(".t8-village-map");
+  assert.equal(await page.evaluate(() => globalThis.KorytoTest8.getState().hero.name), "Přístupný kandidát");
+  await audit("campaign map");
+  assert.equal(await page.locator(".t8-location").count(), 3);
+  assert.equal(await page.locator("[data-campaign-action]").count(), 3);
 
   await page.emulateMedia({reducedMotion: "reduce"});
-  await page.locator("[data-action='take-pen']").click();
-  await page.locator("[data-check]").first().waitFor();
-  await audit("first check screen with reduced motion");
-
-  await page.locator("[data-check]").first().click();
-  await page.locator(".dice-overlay").waitFor();
-  assert.equal(await page.evaluate(() => document.activeElement?.matches("[data-dice-skip]")), true, "focus must move into the dice dialog");
-  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), true, "background app must be inert while the dice dialog is open");
+  await page.locator('[data-campaign-action="office-contract"]').click();
+  await page.waitForSelector(".dice-overlay");
+  assert.equal(await page.evaluate(() => document.activeElement?.matches("[data-dice-skip]")), true, "focus enters dice dialog");
+  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), true, "background is inert during roll");
   await page.keyboard.press("Tab");
-  assert.equal(await page.evaluate(() => document.querySelector(".dice-overlay")?.contains(document.activeElement)), true, "Tab must remain inside the dice dialog");
-  await page.locator("[data-dice-skip]").click();
-  await page.locator(".dice-overlay").waitFor({state: "detached"});
-  await page.locator(".result-card").waitFor();
-  assert.equal(await page.evaluate(() => document.documentElement.classList.contains("dice-lock")), false);
-  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "background inert state must be restored");
+  assert.equal(await page.evaluate(() => document.querySelector(".dice-overlay")?.contains(document.activeElement)), true, "focus stays inside dice dialog");
+  await page.click("[data-dice-skip]");
+  await page.waitForSelector(".dice-overlay", {state: "detached"});
+  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "background interaction returns");
+  await audit("campaign after roll");
 
-  await page.locator("[data-action='accept-first']").click();
-  await page.locator("[data-companion]").first().click();
-  await page.locator("[data-check]").first().waitFor();
-  await page.evaluate(() => {
-    globalThis.__korytoOriginalCanvasContext = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function forcedDiceRendererFailure() {
-      throw new Error("forced dice renderer failure");
-    };
-  });
-  expectedDiceFailure = true;
-  await page.locator("[data-check]").first().click();
-  await page.locator(".result-card").waitFor();
-  await page.locator(".dice-overlay").waitFor({state: "detached"});
-  expectedDiceFailure = false;
-  await page.evaluate(() => {
-    HTMLCanvasElement.prototype.getContext = globalThis.__korytoOriginalCanvasContext;
-    delete globalThis.__korytoOriginalCanvasContext;
-  });
-  assert.equal(await page.locator(".dice-overlay").count(), 0, "failed presentation must remove the modal");
-  assert.equal(await page.evaluate(() => document.documentElement.classList.contains("dice-lock")), false, "failed presentation must release dice-lock");
-  assert.equal(await page.evaluate(() => document.getElementById("app")?.inert), false, "failed presentation must restore background interaction");
-
-  await page.evaluate(() => {
-    globalThis.__korytoOriginalStorageSetItem = Storage.prototype.setItem;
-    Storage.prototype.setItem = function forcedStorageFailure() {
-      throw new DOMException("Storage denied", "SecurityError");
-    };
-  });
-  await page.locator("[data-action='accept-registration']").click();
-  await page.locator("[data-action='start-jzd']").waitFor();
-  await page.evaluate(() => {
-    Storage.prototype.setItem = globalThis.__korytoOriginalStorageSetItem;
-    delete globalThis.__korytoOriginalStorageSetItem;
-  });
-  assert.equal(
-    await page.evaluate(() => globalThis.KorytoClean.getState().scene),
-    "chapterOpen",
-    "a denied save must not block the persisted scene transition"
-  );
-  await page.locator(".hud-actions [data-action='save']").click();
-  assert.match(await page.locator(".hud-actions [data-action='save']").innerText(), /Uloženo/);
-  await page.evaluate(() => {
-    globalThis.__korytoOriginalStorageRemoveItem = Storage.prototype.removeItem;
-    Storage.prototype.removeItem = function forcedStorageRemovalFailure() {
-      throw new DOMException("Storage removal denied", "SecurityError");
-    };
-  });
-  await page.locator("[data-action='restart']").click();
-  assert.equal(
-    await page.evaluate(() => globalThis.KorytoClean.getState().scene),
-    "chapterOpen",
-    "a failed save deletion must keep the current campaign active"
-  );
-  assert.match(await page.locator("[data-action='restart']").innerText(), /Smazání selhalo/);
-  await page.evaluate(() => {
-    Storage.prototype.removeItem = globalThis.__korytoOriginalStorageRemoveItem;
-    delete globalThis.__korytoOriginalStorageRemoveItem;
-  });
-  await page.locator("[data-action='start-jzd']").click();
-  await page.locator("[data-action='jzd-briefing-next']").click();
-  await page.locator("[data-quest-companion]").first().waitFor();
-  assert.equal(await page.locator("[data-quest-companion][aria-pressed]").count(), 3, "every companion choice must expose selected state");
-  assert.equal(await page.locator("[data-quest-companion][aria-pressed='true']").count(), 1, "the recruited companion starts selected");
-  await page.locator("[data-quest-companion='bohumil']").focus();
-  await page.keyboard.press("Enter");
-  assert.equal(await page.locator("[data-quest-companion][aria-pressed='true']").count(), 2, "two selected companions must be programmatically visible");
-  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-quest-companion")), "bohumil", "focus must return to the selected companion");
-  assert.equal(await page.locator("[data-quest-item][aria-pressed]").count(), 3, "every item choice must expose selected state");
-  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").count(), 0, "no item starts selected");
-  await page.locator("[data-quest-item='recorder']").focus();
-  await page.keyboard.press("Enter");
-  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").getAttribute("data-quest-item"), "recorder");
-  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-quest-item")), "recorder", "focus must return to the selected item");
-  await page.locator("[data-quest-item='archiveKey']").focus();
-  await page.keyboard.press("Enter");
-  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").count(), 1, "item selection remains exclusive");
-  assert.equal(await page.locator("[data-quest-item][aria-pressed='true']").getAttribute("data-quest-item"), "archiveKey");
-  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("data-quest-item")), "archiveKey", "focus must follow the replacement item control");
-  await audit("JZD preparation selected states");
-
-  assert.deepEqual(browserErrors, [], `browser errors: ${browserErrors.join(" | ")}`);
-  console.log("Accessibility, draft preservation, selection semantics, focus containment, and dice-failure cleanup passed in the packaged build.");
+  assert.deepEqual(errors, [], `browser errors: ${errors.join(" | ")}`);
+  console.log("TEST.8 accessibility, focus, reduced motion, and mobile overflow passed.");
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));

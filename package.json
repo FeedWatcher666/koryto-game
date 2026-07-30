@@ -1,11 +1,11 @@
 {
   "name": "koryto-clean-rewrite",
-  "version": "0.20.0-clean-test.7",
+  "version": "0.20.0-clean-test.8",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/smoke.mjs",
+    "test": "node tests/test8-campaign.mjs",
     "project:validate": "node scripts/validate-project-memory.mjs",
-    "check": "node --check src/data.js && node --check src/rules.js && node --check src/state.js && node --check src/quest-jzd.js && node --check src/dice-physics.js && node --check src/dice.js && node --check src/ui.js && node --check src/main.js && node --check scripts/build-offline.mjs && node --check scripts/validate-project-memory.mjs && node --check tests/browser.mjs && node --check tests/accessibility.mjs"
+    "check": "node --check src/data.js && node --check src/rules.js && node --check src/test8-campaign.js && node --check src/dice-physics.js && node --check src/dice.js && node --check src/test8-main.js && node --check scripts/build-offline.mjs && node --check scripts/validate-project-memory.mjs && node --check tests/test8-campaign.mjs && node --check tests/browser.mjs && node --check tests/accessibility.mjs"
   }
 }
