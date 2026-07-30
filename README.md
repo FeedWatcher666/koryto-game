@@ -10,34 +10,33 @@ node scripts/build-offline.mjs
 
 Potom otevřete `dist/koryto-v0.20.0-clean-test.8/index.html`. Distribuční soubor funguje dvojklikem bez lokálního serveru.
 
-## Strategická kampaň
+## Strategická kampaň po prvním lidském playtestu
 
-První řez TEST.8 obsahuje malou třídenní kampaň v Dolních Vejprnicích:
+První lidský průchod původního TEST.8 selhal: hráč necítil oběť, nedokázal určit dopad Věčného a strategie působily stejně. Aktuální redesign proto mění samotná pravidla kampaně:
 
-- dvě akce za den,
-- mapu se třemi aktivními lokacemi,
-- dvě současné kauzy,
-- viditelný plán Vladimíra Věčného a jeho protiakci na konci dne,
-- podporu, důkazy a tlak jako hlavní strategické zdroje,
-- volbu jednoho člena štábu, který odemkne vlastní akci a mění obsah lokace,
-- tři finální strategie,
-- skutečnou výhru i prohru,
-- d20 jako řešení rizikové akce, nikoli jako náhradu strategie.
-
-Hráč nemůže stihnout všechno. Každá akce ukazuje cenu, zamýšlený efekt a riziko ještě před kliknutím. Výsledek se propíše přímo do mapy, kauz a Věčného tlaku bez samostatné obrazovky „pokračovat“.
+- tři herní dny a dvě akce za den,
+- každý den nabízí nejméně tři důležité příležitosti,
+- po druhé akci se jedna neprovedená příležitost změní v pojmenovanou nevratnou oběť,
+- Věčný podle oběti fyzicky uzavře lokaci nebo poškodí následující herní stav,
+- reakce na Věčného stojí jednu z pouhých dvou akcí dalšího dne,
+- veřejná, právní nebo dělnická doktrína se volí už před druhým dnem,
+- každá doktrína odemyká vlastní akce, používá jiný hlavní zdroj a má vlastní podmínku selhání,
+- každá doktrína nabízí dvě rozdílné finální taktiky,
+- d20 rozhoduje riziko provedení, ale neumí nahradit chybějící strategickou přípravu,
+- kauzy po konci kampaně přecházejí do terminálního stavu místo chybného `active`.
 
 ## Playtest
 
 Každý dokončený průchod se archivuje samostatně. Závěr nabízí tlačítko **Kopírovat playtest**, které exportuje:
 
-- verzi a build SHA,
+- verzi a přesný build SHA,
 - délku průchodu,
 - všechny akce a navštívené lokace,
-- řešené i zanedbané kauzy,
-- Věčného protiakce,
-- štáb a finální strategii,
-- hody d20,
-- zdroje a důvod výhry nebo prohry.
+- každodenní oběti,
+- změny mapy způsobené Věčným a reakce hráče,
+- stav obou kauz,
+- člena štábu, doktrínu a finální taktiku,
+- hody d20, zdroje, příznaky kampaně a důvod výhry nebo prohry.
 
 ## Ověření
 
@@ -48,11 +47,11 @@ npm run project:validate
 node scripts/build-offline.mjs
 ```
 
-Packaged browser gate odehraje strategickou výhru na desktopu a skutečnou prohru tlakem na mobilu. Ověřuje také save/reload, šest spotřebovaných akcí, tři Věčného protiakce, odemčenou akci štábu, export playtestu, přístupnost, horizontální overflow a Lighthouse.
+Packaged browser gate musí odehrát doktrinální výhru na desktopu a skutečnou prohru tlakem na mobilu. Ověřuje také save/reload, uzavření lokace Věčným, reakční akci, každodenní oběti, terminální stavy kauz, export playtestu, přístupnost, horizontální overflow a Lighthouse.
 
 ## Projektová paměť a skilly
 
-Závazný směr TEST.8 je v `docs/v0.20/test8-core-loop.md` a implementační kontrakt v `docs/v0.20/test8-campaign-contract.md`. Repo obsahuje čtyři lokální skilly pro questy, UI, playtest a release gate.
+Závazný směr TEST.8 je v `docs/v0.20/test8-core-loop.md`, implementační kontrakt v `docs/v0.20/test8-campaign-contract.md` a redesign po lidském neúspěchu v `docs/v0.20/test8-redesign-brief.md`. Repo obsahuje čtyři lokální skilly pro questy, UI, playtest a release gate.
 
 ## Veřejný tester
 
@@ -66,7 +65,7 @@ PR #45 zůstává draft. Veřejná stránka se na TEST.8 změní až po zeleném
 
 - Staré buildy jsou pouze obsahová a designová reference.
 - Žádný import legacy runtime.
-- Save schema 3 a klíč `koryto.clean.v0200.test8`.
-- Offline runtime se generuje z kanonických modulů a ručně se neupravuje.
+- Save schema 4 a klíč `koryto.clean.v0200.test8`.
+- Offline runtime se generuje z kanonických modulů, ručně se neupravuje a obsahuje přesný SHA sestavení.
 - Automatické testy dokazují stabilitu, ne zábavnost.
-- TEST.8 lze přijmout pouze po lidském průchodu alespoň dvěma mechanicky odlišnými strategiemi.
+- TEST.8 lze přijmout pouze po lidském potvrzení, že hráč umí pojmenovat vlastní oběť, konkrétní zásah Věčného a mechanický rozdíl zvolené doktríny.
