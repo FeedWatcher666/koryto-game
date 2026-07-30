@@ -7,6 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const version = fs.readFileSync(path.join(root, "VERSION"), "utf8").trim();
 const target = path.join(root, "dist", `koryto-v${version}`);
 const modules = ["data.js", "rules.js", "test8-campaign.js", "dice-physics.js", "dice.js", "test8-main.js"];
+const buildSha = process.env.REVIEW_SHA || process.env.KORYTO_BUILD_SHA || process.env.GITHUB_SHA || "development";
 
 function stripModuleSyntax(source, file) {
   const withoutImports = source.replace(/import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/g, "");
@@ -30,8 +31,11 @@ const runtimePath = path.join(target, "src", "runtime.js");
 fs.writeFileSync(runtimePath, runtime);
 
 const sourceIndex = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const offlineIndex = sourceIndex.replace('<script type="module" src="src/test8-main.js"></script>', '<script defer src="src/runtime.js"></script>');
+const offlineIndex = sourceIndex
+  .replace('<script type="module" src="src/test8-main.js"></script>', '<script defer src="src/runtime.js"></script>')
+  .replace('meta name="koryto-build-sha" content="development"', `meta name="koryto-build-sha" content="${buildSha}"`);
 if (offlineIndex === sourceIndex) throw new Error("Source index does not contain the expected TEST.8 module entrypoint");
+if (!offlineIndex.includes(`content="${buildSha}"`)) throw new Error("Offline index is missing the exact build SHA");
 fs.writeFileSync(path.join(target, "index.html"), offlineIndex);
 
 for (const file of ["VERSION", "README.md"]) fs.copyFileSync(path.join(root, file), path.join(target, file));
@@ -55,9 +59,11 @@ for (const required of [
   "worn-bakelite",
   "currentRivalPlan",
   "applyCampaignAction",
-  "VĚČNÉHO DNEŠNÍ PLÁN",
+  "availableFinalTactics",
+  "chooseFinalTactic",
+  "VĚČNÉHO AKTUÁLNÍ ZÁSAH",
   "Kopírovat playtest"
 ]) {
   if (!runtime.includes(required)) throw new Error(`Generated runtime is missing ${required}`);
 }
-console.log(`Built ${path.relative(root, target)} from ${modules.length} canonical modules.`);
+console.log(`Built ${path.relative(root, target)} from ${modules.length} canonical modules at ${buildSha}.`);
